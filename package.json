@@ -9,12 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "14.0.4",
+    "embla-carousel-autoplay": "^8.0.0",
+    "embla-carousel-react": "^8.0.0",
+    "lucide-react": "^0.294.0",
+    "next": "^15.1.0",
     "react": "^18",
     "react-dom": "^18",
-    "embla-carousel-react": "^8.0.0",
-    "embla-carousel-autoplay": "^8.0.0",
-    "lucide-react": "^0.294.0"
+    "tailwindcss-animate": "^1.0.7",
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
     "@types/node": "^20",

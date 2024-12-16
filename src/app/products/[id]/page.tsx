@@ -1,125 +1,109 @@
-'use client'
+import { ProductDetails } from "@/components/features/ProductDetails/ProductDetails"
+import { notFound } from "next/navigation"
+import { use } from 'react'
 
-import Image from 'next/image'
-import { useState, use } from 'react'
-import { Plus, Minus, ShoppingCart } from 'lucide-react'
-import { useCartStore } from '@/lib/store/cart'
-import { toast } from 'react-hot-toast'
-
-const PRODUCTS = {
-  1: {
-    name: "Apple MacBook Pro 16-inch, M1 Max",
+// 临时的模拟数据，包含所有产品
+const MOCK_PRODUCTS: Record<string, any> = {
+  "1": {
+    id: 1,
+    name: "Apple MacBook Pro 16-inch",
     price: 3499.99,
     description: "Supercharged by M1 Max chip for groundbreaking performance and amazing battery life.",
-    image: "macbook.jpg"
+    image: "macbook.jpg",
+    stock: 10
   },
-  2: {
-    name: "Apple AirPods Pro with Active Noise Cancellation",
+  "2": {
+    id: 2,
+    name: "Apple AirPods Pro",
     price: 249.99,
-    description: "Active Noise Cancellation for immersive sound. Transparency mode for hearing what's happening around you.",
-    image: "airpods2.jpg"
+    description: "Active Noise Cancellation for immersive sound.",
+    image: "airpods2.jpg",
+    stock: 20
   },
-  3: {
-    name: "Sony WH-1000XM5 Wireless Industry Leading Noise Canceling Headphones",
+  "3": {
+    id: 3,
+    name: "Sony WH-1000XM5",
     price: 399.99,
     description: "Industry-leading noise cancellation with two processors and eight microphones.",
-    image: "sony.jpg"
+    image: "sony.jpg",
+    stock: 15
   },
-  4: {
-    name: "Dell XPS 13 9310 13.4-inch FHD+ Touchscreen Laptop",
+  "4": {
+    id: 4,
+    name: "Dell XPS 13",
     price: 1299.99,
-    description: "13.4-inch FHD+ (1920 x 1200) InfinityEdge Touch Anti-Reflective Display.",
-    image: "xps.jpg"
+    description: "13.4-inch FHD+ InfinityEdge Touch Anti-Reflective Display.",
+    image: "xps.jpg",
+    stock: 8
   },
-  5: {
-    name: "Dell Alienware 34-inch Curved Gaming Monitor",
+  "5": {
+    id: 5,
+    name: "Dell Alienware 34",
     price: 999.99,
     description: "34-inch curved gaming monitor with WQHD resolution and 120Hz refresh rate.",
-    image: "dell.jpg"
+    image: "dell.jpg",
+    stock: 12
   },
-  6: {
-    name: "Apple Watch Ultra 2, GPS + Cellular, 49mm Titanium Case",
+  "6": {
+    id: 6,
+    name: "Apple Watch Ultra",
     price: 799.99,
     description: "The most rugged and capable Apple Watch with precision dual-frequency GPS.",
-    image: "ultra.jpg"
+    image: "ultra.jpg",
+    stock: 25
   }
-} as const
-
-interface ProductPageProps {
-  params: Promise<{ id: string }>
 }
 
-export default function ProductPage({ params }: ProductPageProps) {
-  const { id } = use(params)
-  const [quantity, setQuantity] = useState(1)
-  const product = PRODUCTS[id as keyof typeof PRODUCTS]
-  const addToCart = useCartStore((state) => state.addToCart)
+interface Product {
+  id: number
+  name: string
+  price: number
+  description: string
+  image: string
+  stock: number
+}
 
+// 模拟获取产品数据的函数
+async function getProduct(id: string): Promise<Product> {
+  // 模拟网络延迟
+  await new Promise(resolve => setTimeout(resolve, 100))
+  
+  const product = MOCK_PRODUCTS[id]
   if (!product) {
-    return <div>Product not found</div>
+    notFound()
   }
+  
+  return product
+}
 
-  const handleAddToCart = () => {
-    addToCart(
-      {
-        id: id,
-        name: product.name,
-        price: product.price,
-        image: product.image,
-      },
-      quantity
-    )
-    toast.success('Added to cart!')
-  }
+export default async function ProductPage({
+  params
+}: {
+  params: Promise<{ id: string }>
+}) {
+  // 正确处理异步参数
+  const resolvedParams = await params
+  const product = await getProduct(resolvedParams.id)
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        {/* 左侧：产品图片 */}
-        <div className="relative aspect-square bg-white rounded-lg">
-          <Image
-            src={`http://localhost:8080/api/uploads/${product.image}`}
-            alt={product.name}
-            fill
-            className="object-contain p-8"
-            priority
-          />
-        </div>
+    <div className="container mx-auto px-4 py-8">
+      <ProductDetails product={product} />
+    </div>
+  )
+}
 
-        {/* 右侧：产品信息 */}
-        <div className="space-y-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
-            <p className="mt-4 text-2xl font-semibold">€{product.price.toFixed(2)}</p>
+// 加载状态组件
+export function Loading() {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="animate-pulse">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="aspect-square bg-gray-200 rounded-lg" />
+          <div className="space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-3/4" />
+            <div className="h-6 bg-gray-200 rounded w-1/4" />
+            <div className="h-24 bg-gray-200 rounded" />
           </div>
-
-          <p className="text-gray-600">{product.description}</p>
-
-          {/* 数量选择器 */}
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="p-2 border rounded-md hover:bg-gray-50 active:bg-gray-100"
-            >
-              <Minus className="w-5 h-5" />
-            </button>
-            <span className="text-xl font-medium w-12 text-center">{quantity}</span>
-            <button
-              onClick={() => setQuantity(quantity + 1)}
-              className="p-2 border rounded-md hover:bg-gray-50 active:bg-gray-100"
-            >
-              <Plus className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* 添加到购物车按钮 */}
-          <button 
-            onClick={handleAddToCart}
-            className="w-full bg-black text-white py-4 rounded-md flex items-center justify-center gap-2 hover:bg-gray-900 transition-colors active:bg-gray-800"
-          >
-            <ShoppingCart className="w-5 h-5" />
-            Add to Cart
-          </button>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { getProductImageUrl } from '@/lib/utils'
 
 interface ProductCardProps {
   id: string
@@ -16,12 +17,14 @@ export function ProductCard({ id, name, price, imageUrl }: ProductCardProps) {
       href={`/products/${id}`}
       className="group relative flex flex-col overflow-hidden rounded-lg border hover:shadow-lg transition-shadow duration-300"
     >
-      <div className="aspect-square relative">
+      <div className="relative w-full pt-[100%]">
         <Image
-          src={imageUrl}
+          src={getProductImageUrl(imageUrl)}
           alt={name}
           fill
-          className="object-cover object-center group-hover:opacity-75 transition-opacity duration-300"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="absolute inset-0 w-full h-full object-contain p-4 group-hover:opacity-75 transition-opacity duration-300"
+          priority
         />
       </div>
       <div className="p-4">

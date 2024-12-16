@@ -2,6 +2,8 @@
 
 import { useCartStore } from '@/lib/store/cart'
 import { ShoppingCart, X } from 'lucide-react'
+import Image from 'next/image'
+import { getProductImageUrl } from '@/lib/utils'
 
 interface CartSidebarProps {
   isOpen: boolean
@@ -12,6 +14,23 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const { items, removeFromCart, updateQuantity, getCartTotal } = useCartStore()
 
   if (!isOpen) return null
+
+  const handleUpdateQuantity = async (id: string, newQuantity: number) => {
+    if (newQuantity < 1) return
+    try {
+      await updateQuantity(id, newQuantity)
+    } catch (error) {
+      console.error('Failed to update quantity:', error)
+    }
+  }
+
+  const handleRemoveItem = async (id: string) => {
+    try {
+      await removeFromCart(id)
+    } catch (error) {
+      console.error('Failed to remove item:', error)
+    }
+  }
 
   return (
     <>
@@ -26,7 +45,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b">
-            <h2 className="text-lg font-semibold">Shopping Cart</h2>
+            <h2 className="text-lg font-semibold">Shopping Cart ({items.length})</h2>
             <button 
               onClick={onClose}
               className="p-2 hover:bg-gray-100 rounded-full"
@@ -44,34 +63,38 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
               </div>
             ) : (
               <div className="space-y-4">
-                {items.map((item) => (
+                {items.map((item) => item && (
                   <div key={item.id} className="flex gap-4 border-b pb-4">
                     <div className="relative w-20 h-20">
-                      <img
-                        src={`http://localhost:8080/api/uploads/${item.image}`}
-                        alt={item.name}
-                        className="object-contain"
-                      />
+                      {item.image && (
+                        <Image
+                          src={getProductImageUrl(item.image)}
+                          alt={item.name || 'Product image'}
+                          fill
+                          className="object-contain"
+                        />
+                      )}
                     </div>
                     <div className="flex-1">
                       <h3 className="font-medium">{item.name}</h3>
-                      <p className="text-gray-600">€{item.price.toFixed(2)}</p>
+                      <p className="text-gray-600">€{Number(item.price).toFixed(2)}</p>
                       <div className="flex items-center gap-2 mt-2">
                         <button
-                          onClick={() => updateQuantity(item.id, Math.max(0, item.quantity - 1))}
+                          onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
                           className="p-1 border rounded hover:bg-gray-50"
+                          disabled={item.quantity <= 1}
                         >
                           -
                         </button>
                         <span>{item.quantity}</span>
                         <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
                           className="p-1 border rounded hover:bg-gray-50"
                         >
                           +
                         </button>
                         <button
-                          onClick={() => removeFromCart(item.id)}
+                          onClick={() => handleRemoveItem(item.id)}
                           className="ml-auto text-red-500 hover:text-red-600"
                         >
                           Remove

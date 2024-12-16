@@ -6,6 +6,9 @@ import { PhotoGallery } from "@/components/PhotoGallery";
 import { useCartStore } from '@/lib/store/cart';
 import Link from 'next/link';
 
+// 定义基础URL
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'
+
 // 定义产品类型
 interface Product {
   id: number;
@@ -51,20 +54,18 @@ function ErrorCard({ error }: { error: Error }) {
 
 async function getProducts() {
   try {
-    const res = await fetch('http://localhost:8080/api/products', {
-      cache: 'no-store',
+    const res = await fetch(`${BASE_URL}/products`, {
+      next: { revalidate: 60 },
       headers: {
         'Content-Type': 'application/json',
       },
-    });
+    })
     
     if (!res.ok) {
-      throw new Error(`Failed to fetch products: ${res.status}`);
+      throw new Error(`Failed to fetch products: ${res.status}`)
     }
     
-    const products = await res.json();
-    console.log('Raw products data:', products);
-
+    const products = await res.json()
     return products.map((product: any) => ({
       id: product.id,
       name: product.name,
@@ -72,31 +73,30 @@ async function getProducts() {
       description: product.description,
       image: PRODUCT_IMAGES[product.id] || 'default.jpg',
       stock: parseInt(product.stockQuantity) || 100
-    }));
-    
+    }))
   } catch (error) {
-    console.error('Error fetching products:', error);
-    throw error;
+    console.error('Error fetching products:', error)
+    return []
   }
 }
 
 // 获取照片gallery数据
 async function getPhotos() {
   try {
-    const res = await fetch('http://localhost:8080/api/photos', { 
-      cache: 'no-store',
+    const res = await fetch(`${BASE_URL}/photos`, { 
+      next: { revalidate: 60 },
       headers: {
         'Content-Type': 'application/json',
       }
-    });
+    })
     
-    if (!res.ok) throw new Error(`Failed to fetch photos: ${res.status}`);
-    const data = await res.json();
+    if (!res.ok) throw new Error(`Failed to fetch photos: ${res.status}`)
+    const data = await res.json()
     
-    return data.data.map((photo: string) => `http://localhost:8080${photo}`);
+    return data.data
   } catch (error) {
-    console.error('Error fetching photos:', error);
-    return [];
+    console.error('Error fetching photos:', error)
+    return []
   }
 }
 

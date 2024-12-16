@@ -1,63 +1,61 @@
 'use client'
 
-import Image from "next/image";
+import Image from "next/image"
+import { useEffect, useRef } from 'react'
+import { getGalleryImageUrl } from '@/lib/utils'
 
-export function PhotoGallery({ photos }: { photos: string[] }) {
-  // 创建更多副本以确保完全无缝循环
-  const extendedPhotos = [...photos, ...photos, ...photos, ...photos, ...photos];
+interface PhotoGalleryProps {
+  photos: string[]
+}
+
+export function PhotoGallery({ photos }: PhotoGalleryProps) {
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const scrollContainer = scrollRef.current
+    if (!scrollContainer) return
+
+    const scrollWidth = scrollContainer.scrollWidth
+    const clientWidth = scrollContainer.clientWidth
+    let scrollPos = 0
+
+    const scroll = () => {
+      scrollPos = (scrollPos + 1) % scrollWidth
+      scrollContainer.scrollLeft = scrollPos
+      if (scrollPos >= scrollWidth - clientWidth) {
+        scrollPos = 0
+      }
+    }
+
+    const interval = setInterval(scroll, 50)
+    return () => clearInterval(interval)
+  }, [])
+
+  // 复制照片数组以确保无缝滚动
+  const extendedPhotos = [...photos, ...photos, ...photos]
 
   return (
-    <div className="overflow-hidden bg-gray-50 rounded-lg relative">
-      <div 
-        className="flex animate-scroll"
-        style={{ 
-          animation: 'scroll 60s linear infinite',
-          width: `${(photos.length * 5 * 100) / 5}%`, // 确保总宽度正确
-        }}
+    <div className="relative h-32 overflow-hidden bg-gray-50 rounded-lg">
+      <div
+        ref={scrollRef}
+        className="flex gap-4 absolute whitespace-nowrap transition-transform duration-1000"
+        style={{ willChange: 'transform' }}
       >
         {extendedPhotos.map((photo, index) => (
-          <div 
-            key={index} 
-            className="relative flex-none"
-            style={{ width: `${100 / (photos.length * 5)}%` }} // 动态计算每个项的宽度
+          <div
+            key={`${photo}-${index}`}
+            className="w-48 h-32 flex-shrink-0 relative"
           >
-            <div className="relative h-48 rounded-lg overflow-hidden m-2">
-              <Image
-                src={photo}
-                alt={`Gallery image ${index + 1}`}
-                fill
-                className="object-contain p-2"
-                sizes="20vw"
-                priority={index < 5}
-              />
-            </div>
+            <Image
+              src={getGalleryImageUrl(photo)}
+              alt={`Gallery photo ${index + 1}`}
+              fill
+              className="object-cover rounded-lg"
+              sizes="(max-width: 768px) 33vw, 20vw"
+            />
           </div>
         ))}
       </div>
-
-      <style jsx global>{`
-        @keyframes scroll {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-${100 / 5}%);  // 只移动一组照片的距离
-          }
-        }
-        .animate-scroll {
-          will-change: transform;
-          transform: translate3d(0, 0, 0);
-          transition: transform linear;
-        }
-        .animate-scroll:hover {
-          animation-play-state: paused;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .animate-scroll {
-            animation-play-state: paused;
-          }
-        }
-      `}</style>
     </div>
-  );
+  )
 } 

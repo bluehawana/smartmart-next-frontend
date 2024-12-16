@@ -5,6 +5,7 @@ import { ShoppingCart, X } from 'lucide-react'
 import Image from 'next/image'
 import { getProductImageUrl } from '@/lib/utils'
 import { toast } from 'react-hot-toast'
+import { CheckoutButton } from '@/components/features/CheckoutButton/CheckoutButton'
 
 interface CartSidebarProps {
   isOpen: boolean
@@ -119,12 +120,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
               <span>Total</span>
               <span className="font-bold">€{getCartTotal().toFixed(2)}</span>
             </div>
-            <button 
-              className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:bg-gray-300"
-              disabled={items.length === 0}
-            >
-              Checkout
-            </button>
+            <CheckoutButton />
           </div>
         </div>
       </div>

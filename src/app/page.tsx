@@ -128,18 +128,20 @@ export default async function Home() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Suspense fallback={<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => <LoadingCard key={i} />)}
-          </div>}>
+          <Suspense fallback={
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => <LoadingCard key={`loading-${i}`} />)}
+            </div>
+          }>
             {products.slice(0, 6).map((product) => (
               <Link 
                 href={`/products/${product.id}`}
-                key={product.id}
+                key={`product-${product.id}`}
                 className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
               >
                 <div className="relative w-full pt-[100%]">
                   <Image
-                    src={`http://localhost:8080/api/uploads/${product.image}`}
+                    src={`${process.env.NEXT_PUBLIC_IMAGE_BASE_URL}/${product.image}`}
                     alt={product.name}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

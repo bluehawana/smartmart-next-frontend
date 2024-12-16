@@ -70,7 +70,7 @@ export const useCartStore = create<CartStore>((set, get) => ({
         credentials: 'include',
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         }
       })
       
@@ -78,11 +78,12 @@ export const useCartStore = create<CartStore>((set, get) => ({
         throw new Error(`HTTP error! status: ${response.status}`)
       }
       
-      const data: CartResponse = await response.json()
-      
+      const items = await response.json()
+      console.log('Cart data received:', items)
+
       // 转换后端数据格式为前端格式
-      const cartItems = data.items.map(item => ({
-        id: item.id.toString(),
+      const cartItems = items.map((item: any) => ({
+        id: String(item.id),
         productId: item.productId,
         quantity: item.quantity,
         ...PRODUCTS_MAP[item.productId] || {
@@ -104,21 +105,58 @@ export const useCartStore = create<CartStore>((set, get) => ({
   addToCart: async (productId: number, quantity: number) => {
     set({ isLoading: true, error: null })
     try {
+      console.log('Adding to cart:', { productId, quantity })
+      
       const response = await fetch(`${API_BASE_URL}/cart/items`, {
         method: 'POST',
         headers: { 
           'Accept': 'application/json',
-          'Content-Type': 'application/json' 
+          'Content-Type': 'application/json'
         },
         credentials: 'include',
-        body: JSON.stringify({ productId, quantity })
+        body: JSON.stringify({ 
+          productId: Number(productId),
+          quantity: Number(quantity)
+        })
       })
       
       if (!response.ok) {
-        throw new Error('Failed to add to cart')
+        const errorText = await response.text()
+        console.error('Server response:', errorText)
+        throw new Error(`Failed to add to cart: ${response.status} ${errorText}`)
       }
-      
-      // 刷新购物车数据
+
+      const addedItem = await response.json()
+      console.log('Added item:', addedItem)
+
+      // 立即更新本地状态
+      const { items } = get()
+      const productInfo = PRODUCTS_MAP[productId]
+      if (productInfo) {
+        const existingItem = items.find(item => item.productId === productId)
+        if (existingItem) {
+          // 更新现有商品数量
+          set({
+            items: items.map(item => 
+              item.productId === productId 
+                ? { ...item, quantity: item.quantity + quantity }
+                : item
+            )
+          })
+        } else {
+          // 添加新商品
+          set({
+            items: [...items, {
+              id: String(addedItem.id),
+              productId,
+              quantity,
+              ...productInfo
+            }]
+          })
+        }
+      }
+
+      // 然后再刷新购物车数据以确保同步
       await get().fetchCart()
     } catch (error) {
       console.error('Error adding to cart:', error)
@@ -132,18 +170,25 @@ export const useCartStore = create<CartStore>((set, get) => ({
   removeFromCart: async (id: string) => {
     set({ isLoading: true, error: null })
     try {
+      // 确保 id 存在于 URL 中
+      if (!id) {
+        throw new Error('Invalid item ID')
+      }
+
       const response = await fetch(`${API_BASE_URL}/cart/items/${id}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Credentials': 'true'
         }
       })
       
       if (!response.ok) {
-        const errorData = await response.json().catch(() => null)
-        throw new Error(errorData?.message || 'Failed to remove from cart')
+        const errorText = await response.text()
+        console.error('Server response:', errorText)
+        throw new Error(`Failed to remove item: ${response.status} ${errorText}`)
       }
       
       // 成功后更新本地状态
@@ -165,6 +210,9 @@ export const useCartStore = create<CartStore>((set, get) => ({
 
   updateQuantity: async (id: string, quantity: number) => {
     if (quantity < 1) return
+    if (!id) {
+      throw new Error('Invalid item ID')
+    }
     
     set({ isLoading: true, error: null })
     try {
@@ -172,15 +220,17 @@ export const useCartStore = create<CartStore>((set, get) => ({
         method: 'PUT',
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Credentials': 'true'
         },
         credentials: 'include',
         body: JSON.stringify({ quantity })
       })
       
       if (!response.ok) {
-        const errorData = await response.json().catch(() => null)
-        throw new Error(errorData?.message || 'Failed to update quantity')
+        const errorText = await response.text()
+        console.error('Server response:', errorText)
+        throw new Error(`Failed to update quantity: ${response.status} ${errorText}`)
       }
       
       // 成功后更新本地状态

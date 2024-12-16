@@ -70,3 +70,38 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.embla {
+  overflow: hidden;
+}
+
+.embla__viewport {
+  overflow: hidden;
+}
+
+.embla__container {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.embla__slide {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+  /* 悬停时暂停动画 */
+  &:hover {
+    animation-play-state: paused;
+  }
+}

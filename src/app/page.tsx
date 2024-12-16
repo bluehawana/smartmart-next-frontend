@@ -5,8 +5,9 @@ import Autoplay from 'embla-carousel-autoplay';
 import { PhotoGallery } from "@/components/PhotoGallery";
 import { useCartStore } from '@/lib/store/cart';
 import Link from 'next/link';
+import { EmblaOptionsType } from 'embla-carousel-react'
 
-// 定义基础URL
+// 修改基础URL定义
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'
 
 // 定义产品类型
@@ -54,28 +55,32 @@ function ErrorCard({ error }: { error: Error }) {
 
 async function getProducts() {
   try {
-    const res = await fetch(`${BASE_URL}/products`, {
-      next: { revalidate: 60 },
+    const url = `${BASE_URL}/products`
+    console.log('API URL:', url)
+    console.log('Environment:', {
+      NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+      BASE_URL
+    })
+
+    const res = await fetch(url, {
+      cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
-      },
+      }
     })
-    
+
     if (!res.ok) {
-      throw new Error(`Failed to fetch products: ${res.status}`)
+      console.error(`API响应错误: ${res.status}`)
+      const errorText = await res.text()
+      console.error('错误详情:', errorText)
+      return []
     }
-    
-    const products = await res.json()
-    return products.map((product: any) => ({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      description: product.description,
-      image: PRODUCT_IMAGES[product.id] || 'default.jpg',
-      stock: parseInt(product.stockQuantity) || 100
-    }))
+
+    const data = await res.json()
+    console.log('API响应数据:', data)
+    return data
   } catch (error) {
-    console.error('Error fetching products:', error)
+    console.error('获取产品时出错:', error)
     return []
   }
 }
@@ -83,21 +88,51 @@ async function getProducts() {
 // 获取照片gallery数据
 async function getPhotos() {
   try {
-    const res = await fetch(`${BASE_URL}/photos`, { 
-      next: { revalidate: 60 },
+    console.log('开始获取照片数据...');
+    const res = await fetch(`${BASE_URL}/photos`, {
+      cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
       }
-    })
-    
-    if (!res.ok) throw new Error(`Failed to fetch photos: ${res.status}`)
-    const data = await res.json()
-    
-    return data.data
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`照片API响应错误: 状态码=${res.status}, 错误信息=${errorText}`);
+      return [
+        'macbook.jpg',
+        'airpods2.jpg',
+        'sony.jpg',
+        'xps.jpg',
+        'dell.jpg',
+        'ultra.jpg'
+      ];
+    }
+
+    const data = await res.json();
+    return data.data || [];
   } catch (error) {
-    console.error('Error fetching photos:', error)
-    return []
+    console.error('获取照片时出错:', error);
+    return [
+      'macbook.jpg',
+      'airpods2.jpg',
+      'sony.jpg',
+      'xps.jpg',
+      'dell.jpg',
+      'ultra.jpg'
+    ];
   }
+}
+
+const autoplayOptions = {
+  delay: 3000,
+  rootNode: (emblaRoot: HTMLElement) => emblaRoot.parentElement,
+}
+
+const carouselOptions: EmblaOptionsType = {
+  loop: true,
+  align: 'start',
+  slidesToScroll: 1,
 }
 
 export default async function Home() {
@@ -106,12 +141,16 @@ export default async function Home() {
   let error = null;
 
   try {
+    console.log('开始获取数据...');
     [products, photos] = await Promise.all([
       getProducts(),
       getPhotos()
     ]);
+    console.log('获取到的产品:', products);
+    console.log('获取到的照片:', photos);
   } catch (e) {
     error = e as Error;
+    console.error('数据获取失败:', error);
   }
 
   if (error) {
@@ -141,7 +180,7 @@ export default async function Home() {
               >
                 <div className="relative w-full pt-[100%]">
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_IMAGE_BASE_URL}/${product.image}`}
+                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${PRODUCT_IMAGES[product.id]}`}
                     alt={product.name}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

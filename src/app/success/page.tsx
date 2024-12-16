@@ -1,44 +1,64 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { CheckCircle } from 'lucide-react'
 import { useCartStore } from '@/lib/store/cart'
+import { CheckCircle } from 'lucide-react'
+import Link from 'next/link'
 
 export default function SuccessPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session_id')
-  const fetchCart = useCartStore(state => state.fetchCart)
+  const clearCart = useCartStore(state => state.clearCart)
+  const [confirmationSent, setConfirmationSent] = useState(false)
 
   useEffect(() => {
-    // 清空购物车
-    fetchCart()
+    if (sessionId && !confirmationSent) {
+      // 立即清空购物车
+      clearCart()
+      setConfirmationSent(true)
 
-    // 5秒后重定向到首页
-    const timer = setTimeout(() => {
-      router.push('/')
-    }, 5000)
-
-    return () => clearTimeout(timer)
-  }, [router, fetchCart])
+      // 发送确认邮件
+      fetch('/api/order/confirm', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          sessionId,
+          // 添加其他需要的信息
+          timestamp: new Date().toISOString()
+        })
+      })
+      .then(async response => {
+        if (!response.ok) {
+          const text = await response.text()
+          throw new Error(`Failed to send confirmation: ${text}`)
+        }
+        console.log('Confirmation email sent successfully')
+      })
+      .catch(error => {
+        console.error('Error sending confirmation:', error)
+      })
+    }
+  }, [sessionId, clearCart, confirmationSent])
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full p-8 bg-white rounded-lg shadow-lg text-center">
+    <div className="max-w-[1200px] mx-auto px-4 py-16">
+      <div className="text-center">
         <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          Payment Successful!
-        </h1>
-        <p className="text-gray-600 mb-4">
-          Thank you for your purchase. Your order has been confirmed.
+        <h1 className="text-2xl font-bold mb-4">Thank you for your purchase!</h1>
+        <p className="text-gray-600 mb-8">
+          You will receive an email confirmation shortly.
+          {sessionId && <span className="block mt-2 text-sm">Order ID: {sessionId}</span>}
         </p>
-        <p className="text-gray-500 text-sm mb-6">
-          Order ID: {sessionId}
-        </p>
-        <p className="text-gray-500 text-sm">
-          You will be redirected to the homepage in 5 seconds...
-        </p>
+        <Link
+          href="/"
+          className="inline-block bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-900"
+        >
+          Continue Shopping
+        </Link>
       </div>
     </div>
   )

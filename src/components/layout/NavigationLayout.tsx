@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Menu, Search, ShoppingCart, User } from 'lucide-react'
 import Link from 'next/link'
 import { MenuLeft } from './MenuLeft'
@@ -12,8 +12,13 @@ export function NavigationLayout({ children }: { children: React.ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   const cartItemsCount = useCartStore(state => state.getCartItemsCount())
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -48,8 +53,8 @@ export function NavigationLayout({ children }: { children: React.ReactNode }) {
               className="p-2 hover:bg-gray-100 rounded-full relative"
             >
               <ShoppingCart size={24} />
-              {cartItemsCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              {mounted && cartItemsCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {cartItemsCount}
                 </span>
               )}

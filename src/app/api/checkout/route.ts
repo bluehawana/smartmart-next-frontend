@@ -1,81 +1,37 @@
 import { NextResponse } from 'next/server'
-import { Stripe } from 'stripe'
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    if (!process.env.STRIPE_SECRET_KEY) {
-      throw new Error('Missing Stripe Secret Key')
-    }
-    
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2023-10-16',
-    })
+    // 从请求中获取商品数据
+    const body = await request.json()
 
-    const { items } = await req.json()
-
-    if (!items || !Array.isArray(items) || items.length === 0) {
-      return NextResponse.json(
-        { message: 'Invalid items' },
-        { status: 400 }
-      )
-    }
-
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: items.map(item => ({
-        price_data: {
-          currency: 'eur',
-          product_data: {
-            name: item.name,
-            images: [item.image ? `${process.env.NEXT_PUBLIC_IMAGE_BASE_URL}/${item.image}` : ''],
-          },
-          unit_amount: Math.round(item.price * 100),
-        },
-        quantity: item.quantity,
-      })),
-      mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_API_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_API_URL}/cart`,
-      shipping_address_collection: {
-        allowed_countries: ['US', 'GB', 'DE', 'FR', 'ES', 'IT', 'NL', 'BE'],
+    // 转发请求到后端
+    const response = await fetch('http://localhost:8080/api/checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      shipping_options: [
-        {
-          shipping_rate_data: {
-            type: 'fixed_amount',
-            fixed_amount: { amount: 500, currency: 'eur' },
-            display_name: 'Standard Shipping',
-            delivery_estimate: {
-              minimum: { unit: 'business_day', value: 3 },
-              maximum: { unit: 'business_day', value: 5 },
-            },
-          },
-        },
-      ],
+      body: JSON.stringify(body)  // 转发原始请求体
     })
 
-    return new NextResponse(
-      JSON.stringify({ url: session.url }),
-      {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    )
+    // 获取后端响应
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to create checkout session')
+    }
+
+    // 返回后端响应
+    return NextResponse.json(data)
+    
   } catch (error) {
-    console.error('Stripe error:', error)
-    return new NextResponse(
-      JSON.stringify({ 
-        message: 'Error creating checkout session',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      }),
+    console.error('Checkout API error:', error)
+    return NextResponse.json(
       { 
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to create checkout session'
+      },
+      { status: 500 }
     )
   }
 } 

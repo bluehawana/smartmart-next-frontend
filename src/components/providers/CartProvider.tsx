@@ -1,14 +1,25 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useCartStore } from '@/lib/store/cart'
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const fetchCart = useCartStore((state) => state.fetchCart)
+  const [mounted, setMounted] = useState(false)
+  const fetchCart = useCartStore(state => state.fetchCart)
 
   useEffect(() => {
-    fetchCart()
-  }, [fetchCart])
+    setMounted(true)
+  }, [])
 
-  return <>{children}</>
+  useEffect(() => {
+    if (mounted) {
+      fetchCart()
+    }
+  }, [mounted, fetchCart])
+
+  return (
+    <div className="min-h-screen">
+      {children}
+    </div>
+  )
 } 

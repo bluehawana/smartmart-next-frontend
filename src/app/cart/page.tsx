@@ -1,37 +1,102 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { XCircle } from 'lucide-react'
-import { toast } from 'react-hot-toast'
+import { useCartStore } from '@/lib/store/cart'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Minus, Plus, Trash2 } from 'lucide-react'
+import { CheckoutButton } from '@/components/features/CheckoutButton'
 
 export default function CartPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const canceled = searchParams.get('canceled')
+  const { items, removeItem, updateQuantity } = useCartStore()
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
-  useEffect(() => {
-    if (canceled) {
-      toast.error('Payment was canceled')
-    }
-  }, [canceled])
+  if (items.length === 0) {
+    return (
+      <div className="max-w-[1200px] mx-auto px-4 py-8">
+        <h1 className="text-2xl font-bold mb-8">Shopping Cart</h1>
+        <div className="text-center py-12">
+          <p className="text-gray-500 mb-4">Your cart is empty</p>
+          <Link href="/" className="text-blue-600 hover:underline">
+            Continue Shopping
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full p-8 bg-white rounded-lg shadow-lg text-center">
-        <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          Payment Canceled
-        </h1>
-        <p className="text-gray-600 mb-6">
-          Your payment was canceled. You can try again when you're ready.
-        </p>
-        <button
-          onClick={() => router.push('/')}
-          className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800"
-        >
-          Return to Home
-        </button>
+    <div className="max-w-[1200px] mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-8">Shopping Cart</h1>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          {items.map((item) => (
+            <div key={item.id} className="flex gap-4 py-4 border-b">
+              <div className="relative w-24 h-24">
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  fill
+                  className="object-cover rounded"
+                />
+              </div>
+              
+              <div className="flex-1">
+                <h3 className="font-medium">{item.name}</h3>
+                <p className="text-gray-500 text-sm mb-2">€{item.price.toFixed(2)}</p>
+                
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => updateQuantity(item.id, Math.max(0, item.quantity - 1))}
+                    className="p-1 hover:bg-gray-100 rounded"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <span className="w-8 text-center">{item.quantity}</span>
+                  <button
+                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                    className="p-1 hover:bg-gray-100 rounded"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              <button
+                onClick={() => removeItem(item.id)}
+                className="p-2 hover:bg-gray-100 rounded"
+              >
+                <Trash2 className="w-5 h-5 text-red-500" />
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div className="lg:col-span-1">
+          <div className="bg-gray-50 p-6 rounded-lg">
+            <h2 className="text-lg font-medium mb-4">Order Summary</h2>
+            
+            <div className="space-y-2 mb-4">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span>€{total.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Shipping</span>
+                <span>Free</span>
+              </div>
+            </div>
+            
+            <div className="border-t pt-4 mb-6">
+              <div className="flex justify-between font-medium">
+                <span>Total</span>
+                <span>€{total.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <CheckoutButton />
+          </div>
+        </div>
       </div>
     </div>
   )

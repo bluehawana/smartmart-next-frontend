@@ -4,6 +4,7 @@ import { useCartStore } from '@/lib/store/cart'
 import { ShoppingCart, X } from 'lucide-react'
 import Image from 'next/image'
 import { getProductImageUrl } from '@/lib/utils'
+import { toast } from 'react-hot-toast'
 
 interface CartSidebarProps {
   isOpen: boolean
@@ -11,7 +12,7 @@ interface CartSidebarProps {
 }
 
 export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
-  const { items, removeFromCart, updateQuantity, getCartTotal } = useCartStore()
+  const { items, removeFromCart, updateQuantity, getCartTotal, isLoading } = useCartStore()
 
   if (!isOpen) return null
 
@@ -20,6 +21,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     try {
       await updateQuantity(id, newQuantity)
     } catch (error) {
+      toast.error('Failed to update quantity')
       console.error('Failed to update quantity:', error)
     }
   }
@@ -27,7 +29,9 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const handleRemoveItem = async (id: string) => {
     try {
       await removeFromCart(id)
+      toast.success('Item removed from cart')
     } catch (error) {
+      toast.error('Failed to remove item')
       console.error('Failed to remove item:', error)
     }
   }
@@ -81,21 +85,23 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                       <div className="flex items-center gap-2 mt-2">
                         <button
                           onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
-                          className="p-1 border rounded hover:bg-gray-50"
-                          disabled={item.quantity <= 1}
+                          className="p-1 border rounded hover:bg-gray-50 disabled:opacity-50"
+                          disabled={item.quantity <= 1 || isLoading}
                         >
                           -
                         </button>
                         <span>{item.quantity}</span>
                         <button
                           onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
-                          className="p-1 border rounded hover:bg-gray-50"
+                          className="p-1 border rounded hover:bg-gray-50 disabled:opacity-50"
+                          disabled={isLoading}
                         >
                           +
                         </button>
                         <button
                           onClick={() => handleRemoveItem(item.id)}
-                          className="ml-auto text-red-500 hover:text-red-600"
+                          className="ml-auto text-red-500 hover:text-red-600 disabled:opacity-50"
+                          disabled={isLoading}
                         >
                           Remove
                         </button>

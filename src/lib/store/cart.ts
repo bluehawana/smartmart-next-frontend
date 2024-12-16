@@ -137,18 +137,27 @@ export const useCartStore = create<CartStore>((set, get) => ({
         credentials: 'include',
         headers: {
           'Accept': 'application/json',
+          'Content-Type': 'application/json'
         }
       })
       
       if (!response.ok) {
-        throw new Error('Failed to remove from cart')
+        const errorData = await response.json().catch(() => null)
+        throw new Error(errorData?.message || 'Failed to remove from cart')
       }
       
+      // 成功后更新本地状态
+      const { items } = get()
+      set({ 
+        items: items.filter(item => item.id !== id),
+        error: null 
+      })
+
+      // 然后再刷新购物车数据
       await get().fetchCart()
     } catch (error) {
       console.error('Error removing from cart:', error)
       set({ error: error instanceof Error ? error.message : 'Failed to remove from cart' })
-      throw error
     } finally {
       set({ isLoading: false })
     }
@@ -170,14 +179,24 @@ export const useCartStore = create<CartStore>((set, get) => ({
       })
       
       if (!response.ok) {
-        throw new Error('Failed to update quantity')
+        const errorData = await response.json().catch(() => null)
+        throw new Error(errorData?.message || 'Failed to update quantity')
       }
       
+      // 成功后更新本地状态
+      const { items } = get()
+      set({
+        items: items.map(item => 
+          item.id === id ? { ...item, quantity } : item
+        ),
+        error: null
+      })
+
+      // 然后再刷新购物车数据
       await get().fetchCart()
     } catch (error) {
       console.error('Error updating quantity:', error)
       set({ error: error instanceof Error ? error.message : 'Failed to update quantity' })
-      throw error
     } finally {
       set({ isLoading: false })
     }

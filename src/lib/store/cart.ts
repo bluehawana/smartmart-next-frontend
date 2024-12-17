@@ -127,49 +127,51 @@ export const useCartStore = create<CartStore>()(
         try {
           const response = await fetch('/api/cart/items', {
             method: 'POST',
-            credentials: 'include',
             headers: {
               'Accept': 'application/json',
               'Content-Type': 'application/json'
             },
+            credentials: 'include',
             body: JSON.stringify({ 
               productId: Number(productId),
               quantity: Number(quantity)
             })
           })
-          
+
           if (!response.ok) {
-            const errorText = await response.text()
-            console.error('Add to cart error:', errorText)
-            throw new Error(`Failed to add to cart: ${response.status}`)
+            const errorData = await response.json()
+            console.error('Add to cart error:', errorData)
+            throw new Error(errorData.message || `Failed to add to cart: ${response.status}`)
           }
 
           const addedItem = await response.json()
-          const productInfo = PRODUCTS_MAP[productId]
+          console.log('Added item response:', addedItem)
 
-          if (productInfo) {
-            set((state) => {
-              const existingItem = state.items.find(item => item.productId === productId)
-              if (existingItem) {
-                return {
-                  items: state.items.map(item => 
-                    item.productId === productId 
-                      ? { ...item, quantity: item.quantity + quantity }
-                      : item
-                  )
-                }
-              } else {
-                return {
-                  items: [...state.items, {
-                    id: String(addedItem.id),
-                    productId,
-                    quantity,
-                    ...productInfo
-                  }]
-                }
+          // 更新本地状态
+          set((state) => {
+            const existingItem = state.items.find(item => item.productId === productId)
+            if (existingItem) {
+              return {
+                items: state.items.map(item => 
+                  item.productId === productId 
+                    ? { ...item, quantity: item.quantity + quantity }
+                    : item
+                )
               }
-            })
-          }
+            } else {
+              return {
+                items: [...state.items, {
+                  id: String(addedItem.id),
+                  productId,
+                  quantity,
+                  name: addedItem.name,
+                  price: addedItem.price,
+                  image: PRODUCTS_MAP[productId]?.image || 'default.jpg',
+                  description: PRODUCTS_MAP[productId]?.description || ''
+                }]
+              }
+            }
+          })
         } catch (error) {
           console.error('Error adding to cart:', error)
           set({ error: error instanceof Error ? error.message : 'Failed to add to cart' })
@@ -237,10 +239,20 @@ export const useCartStore = create<CartStore>()(
         }
       },
 
-      clearCart: () => {
+      clearCart: async () => {
         try {
           // 清空本地状态
           set({ items: [], error: null })
+          
+          // 同步到后端
+          await fetch('/api/cart/clear', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          
           console.log('Cart cleared successfully')
         } catch (error) {
           console.error('Error clearing cart:', error)

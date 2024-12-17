@@ -1,53 +1,80 @@
 package com.bluehawana.smrtmart.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.stripe.Stripe;
+import com.stripe.model.checkout.Session;
+import com.stripe.param.checkout.SessionCreateParams;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@RequiredArgsConstructor
+@Slf4j
 public class OrderController {
-    
-    @Autowired
-    private OrderService orderService;
-    
-    @Autowired
-    private EmailService emailService;
-    
-    @PostMapping("/confirm")
-    public ResponseEntity<?> confirmOrder(@RequestBody OrderConfirmRequest request) {
+
+    @Value("${stripe.secret.key}")
+    private String stripeSecretKey;
+
+    private final CartItemService cartItemService;
+
+    @PostMapping("/checkout")
+    public ResponseEntity<?> createCheckoutSession(@RequestBody Map<String, List<CartItemDTO>> request) {
         try {
-            // 获取 Stripe session 信息
-            Session session = Session.retrieve(request.getSessionId());
+            Stripe.apiKey = stripeSecretKey;
+            List<CartItemDTO> items = request.get("items");
             
-            // 发送确认邮件
-            emailService.sendOrderConfirmation(
-                session.getCustomerEmail(),
-                request.getSessionId(),
-                session.getAmountTotal() / 100.0
-            );
+            if (items == null || items.isEmpty()) {
+                return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Cart is empty"));
+            }
+
+            List<SessionCreateParams.LineItem> lineItems = new ArrayList<>();
             
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Order confirmed and email sent"
-            ));
+            for (CartItemDTO item : items) {
+                lineItems.add(
+                    SessionCreateParams.LineItem.builder()
+                        .setPriceData(
+                            SessionCreateParams.LineItem.PriceData.builder()
+                                .setCurrency("eur")
+                                .setUnitAmount((long)(item.getPrice().doubleValue() * 100))
+                                .setProductData(
+                                    SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                        .setName(item.getName())
+                                        .setDescription(item.getDescription())
+                                        .build()
+                                )
+                                .build()
+                        )
+                        .setQuantity((long)item.getQuantity())
+                        .build()
+                );
+            }
+
+            SessionCreateParams params = SessionCreateParams.builder()
+                .setMode(SessionCreateParams.Mode.PAYMENT)
+                .setSuccessUrl("http://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}")
+                .setCancelUrl("http://localhost:3000/cart")
+                .addAllLineItem(lineItems)
+                .setCustomerCreation(SessionCreateParams.CustomerCreation.ALWAYS)
+                .build();
+
+            Session session = Session.create(params);
+            
+            return ResponseEntity.ok(Map.of("url", session.getUrl()));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to create checkout session", e);
             return ResponseEntity.status(500)
-                .body(Map.of(
-                    "success", false,
-                    "message", "Failed to confirm order: " + e.getMessage()
-                ));
+                .body(Map.of("message", "Failed to create checkout session: " + e.getMessage()));
         }
     }
-}
 
-class OrderConfirmRequest {
-    private String sessionId;
-    // getters and setters
+    // ... 其他方法保持不变
 } 

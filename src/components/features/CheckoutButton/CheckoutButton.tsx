@@ -2,34 +2,34 @@
 
 import { useCartStore } from '@/lib/store/cart'
 import { useState } from 'react'
-import { toast } from 'react-hot-toast'
 
 export function CheckoutButton() {
   const [isLoading, setIsLoading] = useState(false)
-  const { items } = useCartStore()
+  const items = useCartStore(state => state.items)
 
   const handleCheckout = async () => {
-    setIsLoading(true)
     try {
+      setIsLoading(true)
       const cartItems = items.map(item => ({
         productId: item.productId,
         quantity: item.quantity,
         price: item.price,
         name: item.name,
-        image: item.image
+        description: item.description
       }))
 
-      const response = await fetch('/api/checkout', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ items: cartItems }),
+        body: JSON.stringify({ items: cartItems })
       })
 
       if (!response.ok) {
         const errorData = await response.json()
+        console.error('Checkout error:', errorData)
         throw new Error(errorData.message || 'Failed to create checkout session')
       }
 
@@ -41,31 +41,22 @@ export function CheckoutButton() {
       window.location.href = url
     } catch (error) {
       console.error('Checkout error:', error)
-      toast.error(
-        error instanceof Error 
-          ? error.message 
-          : 'Failed to proceed to checkout. Please try again.'
-      )
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <button 
+    <button
       onClick={handleCheckout}
-      disabled={items.length === 0 || isLoading}
-      className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:bg-gray-300 relative"
-      aria-label={isLoading ? 'Processing checkout...' : 'Proceed to checkout'}
+      disabled={isLoading || items.length === 0}
+      className={`w-full py-3 rounded-lg transition-colors ${
+        isLoading || items.length === 0
+          ? 'bg-gray-400 cursor-not-allowed'
+          : 'bg-black hover:bg-gray-900'
+      } text-white`}
     >
-      {isLoading ? (
-        <div className="flex items-center justify-center">
-          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-          Processing...
-        </div>
-      ) : (
-        'Checkout'
-      )}
+      {isLoading ? 'Processing...' : 'Checkout'}
     </button>
   )
 } 

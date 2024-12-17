@@ -1,65 +1,83 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { useCartStore } from '@/lib/store/cart'
-import { CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 
 export default function SuccessPage() {
-  const router = useRouter()
+  const [status, setStatus] = useState('processing')
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session_id')
   const clearCart = useCartStore(state => state.clearCart)
-  const [confirmationSent, setConfirmationSent] = useState(false)
 
   useEffect(() => {
-    if (sessionId && !confirmationSent) {
-      // 立即清空购物车
+    if (sessionId) {
+      // 清空购物车
       clearCart()
-      setConfirmationSent(true)
 
-      // 发送确认邮件
-      fetch('/api/order/confirm', {
+      // 处理订单确认
+      fetch(`/api/checkout/success?session_id=${sessionId}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          sessionId,
-          // 添加其他需要的信息
-          timestamp: new Date().toISOString()
+        credentials: 'include'
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setStatus('complete')
+          } else {
+            setStatus('error')
+            console.error('Error:', data.message)
+          }
         })
-      })
-      .then(async response => {
-        if (!response.ok) {
-          const text = await response.text()
-          throw new Error(`Failed to send confirmation: ${text}`)
-        }
-        console.log('Confirmation email sent successfully')
-      })
-      .catch(error => {
-        console.error('Error sending confirmation:', error)
-      })
+        .catch(err => {
+          console.error('Error:', err)
+          setStatus('error')
+        })
     }
-  }, [sessionId, clearCart, confirmationSent])
+  }, [sessionId, clearCart])
 
   return (
-    <div className="max-w-[1200px] mx-auto px-4 py-16">
-      <div className="text-center">
-        <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-        <h1 className="text-2xl font-bold mb-4">Thank you for your purchase!</h1>
-        <p className="text-gray-600 mb-8">
-          You will receive an email confirmation shortly.
-          {sessionId && <span className="block mt-2 text-sm">Order ID: {sessionId}</span>}
-        </p>
-        <Link
-          href="/"
-          className="inline-block bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-900"
-        >
-          Continue Shopping
-        </Link>
-      </div>
+    <div className="max-w-lg mx-auto mt-10 p-6 bg-white rounded-lg shadow">
+      {status === 'processing' && (
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4">Processing your order...</p>
+        </div>
+      )}
+
+      {status === 'complete' && (
+        <div>
+          <h1 className="text-2xl font-bold text-green-600 mb-4">Thank you for your purchase!</h1>
+          <p>A confirmation email has been sent to your email address.</p>
+          <p className="mt-4">Your order has been successfully processed.</p>
+          {sessionId && (
+            <p className="text-sm text-gray-500 mt-2">
+              Order ID: {sessionId}
+            </p>
+          )}
+          <Link
+            href="/"
+            className="mt-6 inline-block bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-900"
+          >
+            Continue Shopping
+          </Link>
+        </div>
+      )}
+
+      {status === 'error' && (
+        <div>
+          <h1 className="text-2xl font-bold text-red-600 mb-4">Oops!</h1>
+          <p>There was an error processing your order.</p>
+          <p className="mt-2">Please contact customer support if you need assistance.</p>
+          <Link
+            href="/"
+            className="mt-6 inline-block bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-900"
+          >
+            Return to Home
+          </Link>
+        </div>
+      )}
     </div>
   )
 } 

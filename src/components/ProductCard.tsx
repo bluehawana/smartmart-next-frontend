@@ -5,15 +5,15 @@ import { useCartStore } from '@/lib/store/cart'
 import { useState } from 'react';
 
 interface ProductCardProps {
-  id: number
+  id: string
   name: string
   price: number
-  image: string
+  images: string[]
   description: string
   stock: number
 }
 
-export function ProductCard({ id, name, price, image, description, stock }: ProductCardProps) {
+export function ProductCard({ id, name, price, images, description, stock }: ProductCardProps) {
   const [isAdding, setIsAdding] = useState(false);
   const addItem = useCartStore(state => state.addItem);
 
@@ -26,7 +26,7 @@ export function ProductCard({ id, name, price, image, description, stock }: Prod
         id,
         name,
         price,
-        image,
+        image: images && images.length > 0 ? images[0] : 'placeholder.jpg',
         quantity: 1
       });
       
@@ -50,7 +50,10 @@ export function ProductCard({ id, name, price, image, description, stock }: Prod
     <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-[600px]">
       <div className="relative h-80 bg-gray-50 flex-shrink-0">
         <Image
-          src={`http://localhost:8080/api/uploads/${image}`}
+          src={images && images.length > 0 
+            ? `${process.env.NEXT_PUBLIC_IMAGE_BASE_URL}/${images[0]}`
+            : '/placeholder-product.jpg'
+          }
           alt={name}
           fill
           className="object-contain p-6"

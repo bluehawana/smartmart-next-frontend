@@ -6,24 +6,15 @@ const nextConfig = {
         protocol: 'http',
         hostname: 'localhost',
         port: '8080',
-        pathname: '/api/uploads/**',
+        pathname: '/uploads/**',
       },
       {
         protocol: 'https',
-        hostname: 'picsum.photos',
-        port: '',
-        pathname: '/**',
+        hostname: 'api.smrtmart.com',
+        pathname: '/uploads/**',
       },
     ],
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'http://localhost:8080/api/:path*',
-      },
-    ]
-  }
 }
 
-module.exports = nextConfig 
+module.exports = nextConfig

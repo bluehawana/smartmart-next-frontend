@@ -60,6 +60,7 @@ interface CartStore {
   updateQuantity: (id: string, quantity: number) => Promise<void>
   fetchCart: () => Promise<void>
   getCartTotal: () => number
+  getTotalPrice: () => number
   getCartItemsCount: () => number
   clearCart: () => void
 }
@@ -113,6 +114,11 @@ export const useCartStore = create<CartStore>()(
       },
 
       getCartTotal: () => {
+        const { items } = get()
+        return items.reduce((total, item) => total + (item.price * item.quantity), 0)
+      },
+
+      getTotalPrice: () => {
         const { items } = get()
         return items.reduce((total, item) => total + (item.price * item.quantity), 0)
       },

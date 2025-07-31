@@ -7,28 +7,21 @@ import { useCartStore } from '@/lib/store/cart';
 import Link from 'next/link';
 import { EmblaOptionsType } from 'embla-carousel-react'
 
-// 修改基础URL定义
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'
+// API base URL
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1'
 
-// 定义产品类型
+// Product interface matching Go backend
 interface Product {
-  id: number;
+  id: string;
   name: string;
   price: number;
-  image: string;
+  images: string[];
   description: string;
   stock: number;
+  status: string;
+  featured: boolean;
+  category: string;
 }
-
-// 定义固定的图片映射
-const PRODUCT_IMAGES: Record<number, string> = {
-  1: "macbook.jpg",     // MacBook Pro
-  2: "airpods2.jpg",    // AirPods Pro 2
-  3: "sony.jpg",        // Sony WH-1000XM5
-  4: "xps.jpg",         // Dell XPS 13
-  5: "dell.jpg",        // Dell Alienware 34
-  6: "ultra.jpg"        // Apple Watch Ultra
-};
 
 // 加载状态组件
 function LoadingCard() {
@@ -55,12 +48,8 @@ function ErrorCard({ error }: { error: Error }) {
 
 async function getProducts() {
   try {
-    const url = `${BASE_URL}/products`
-    console.log('API URL:', url)
-    console.log('Environment:', {
-      NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-      BASE_URL
-    })
+    const url = `${BASE_URL}/products?status=active&limit=6`
+    console.log('Fetching products from:', url)
 
     const res = await fetch(url, {
       cache: 'no-store',
@@ -70,26 +59,32 @@ async function getProducts() {
     })
 
     if (!res.ok) {
-      console.error(`API响应错误: ${res.status}`)
+      console.error(`API Error: ${res.status}`)
       const errorText = await res.text()
-      console.error('错误详情:', errorText)
+      console.error('Error details:', errorText)
       return []
     }
 
-    const data = await res.json()
-    console.log('API响应数据:', data)
-    return data
+    const response = await res.json()
+    console.log('API Response:', response)
+    
+    // The Go API returns data in response.data.data format
+    if (response.success && response.data && response.data.data) {
+      return response.data.data
+    }
+    
+    return []
   } catch (error) {
-    console.error('获取产品时出错:', error)
+    console.error('Error fetching products:', error)
     return []
   }
 }
 
-// 获取照片gallery数据
-async function getPhotos() {
+// Get featured products for gallery
+async function getFeaturedProducts() {
   try {
-    console.log('开始获取照片数据...');
-    const res = await fetch(`${BASE_URL}/photos`, {
+    console.log('Fetching featured products...');
+    const res = await fetch(`${BASE_URL}/products/featured?limit=6`, {
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
@@ -97,30 +92,21 @@ async function getPhotos() {
     });
 
     if (!res.ok) {
-      const errorText = await res.text();
-      console.error(`照片API响应错误: 状态码=${res.status}, 错误信息=${errorText}`);
-      return [
-        'macbook.jpg',
-        'airpods2.jpg',
-        'sony.jpg',
-        'xps.jpg',
-        'dell.jpg',
-        'ultra.jpg'
-      ];
+      console.error(`Featured products API error: ${res.status}`);
+      return [];
     }
 
-    const data = await res.json();
-    return data.data || [];
+    const response = await res.json();
+    if (response.success && response.data) {
+      // Extract image URLs from featured products
+      return response.data.map((product: Product) => 
+        product.images && product.images.length > 0 ? product.images[0] : 'placeholder.jpg'
+      );
+    }
+    return [];
   } catch (error) {
-    console.error('获取照片时出错:', error);
-    return [
-      'macbook.jpg',
-      'airpods2.jpg',
-      'sony.jpg',
-      'xps.jpg',
-      'dell.jpg',
-      'ultra.jpg'
-    ];
+    console.error('Error fetching featured products:', error);
+    return [];
   }
 }
 
@@ -141,16 +127,16 @@ export default async function Home() {
   let error = null;
 
   try {
-    console.log('开始获取数据...');
+    console.log('Fetching data...');
     [products, photos] = await Promise.all([
       getProducts(),
-      getPhotos()
+      getFeaturedProducts()
     ]);
-    console.log('获取到的产品:', products);
-    console.log('获取到的照片:', photos);
+    console.log('Products:', products);
+    console.log('Featured photos:', photos);
   } catch (e) {
     error = e as Error;
-    console.error('数据获取失败:', error);
+    console.error('Data fetch failed:', error);
   }
 
   if (error) {
@@ -172,7 +158,7 @@ export default async function Home() {
               {[...Array(6)].map((_, i) => <LoadingCard key={`loading-${i}`} />)}
             </div>
           }>
-            {products.slice(0, 6).map((product) => (
+            {products.length > 0 ? products.map((product) => (
               <Link 
                 href={`/products/${product.id}`}
                 key={`product-${product.id}`}
@@ -180,7 +166,10 @@ export default async function Home() {
               >
                 <div className="relative w-full pt-[100%]">
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${PRODUCT_IMAGES[product.id]}`}
+                    src={product.images && product.images.length > 0 
+                      ? `${process.env.NEXT_PUBLIC_IMAGE_BASE_URL}/${product.images[0]}`
+                      : '/placeholder-product.jpg'
+                    }
                     alt={product.name}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -190,10 +179,20 @@ export default async function Home() {
                 </div>
                 <div className="p-4">
                   <h3 className="text-lg font-medium text-gray-900">{product.name}</h3>
-                  <p className="mt-1 text-xl font-semibold text-gray-900">€{product.price.toFixed(2)}</p>
+                  <p className="text-sm text-gray-600 mb-2">{product.category}</p>
+                  <p className="mt-1 text-xl font-semibold text-gray-900">${product.price.toFixed(2)}</p>
+                  {product.stock > 0 ? (
+                    <p className="text-sm text-green-600">In Stock ({product.stock})</p>
+                  ) : (
+                    <p className="text-sm text-red-600">Out of Stock</p>
+                  )}
                 </div>
               </Link>
-            ))}
+            )) : (
+              <div className="col-span-full text-center py-8">
+                <p className="text-gray-500">No products available at the moment.</p>
+              </div>
+            )}
           </Suspense>
         </div>
       </section>

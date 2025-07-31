@@ -52,7 +52,7 @@ async function getProducts() {
     console.log('Fetching products from:', url)
 
     const res = await fetch(url, {
-      cache: 'no-store',
+      next: { revalidate: 3600 }, // Cache for 1 hour instead of no-store
       headers: {
         'Content-Type': 'application/json',
       }
@@ -76,6 +76,7 @@ async function getProducts() {
     return []
   } catch (error) {
     console.error('Error fetching products:', error)
+    // Return empty array during build when API is not available
     return []
   }
 }
@@ -85,7 +86,7 @@ async function getFeaturedProducts() {
   try {
     console.log('Fetching featured products...');
     const res = await fetch(`${BASE_URL}/products/featured?limit=6`, {
-      cache: 'no-store',
+      next: { revalidate: 3600 }, // Cache for 1 hour instead of no-store
       headers: {
         'Content-Type': 'application/json',
       }
@@ -106,6 +107,7 @@ async function getFeaturedProducts() {
     return [];
   } catch (error) {
     console.error('Error fetching featured products:', error);
+    // Return empty array during build when API is not available
     return [];
   }
 }

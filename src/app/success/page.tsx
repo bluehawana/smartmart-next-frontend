@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useCartStore } from '@/lib/store/cart'
 import Link from 'next/link'
 
-export default function SuccessPage() {
+function SuccessContent() {
   const [status, setStatus] = useState('processing')
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session_id')
@@ -79,5 +79,18 @@ export default function SuccessPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="max-w-lg mx-auto mt-10 p-6 bg-white rounded-lg shadow text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+        <p className="mt-4">Loading...</p>
+      </div>
+    }>
+      <SuccessContent />
+    </Suspense>
   )
 } 

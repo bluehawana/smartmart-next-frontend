@@ -3,15 +3,5 @@
   "outputDirectory": ".next",
   "framework": "nextjs",
   "installCommand": "npm install",
-  "devCommand": "npm run dev",
-  "env": {
-    "NEXT_PUBLIC_API_URL": "@next_public_api_url",
-    "NEXT_PUBLIC_IMAGE_BASE_URL": "@next_public_image_base_url", 
-    "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY": "@next_public_stripe_publishable_key"
-  },
-  "functions": {
-    "app/**/*.tsx": {
-      "maxDuration": 30
-    }
-  }
+  "devCommand": "npm run dev"
 }

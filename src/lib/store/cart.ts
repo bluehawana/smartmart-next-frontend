@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { API_BASE } from '../config'
 
 interface CartItem {
   id: string
@@ -75,7 +76,7 @@ export const useCartStore = create<CartStore>()(
       fetchCart: async () => {
         set({ isLoading: true, error: null })
         try {
-          const response = await fetch('/api/cart', {
+          const response = await fetch(`${API_BASE}/cart`, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -131,7 +132,7 @@ export const useCartStore = create<CartStore>()(
       addToCart: async (productId: number, quantity: number) => {
         set({ isLoading: true, error: null })
         try {
-          const response = await fetch('/api/cart/items', {
+          const response = await fetch(`${API_BASE}/cart/items`, {
             method: 'POST',
             headers: {
               'Accept': 'application/json',
@@ -189,7 +190,7 @@ export const useCartStore = create<CartStore>()(
       removeFromCart: async (id: string) => {
         set({ isLoading: true, error: null })
         try {
-          const response = await fetch(`/api/cart/items/${id}`, {
+          const response = await fetch(`${API_BASE}/cart/items/${id}`, {
             method: 'DELETE',
             credentials: 'include',
             headers: {
@@ -218,7 +219,7 @@ export const useCartStore = create<CartStore>()(
         
         set({ isLoading: true, error: null })
         try {
-          const response = await fetch(`/api/cart/items/${id}`, {
+          const response = await fetch(`${API_BASE}/cart/items/${id}`, {
             method: 'PUT',
             credentials: 'include',
             headers: {
@@ -251,7 +252,7 @@ export const useCartStore = create<CartStore>()(
           set({ items: [], error: null })
           
           // 同步到后端
-          await fetch('/api/cart/clear', {
+          await fetch(`${API_BASE}/cart/clear`, {
             method: 'POST',
             credentials: 'include',
             headers: {

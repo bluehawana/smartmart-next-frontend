@@ -3,6 +3,7 @@
 import { useCartStore } from '@/lib/store/cart'
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
+import { API_BASE } from '@/lib/config'
 
 export function CheckoutButton() {
   const [loading, setLoading] = useState(false)
@@ -14,7 +15,7 @@ export function CheckoutButton() {
       setLoading(true)
       setError(null)
       
-      const response = await fetch('/api/checkout', {
+      const response = await fetch(`${API_BASE}/checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

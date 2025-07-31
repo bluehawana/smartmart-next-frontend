@@ -15,7 +15,7 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '*.railway.app',
+        hostname: '*.herokuapp.com',
         pathname: '/uploads/**',
       },
       {

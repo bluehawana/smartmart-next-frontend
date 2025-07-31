@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useCartStore } from '@/lib/store/cart'
+import { API_BASE } from '@/lib/config'
 import Link from 'next/link'
 
 function SuccessContent() {
@@ -17,7 +18,7 @@ function SuccessContent() {
       clearCart()
 
       // 处理订单确认
-      fetch(`/api/checkout/success?session_id=${sessionId}`, {
+      fetch(`${API_BASE}/checkout/success?session_id=${sessionId}`, {
         method: 'POST',
         credentials: 'include'
       })

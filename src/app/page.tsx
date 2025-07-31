@@ -1,5 +1,7 @@
+'use client';
+
 import Image from "next/image";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import { PhotoGallery } from "@/components/PhotoGallery";
@@ -52,7 +54,6 @@ async function getProducts() {
     console.log('Fetching products from:', url)
 
     const res = await fetch(url, {
-      next: { revalidate: 3600 }, // Cache for 1 hour instead of no-store
       headers: {
         'Content-Type': 'application/json',
       }
@@ -86,7 +87,6 @@ async function getFeaturedProducts() {
   try {
     console.log('Fetching featured products...');
     const res = await fetch(`${BASE_URL}/products/featured?limit=6`, {
-      next: { revalidate: 3600 }, // Cache for 1 hour instead of no-store
       headers: {
         'Content-Type': 'application/json',
       }
@@ -123,23 +123,34 @@ const carouselOptions: EmblaOptionsType = {
   slidesToScroll: 1,
 }
 
-export default async function Home() {
-  let products: Product[] = [];
-  let photos: string[] = [];
-  let error = null;
+export default function Home() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
-  try {
-    console.log('Fetching data...');
-    [products, photos] = await Promise.all([
-      getProducts(),
-      getFeaturedProducts()
-    ]);
-    console.log('Products:', products);
-    console.log('Featured photos:', photos);
-  } catch (e) {
-    error = e as Error;
-    console.error('Data fetch failed:', error);
-  }
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        console.log('Fetching data...');
+        const [productsData, photosData] = await Promise.all([
+          getProducts(),
+          getFeaturedProducts()
+        ]);
+        setProducts(productsData);
+        setPhotos(photosData);
+        console.log('Products:', productsData);
+        console.log('Featured photos:', photosData);
+      } catch (e) {
+        setError(e as Error);
+        console.error('Data fetch failed:', e);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   if (error) {
     return <ErrorCard error={error} />;
@@ -155,12 +166,9 @@ export default async function Home() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Suspense fallback={
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, i) => <LoadingCard key={`loading-${i}`} />)}
-            </div>
-          }>
-            {products.length > 0 ? products.map((product) => (
+          {loading ? (
+            [...Array(6)].map((_, i) => <LoadingCard key={`loading-${i}`} />)
+          ) : products.length > 0 ? products.map((product) => (
               <Link 
                 href={`/products/${product.id}`}
                 key={`product-${product.id}`}
@@ -195,7 +203,6 @@ export default async function Home() {
                 <p className="text-gray-500">No products available at the moment.</p>
               </div>
             )}
-          </Suspense>
         </div>
       </section>
 

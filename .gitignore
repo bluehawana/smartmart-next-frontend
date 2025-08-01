@@ -1,51 +1,37 @@
-# Dependencies
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
 /node_modules
 /.pnp
 .pnp.js
 .yarn/install-state.gz
 
-# Testing
+# testing
 /coverage
 
-# Next.js
+# next.js
 /.next/
 /out/
 
-# Production
+# production
 /build
 
-# Misc
+# misc
 .DS_Store
 *.pem
 
-# Debug
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Local env files (keep .env.example)
+# local env files
 .env*.local
 .env
-!.env.example
 
-# Vercel
+# vercel
 .vercel
 
-# TypeScript
+# typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db

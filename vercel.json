@@ -1,0 +1,16 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/$1"
+    }
+  ],
+  "functions": {
+    "app/**/*.tsx": {
+      "maxDuration": 30
+    }
+  }
+}

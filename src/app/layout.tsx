@@ -28,7 +28,27 @@ export default function RootLayout({
                 <a href="/contact" className="text-gray-600 hover:text-black transition-colors">Contact</a>
               </nav>
               <div className="flex items-center space-x-4">
-                <button className="text-gray-600 hover:text-black">
+                <div className="hidden md:block">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search products..."
+                      className="w-64 px-4 py-2 text-sm border border-gray-300 focus:border-black focus:outline-none"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          const searchTerm = (e.target as HTMLInputElement).value;
+                          if (searchTerm.trim()) {
+                            window.location.href = `/products?search=${encodeURIComponent(searchTerm)}`;
+                          }
+                        }
+                      }}
+                    />
+                    <svg className="absolute right-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <button className="md:hidden text-gray-600 hover:text-black">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>

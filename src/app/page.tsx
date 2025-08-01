@@ -80,70 +80,114 @@ async function getProducts() {
 function getMockProducts(): Product[] {
   return [
     {
-      id: "1",
+      id: "88d35c54-ce2d-40d5-92e9-4af5c7e5e330",
       name: "MacBook Pro 16-inch",
       price: 2499,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/macbook.jpg"],
-      description: "Apple MacBook Pro 16-inch with M3 Pro chip",
+      description: "Apple MacBook Pro 16-inch with M3 Pro chip, 18GB RAM, 512GB SSD. Perfect for professionals and creatives.",
       stock: 15,
       status: "active",
       featured: true,
       category: "computers"
     },
     {
-      id: "2", 
+      id: "c0d069ee-031f-4340-8588-4706103e6b04", 
       name: "AirPods Pro 2nd Generation",
       price: 249,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/airpods2.jpg"],
-      description: "Apple AirPods Pro with Active Noise Cancellation",
+      description: "Apple AirPods Pro with Active Noise Cancellation, Transparency mode, and spatial audio.",
       stock: 50,
       status: "active",
       featured: true,
       category: "audio"
     },
     {
-      id: "3",
+      id: "7a82d048-b478-4b4b-8b78-64eeb3a7ab86",
       name: "Sony WH-1000XM5 Headphones", 
       price: 399,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/sony.jpg"],
-      description: "Industry-leading noise canceling headphones",
+      description: "Industry-leading noise canceling headphones with exceptional sound quality and 30-hour battery life.",
       stock: 25,
       status: "active",
       featured: true,
       category: "audio"
     },
     {
-      id: "4",
-      name: "Dell Alienware 34 Monitor", 
+      id: "a4e33218-57c3-4133-ac51-ca9aa711eddb",
+      name: "Dell Alienware 34 Curved Monitor", 
       price: 899,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell.jpg"],
-      description: "34-inch curved gaming monitor with 144Hz",
+      description: "34-inch curved gaming monitor with 144Hz refresh rate, NVIDIA G-SYNC, and stunning WQHD resolution.",
       stock: 10,
       status: "active",
       featured: true,
       category: "monitors"
     },
     {
-      id: "5",
+      id: "ff5c7fc1-c3c7-4b35-9e21-15ba9d1c71d1",
       name: "Apple Watch Ultra", 
       price: 799,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ultra.jpg"],
-      description: "Most rugged Apple Watch for athletes",
+      description: "The most rugged and capable Apple Watch, designed for endurance athletes and outdoor adventurers.",
       stock: 30,
       status: "active",
       featured: true,
       category: "wearables"
     },
     {
-      id: "6",
+      id: "a87117d8-e9dd-49ab-a131-245cff3cbf2d",
       name: "AI Translate Earphones Pro", 
       price: 199,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ai-translate-pro.jpg"],
-      description: "Real-time translation earphones in 40+ languages",
+      description: "Revolutionary intelligent translate earphones with real-time translation in 40+ languages.",
       stock: 25,
       status: "active",
       featured: true,
       category: "audio"
+    },
+    {
+      id: "611bac4c-ef16-484e-899d-1e7992819a88",
+      name: "Dell XPS 13 Laptop",
+      price: 1299,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/xps.jpg"],
+      description: "Ultra-portable Dell XPS 13 with Intel Core i7, 16GB RAM, 512GB SSD, and stunning InfinityEdge display.",
+      stock: 20,
+      status: "active",
+      featured: false,
+      category: "computers"
+    },
+    {
+      id: "asus-rog-laptop-001",
+      name: "ASUS ROG Gaming Laptop",
+      price: 1599,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/asus.jpg"],
+      description: "High-performance gaming laptop with RTX graphics, RGB keyboard, and advanced cooling system.",
+      stock: 12,
+      status: "active",
+      featured: false,
+      category: "computers"
+    },
+    {
+      id: "iphone-15-pro-max-001",
+      name: "iPhone 15 Pro Max",
+      price: 1199,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/iphone.jpg"],
+      description: "The ultimate iPhone with titanium design, A17 Pro chip, and professional camera system.",
+      stock: 18,
+      status: "active",
+      featured: false,
+      category: "smartphones"
+    },
+    {
+      id: "smart-translator-001",
+      name: "Smart Translator Device",
+      price: 299,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/smart-translator.jpg"],
+      description: "Portable smart translator with voice recognition, supporting 100+ languages for seamless communication.",
+      stock: 35,
+      status: "active",
+      featured: false,
+      category: "accessories"
     }
   ]
 }
@@ -319,10 +363,10 @@ export default function Home() {
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { name: 'Computers', image: photos[0] || '/placeholder-product.svg' },
-              { name: 'Audio', image: photos[1] || '/placeholder-product.svg' },
-              { name: 'Wearables', image: photos[2] || '/placeholder-product.svg' },
-              { name: 'Monitors', image: photos[3] || '/placeholder-product.svg' }
+              { name: 'Computers', image: 'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/macbook.jpg' },
+              { name: 'Audio', image: 'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/sony.jpg' },
+              { name: 'Smartphones', image: 'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/iphone.jpg' },
+              { name: 'Wearables', image: 'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ultra.jpg' }
             ].map((category, index) => (
               <Link 
                 href={`/products?category=${category.name.toLowerCase()}`}

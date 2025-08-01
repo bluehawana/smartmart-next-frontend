@@ -31,6 +31,9 @@ export default function ProductsPage() {
     { value: 'computers', label: 'Computers' },
     { value: 'smartphones', label: 'Smartphones' },
     { value: 'audio', label: 'Audio' },
+    { value: 'wearables', label: 'Wearables' },
+    { value: 'monitors', label: 'Monitors' },
+    { value: 'tablets', label: 'Tablets' },
     { value: 'accessories', label: 'Accessories' },
   ];
 
@@ -61,15 +64,39 @@ export default function ProductsPage() {
       } else {
         console.error('API Error:', response.status);
         // Use mock data when API fails
-        setProducts(getMockProducts());
+        setProducts(getFilteredMockProducts());
       }
     } catch (error) {
       console.error('Error fetching products:', error);
       // Use mock data when API fails
-      setProducts(getMockProducts());
+      setProducts(getFilteredMockProducts());
     } finally {
       setLoading(false);
     }
+  };
+
+  const getFilteredMockProducts = () => {
+    let filtered = getMockProducts();
+    
+    // Filter by category
+    if (category) {
+      filtered = filtered.filter(product => 
+        product.category.toLowerCase() === category.toLowerCase()
+      );
+    }
+    
+    // Filter by search term
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(product =>
+        product.name.toLowerCase().includes(searchLower) ||
+        product.description.toLowerCase().includes(searchLower) ||
+        product.category.toLowerCase().includes(searchLower) ||
+        product.tags.some(tag => tag.toLowerCase().includes(searchLower))
+      );
+    }
+    
+    return filtered;
   };
 
   const getMockProducts = (): Product[] => {
@@ -164,6 +191,71 @@ export default function ProductsPage() {
         featured: false,
         category: "computers",
         tags: ["dell", "xps", "laptop", "ultrabook", "portable"]
+      },
+      {
+        id: "8",
+        name: "Samsung Galaxy S24 Ultra",
+        price: 1199,
+        compare_price: 1299,
+        images: ["/placeholder-product.svg"],
+        description: "The ultimate smartphone with S Pen, advanced AI features, and professional-grade camera system.",
+        stock: 18,
+        status: "active",
+        featured: false,
+        category: "smartphones",
+        tags: ["samsung", "galaxy", "smartphone", "android", "s-pen"]
+      },
+      {
+        id: "9",
+        name: "iPad Pro 12.9-inch",
+        price: 1099,
+        compare_price: 1199,
+        images: ["/placeholder-product.svg"],
+        description: "The most advanced iPad with M2 chip, Liquid Retina XDR display, and Apple Pencil support.",
+        stock: 12,
+        status: "active",
+        featured: false,
+        category: "tablets",
+        tags: ["apple", "ipad", "tablet", "m2", "pencil"]
+      },
+      {
+        id: "10",
+        name: "Logitech MX Master 3S",
+        price: 99,
+        compare_price: 119,
+        images: ["/placeholder-product.svg"],
+        description: "Advanced wireless mouse with ultra-fast scrolling, customizable buttons, and multi-device connectivity.",
+        stock: 35,
+        status: "active",
+        featured: false,
+        category: "accessories",
+        tags: ["logitech", "mouse", "wireless", "productivity", "ergonomic"]
+      },
+      {
+        id: "11",
+        name: "Mechanical Keyboard RGB",
+        price: 149,
+        compare_price: 179,
+        images: ["/placeholder-product.svg"],
+        description: "Premium mechanical gaming keyboard with RGB backlighting and tactile switches.",
+        stock: 22,
+        status: "active",
+        featured: false,
+        category: "accessories",
+        tags: ["keyboard", "mechanical", "gaming", "rgb", "tactile"]
+      },
+      {
+        id: "12",
+        name: "4K Webcam Pro",
+        price: 199,
+        compare_price: 229,
+        images: ["/placeholder-product.svg"],
+        description: "Professional 4K webcam with auto-focus, noise reduction, and wide-angle lens for streaming and video calls.",
+        stock: 15,
+        status: "active",
+        featured: false,
+        category: "accessories",
+        tags: ["webcam", "4k", "streaming", "video", "professional"]
       }
     ];
   };

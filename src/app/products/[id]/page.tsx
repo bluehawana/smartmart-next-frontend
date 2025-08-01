@@ -51,6 +51,38 @@ const MOCK_PRODUCTS: Record<string, any> = {
     description: "The most rugged and capable Apple Watch, designed for endurance athletes and outdoor adventurers.",
     image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ultra.jpg",
     stock: 30
+  },
+  "7": {
+    id: 7,
+    name: "Dell XPS 13 Laptop",
+    price: 1299.99,
+    description: "Ultra-portable Dell XPS 13 with Intel Core i7, 16GB RAM, 512GB SSD, and stunning InfinityEdge display.",
+    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/xps.jpg",
+    stock: 20
+  },
+  "8": {
+    id: 8,
+    name: "ASUS ROG Gaming Laptop",
+    price: 1599.99,
+    description: "High-performance gaming laptop with RTX graphics, RGB keyboard, and advanced cooling system.",
+    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/asus.jpg",
+    stock: 12
+  },
+  "9": {
+    id: 9,
+    name: "iPhone 15 Pro Max",
+    price: 1199.99,
+    description: "The ultimate iPhone with titanium design, A17 Pro chip, and professional camera system.",
+    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/iphone.jpg",
+    stock: 18
+  },
+  "10": {
+    id: 10,
+    name: "Smart Translator Device",
+    price: 299.99,
+    description: "Portable smart translator with voice recognition, supporting 100+ languages for seamless communication.",
+    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/smart-translator.jpg",
+    stock: 35
   }
 }
 

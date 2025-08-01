@@ -13,6 +13,10 @@ function CheckoutSuccessContent() {
     // Clear the cart after successful payment
     if (sessionId) {
       clearCart()
+      // Dispatch event to update cart count in header
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('cartUpdated'));
+      }
     }
   }, [sessionId, clearCart])
 

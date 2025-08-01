@@ -15,20 +15,14 @@ interface ProductCardProps {
 
 export function ProductCard({ id, name, price, images, description, stock }: ProductCardProps) {
   const [isAdding, setIsAdding] = useState(false);
-  const addItem = useCartStore(state => state.addItem);
+  const addToCart = useCartStore(state => state.addToCart);
 
   const handleAddToCart = async () => {
     if (isAdding) return;
     
     setIsAdding(true);
     try {
-      await addItem({
-        id,
-        name,
-        price,
-        image: images && images.length > 0 ? images[0] : 'placeholder.jpg',
-        quantity: 1
-      });
+      await addToCart(Number(id), 1);
       
       // 显示成功反馈
       const button = document.activeElement as HTMLButtonElement;

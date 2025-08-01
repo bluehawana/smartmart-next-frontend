@@ -28,32 +28,13 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     
     setIsAddingToCart(true)
     try {
-      await addToCart(product.id, quantity)
+      // Convert product.id to number for the cart store
+      const numericProductId = Number(product.id)
+      await addToCart(numericProductId, quantity)
       toast.success('Added to cart!')
     } catch (error) {
-      console.error('Cart API failed, using local storage fallback:', error)
-      // Fallback to local storage for development
-      const cartItem = {
-        id: `${product.id}-${Date.now()}`,
-        productId: product.id,
-        name: product.name,
-        price: product.price,
-        quantity: quantity,
-        image: product.image,
-        description: product.description
-      }
-      
-      const existingCart = JSON.parse(localStorage.getItem('local-cart') || '[]')
-      const existingItemIndex = existingCart.findIndex((item: any) => item.productId === product.id)
-      
-      if (existingItemIndex >= 0) {
-        existingCart[existingItemIndex].quantity += quantity
-      } else {
-        existingCart.push(cartItem)
-      }
-      
-      localStorage.setItem('local-cart', JSON.stringify(existingCart))
-      toast.success('Added to cart (local storage)!')
+      console.error('Error adding to cart:', error)
+      toast.error('Failed to add to cart. Please try again.')
     } finally {
       setIsAddingToCart(false)
     }

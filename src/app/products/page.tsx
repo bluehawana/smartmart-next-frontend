@@ -1,21 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://smrtmart-go-backend-1753976056-b4c4ef7e5ab7.herokuapp.com/api/v1';
 
 // UUID to numeric ID mapping for clean URLs - 9 products total
 const UUID_TO_NUMERIC: Record<string, string> = {
-  "88d35c54-ce2d-40d5-92e9-4af5c7e5e330": "1",
-  "c0d069ee-031f-4340-8588-4706103e6b04": "2", 
-  "7a82d048-b478-4b4b-8b78-64eeb3a7ab86": "3",
-  "a4e33218-57c3-4133-ac51-ca9aa711eddb": "4",
-  "ff5c7fc1-c3c7-4b35-9e21-15ba9d1c71d1": "5",
-  "a87117d8-e9dd-49ab-a131-245cff3cbf2d": "6",
-  "611bac4c-ef16-484e-899d-1e7992819a88": "7",
-  "asus-rog-laptop-001": "8",
-  "iphone-15-pro-max-001": "9"
+  "88d35c54-ce2d-40d5-92e9-4af5c7e5e330": "1", // MacBook
+  "c0d069ee-031f-4340-8588-4706103e6b04": "2", // AirPods
+  "7a82d048-b478-4b4b-8b78-64eeb3a7ab86": "3", // Sony Headphones
+  "a4e33218-57c3-4133-ac51-ca9aa711eddb": "4", // Dell Monitor
+  "ff5c7fc1-c3c7-4b35-9e21-15ba9d1c71d1": "5", // Apple Watch
+  "a87117d8-e9dd-49ab-a131-245cff3cbf2d": "6", // AI Translate Earphones
+  "611bac4c-ef16-484e-899d-1e7992819a88": "7", // Dell XPS
+  "asus-rog-router-001": "8", // ASUS Router
+  "iphone-15-pro-max-001": "9"  // iPhone
 }
 
 // Helper function to get clean product URL
@@ -44,6 +44,7 @@ export default function ProductsPage() {
   const [page, setPage] = useState(1);
   const [category, setCategory] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchInput, setSearchInput] = useState('');
 
   const categories = [
     { value: '', label: 'All Categories' },
@@ -55,6 +56,15 @@ export default function ProductsPage() {
     { value: 'networking', label: 'Networking' },
     { value: 'accessories', label: 'Accessories' },
   ];
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchTerm(searchInput);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   useEffect(() => {
     fetchProducts();
@@ -242,8 +252,8 @@ export default function ProductsPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setSearchTerm(searchInput);
     setPage(1);
-    fetchProducts();
   };
 
   if (loading) {
@@ -277,8 +287,8 @@ export default function ProductsPage() {
               <input
                 type="text"
                 placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 className="flex-1 px-4 py-2 border border-gray-300 focus:border-black focus:outline-none text-sm"
               />
               <button

@@ -10,15 +10,15 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v
 
 // UUID to numeric ID mapping for clean URLs - 9 products total
 const UUID_TO_NUMERIC: Record<string, string> = {
-  "88d35c54-ce2d-40d5-92e9-4af5c7e5e330": "1",
-  "c0d069ee-031f-4340-8588-4706103e6b04": "2", 
-  "7a82d048-b478-4b4b-8b78-64eeb3a7ab86": "3",
-  "a4e33218-57c3-4133-ac51-ca9aa711eddb": "4",
-  "ff5c7fc1-c3c7-4b35-9e21-15ba9d1c71d1": "5",
-  "a87117d8-e9dd-49ab-a131-245cff3cbf2d": "6",
-  "611bac4c-ef16-484e-899d-1e7992819a88": "7",
-  "asus-rog-laptop-001": "8",
-  "iphone-15-pro-max-001": "9"
+  "88d35c54-ce2d-40d5-92e9-4af5c7e5e330": "1", // MacBook
+  "c0d069ee-031f-4340-8588-4706103e6b04": "2", // AirPods
+  "7a82d048-b478-4b4b-8b78-64eeb3a7ab86": "3", // Sony Headphones
+  "a4e33218-57c3-4133-ac51-ca9aa711eddb": "4", // Dell Monitor
+  "ff5c7fc1-c3c7-4b35-9e21-15ba9d1c71d1": "5", // Apple Watch
+  "a87117d8-e9dd-49ab-a131-245cff3cbf2d": "6", // AI Translate Earphones
+  "611bac4c-ef16-484e-899d-1e7992819a88": "7", // Dell XPS
+  "asus-rog-router-001": "8", // ASUS Router
+  "iphone-15-pro-max-001": "9"  // iPhone
 }
 
 // Helper function to get clean product URL
@@ -176,7 +176,7 @@ function getMockProducts(): Product[] {
       category: "computers"
     },
     {
-      id: "asus-rog-laptop-001",
+      id: "asus-rog-router-001",
       name: "ASUS ROG Rapture GT-BE98 Gaming Router",
       price: 8990,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/asus.jpg"],

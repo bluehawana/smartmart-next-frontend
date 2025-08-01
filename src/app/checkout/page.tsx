@@ -4,7 +4,9 @@ import { useState } from 'react'
 import { useCartStore } from '@/lib/store/cart'
 import { loadStripe } from '@stripe/stripe-js'
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null
 
 export default function CheckoutPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -22,21 +24,27 @@ export default function CheckoutPage() {
       return
     }
 
+    if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+      alert('Stripe is not configured. Please contact support.')
+      return
+    }
+
     setIsLoading(true)
 
     try {
       // Prepare checkout items
       const checkoutItems = items.map(item => ({
-        product_id: item.id,
+        product_id: item.productId, // Use productId instead of id
         name: item.name,
-        description: `Quantity: ${item.quantity}`,
-        price: item.price,
+        description: item.description || `Quantity: ${item.quantity}`,
+        price: Math.round(item.price * 100), // Convert to cents for Stripe
         quantity: item.quantity,
         images: item.image ? [item.image] : []
       }))
 
       // Create checkout session
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/checkout`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://smrtmart-go-backend-1753976056-b4c4ef7e5ab7.herokuapp.com/api/v1';
+      const response = await fetch(`${apiUrl}/orders/checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,6 +57,11 @@ export default function CheckoutPage() {
         })
       })
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API Error: ${response.status} - ${errorText}`);
+      }
+
       const data = await response.json()
 
       if (!data.success) {
@@ -56,6 +69,10 @@ export default function CheckoutPage() {
       }
 
       // Redirect to Stripe Checkout
+      if (!stripePromise) {
+        throw new Error('Stripe is not configured')
+      }
+
       const stripe = await stripePromise
       if (!stripe) {
         throw new Error('Stripe failed to load')
@@ -71,7 +88,19 @@ export default function CheckoutPage() {
 
     } catch (error) {
       console.error('Checkout error:', error)
-      alert(error instanceof Error ? error.message : 'Checkout failed. Please try again.')
+      
+      // Show detailed error information
+      let errorMessage = 'Checkout failed. Please try again.';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      // If it's a network error, provide more context
+      if (errorMessage.includes('fetch')) {
+        errorMessage = 'Unable to connect to payment service. Please check your internet connection and try again.';
+      }
+      
+      alert(errorMessage)
     } finally {
       setIsLoading(false)
     }
@@ -149,8 +178,19 @@ export default function CheckoutPage() {
       </button>
 
       <div className="mt-4 text-center text-sm text-gray-600">
-        <p>🔒 Secure payment powered by Stripe</p>
-        <p>Your payment information is encrypted and secure</p>
+        {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ? (
+          <>
+            <p>🔒 Secure payment powered by Stripe</p>
+            <p>Your payment information is encrypted and secure</p>
+          </>
+        ) : (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mt-4">
+            <p className="text-yellow-800 font-medium">⚠️ Stripe Configuration Required</p>
+            <p className="text-yellow-700 text-xs mt-1">
+              Add your NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY to .env.local to enable payments
+            </p>
+          </div>
+        )}
       </div>
     </div>
   )

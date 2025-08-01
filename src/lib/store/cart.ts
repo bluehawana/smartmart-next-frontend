@@ -12,44 +12,62 @@ interface CartItem {
   description: string
 }
 
-// 产品数据映射
+// 产品数据映射 - Updated with correct product data
 const PRODUCTS_MAP: Record<number, { name: string; price: number; image: string; description: string }> = {
   1: { 
     name: "Apple MacBook Pro 16-inch", 
-    price: 2499.99, 
+    price: 2499, 
     image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/macbook.jpg",
     description: "Apple MacBook Pro 16-inch with M3 Pro chip, 18GB RAM, 512GB SSD. Perfect for professionals and creatives."
   },
   2: { 
-    name: "Apple AirPods Pro 2nd Generation", 
-    price: 249.99, 
+    name: "AirPods Pro 2nd Generation", 
+    price: 249, 
     image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/airpods2.jpg",
     description: "Apple AirPods Pro with Active Noise Cancellation, Transparency mode, and spatial audio."
   },
   3: { 
     name: "Sony WH-1000XM5 Headphones", 
-    price: 399.99, 
+    price: 399, 
     image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/sony.jpg",
     description: "Industry-leading noise canceling headphones with exceptional sound quality and 30-hour battery life."
   },
   4: { 
-    name: "Dell XPS 13 Laptop", 
-    price: 1299.99, 
-    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/xps.jpg",
-    description: "Ultra-portable Dell XPS 13 with Intel Core i7, 16GB RAM, 512GB SSD, and stunning InfinityEdge display."
-  },
-  5: { 
     name: "Dell Alienware 34 Curved Monitor", 
-    price: 899.99, 
+    price: 899, 
     image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell.jpg",
     description: "34-inch curved gaming monitor with 144Hz refresh rate, NVIDIA G-SYNC, and stunning WQHD resolution."
   },
-  6: { 
+  5: { 
     name: "Apple Watch Ultra", 
-    price: 799.99, 
+    price: 799, 
     image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ultra.jpg",
     description: "The most rugged and capable Apple Watch, designed for endurance athletes and outdoor adventurers."
   },
+  6: { 
+    name: "AI Translate Earphones Pro", 
+    price: 199, 
+    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ai-translate-pro.jpg",
+    description: "Revolutionary intelligent translate earphones with real-time translation in 40+ languages."
+  },
+  7: { 
+    name: "Dell XPS 13 Laptop", 
+    price: 1299, 
+    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/xps.jpg",
+    description: "Ultra-portable Dell XPS 13 with Intel Core i7, 16GB RAM, 512GB SSD, and stunning InfinityEdge display."
+  },
+  8: { 
+    name: "ASUS ROG Rapture GT-BE98 Gaming Router", 
+    price: 8990, 
+    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/asus.jpg",
+    description: "ASUS ROG Rapture GT-BE98 Quad-band Gaming Router with WiFi 7, advanced QoS, and ultra-low latency for competitive gaming."
+  },
+  9: { 
+    name: "iPhone 15 Pro Max", 
+    price: 1199, 
+    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/iphone.jpg",
+    description: "The ultimate iPhone with titanium design, A17 Pro chip, and professional camera system."
+  }
 }
 
 interface CartStore {
@@ -155,8 +173,9 @@ export const useCartStore = create<CartStore>()(
           // 更新本地状态
           set((state) => {
             const existingItem = state.items.find(item => item.productId === productId)
+            let newState;
             if (existingItem) {
-              return {
+              newState = {
                 items: state.items.map(item => 
                   item.productId === productId 
                     ? { ...item, quantity: item.quantity + quantity }
@@ -164,7 +183,7 @@ export const useCartStore = create<CartStore>()(
                 )
               }
             } else {
-              return {
+              newState = {
                 items: [...state.items, {
                   id: String(addedItem.id || Date.now()),
                   productId,
@@ -178,6 +197,13 @@ export const useCartStore = create<CartStore>()(
                 }]
               }
             }
+            
+            // Dispatch custom event to update cart count in header
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('cartUpdated'));
+            }
+            
+            return newState;
           })
         } catch (error) {
           console.error('Error adding to cart:', error)
@@ -185,8 +211,9 @@ export const useCartStore = create<CartStore>()(
           // Fallback: Add to local state only
           set((state) => {
             const existingItem = state.items.find(item => item.productId === productId)
+            let newState;
             if (existingItem) {
-              return {
+              newState = {
                 items: state.items.map(item => 
                   item.productId === productId 
                     ? { ...item, quantity: item.quantity + quantity }
@@ -195,7 +222,7 @@ export const useCartStore = create<CartStore>()(
                 error: null
               }
             } else {
-              return {
+              newState = {
                 items: [...state.items, {
                   id: `local-${productId}-${Date.now()}`,
                   productId,
@@ -210,6 +237,13 @@ export const useCartStore = create<CartStore>()(
                 error: null
               }
             }
+            
+            // Dispatch custom event to update cart count in header
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('cartUpdated'));
+            }
+            
+            return newState;
           })
         } finally {
           set({ isLoading: false })

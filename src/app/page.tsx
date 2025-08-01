@@ -8,17 +8,16 @@ import { EmblaOptionsType } from "embla-carousel";
 // API base URL
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1'
 
-// UUID to numeric ID mapping for clean URLs - 9 products total
+// UUID to numeric ID mapping for clean URLs - based on actual API data
 const UUID_TO_NUMERIC: Record<string, string> = {
   "88d35c54-ce2d-40d5-92e9-4af5c7e5e330": "1", // MacBook
   "c0d069ee-031f-4340-8588-4706103e6b04": "2", // AirPods
   "7a82d048-b478-4b4b-8b78-64eeb3a7ab86": "3", // Sony Headphones
-  "a4e33218-57c3-4133-ac51-ca9aa711eddb": "4", // Dell Monitor
-  "ff5c7fc1-c3c7-4b35-9e21-15ba9d1c71d1": "5", // Apple Watch
-  "a87117d8-e9dd-49ab-a131-245cff3cbf2d": "6", // AI Translate Earphones
-  "611bac4c-ef16-484e-899d-1e7992819a88": "7", // Dell XPS
-  "asus-rog-router-001": "8", // ASUS Router
-  "iphone-15-pro-max-001": "9"  // iPhone
+  "611bac4c-ef16-484e-899d-1e7992819a88": "4", // Dell XPS
+  "a4e33218-57c3-4133-ac51-ca9aa711eddb": "5", // Dell Monitor
+  "ff5c7fc1-c3c7-4b35-9e21-15ba9d1c71d1": "6", // Apple Watch
+  "a87117d8-e9dd-49ab-a131-245cff3cbf2d": "7", // AI Translate Earphones
+  "eed7ffb1-5dc5-45fe-8e77-63430419dce3": "8"  // Smart Language Translator Buds
 }
 
 // Helper function to get clean product URL
@@ -65,7 +64,7 @@ function ErrorCard({ error }: { error: Error }) {
 
 async function getProducts() {
   try {
-    const url = `${BASE_URL}/products?limit=6`
+    const url = `${BASE_URL}/products`
     console.log('Fetching products from:', url)
 
     const res = await fetch(url, {
@@ -132,6 +131,17 @@ function getMockProducts(): Product[] {
       category: "audio"
     },
     {
+      id: "611bac4c-ef16-484e-899d-1e7992819a88",
+      name: "Dell XPS 13 Laptop",
+      price: 1299,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/xps.jpg"],
+      description: "Ultra-portable Dell XPS 13 with Intel Core i7, 16GB RAM, 512GB SSD, and stunning InfinityEdge display.",
+      stock: 20,
+      status: "active",
+      featured: false,
+      category: "computers"
+    },
+    {
       id: "a4e33218-57c3-4133-ac51-ca9aa711eddb",
       name: "Dell Alienware 34 Curved Monitor", 
       price: 899,
@@ -165,39 +175,16 @@ function getMockProducts(): Product[] {
       category: "audio"
     },
     {
-      id: "611bac4c-ef16-484e-899d-1e7992819a88",
-      name: "Dell XPS 13 Laptop",
-      price: 1299,
-      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/xps.jpg"],
-      description: "Ultra-portable Dell XPS 13 with Intel Core i7, 16GB RAM, 512GB SSD, and stunning InfinityEdge display.",
-      stock: 20,
+      id: "eed7ffb1-5dc5-45fe-8e77-63430419dce3",
+      name: "Smart Language Translator Buds",
+      price: 149,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/smart-translator.jpg"],
+      description: "Next-generation wireless earbuds with built-in AI translator. Supports conversation mode, offline translation for 12 languages, and crystal-clear audio quality.",
+      stock: 40,
       status: "active",
-      featured: false,
-      category: "computers"
-    },
-    {
-      id: "asus-rog-router-001",
-      name: "ASUS ROG Rapture GT-BE98 Gaming Router",
-      price: 8990,
-      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/asus.jpg"],
-      description: "Quad-band Gaming Router with WiFi 7 and ultra-low latency for competitive gaming.",
-      stock: 8,
-      status: "active",
-      featured: false,
-      category: "networking"
-    },
-    {
-      id: "iphone-15-pro-max-001",
-      name: "iPhone 15 Pro Max",
-      price: 1199,
-      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/iphone.jpg"],
-      description: "The ultimate iPhone with titanium design, A17 Pro chip, and professional camera system.",
-      stock: 18,
-      status: "active",
-      featured: false,
-      category: "smartphones"
-    },
-
+      featured: true,
+      category: "audio"
+    }
   ]
 }
 
@@ -311,26 +298,26 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Products */}
+      {/* All Products */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-12">
-            <h2 className="text-2xl font-light text-black">Featured Products</h2>
+            <h2 className="text-2xl font-light text-black">All Products</h2>
             <Link href="/products" className="text-sm text-gray-600 hover:text-black border-b border-gray-300 hover:border-black transition-colors">
               View All
             </Link>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {loading ? (
-              [...Array(6)].map((_, i) => (
+              [...Array(8)].map((_, i) => (
                 <div key={`loading-${i}`} className="group">
                   <div className="aspect-square bg-gray-100 animate-pulse mb-4"></div>
                   <div className="h-4 bg-gray-100 animate-pulse mb-2"></div>
                   <div className="h-4 bg-gray-100 animate-pulse w-1/3"></div>
                 </div>
               ))
-            ) : products.length > 0 ? products.slice(0, 6).map((product) => (
+            ) : products.length > 0 ? products.map((product) => (
               <Link 
                 href={getProductUrl(product.id)}
                 key={`product-${product.id}`}

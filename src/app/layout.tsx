@@ -1,7 +1,13 @@
+import type { Metadata } from 'next'
 import "./globals.css";
 import { Toaster } from 'react-hot-toast';
 import { CartProvider } from '@/components/providers/CartProvider';
 import { ClientHeader } from '@/components/layout/ClientHeader';
+
+export const metadata: Metadata = {
+  title: 'SmartMart - Premium Electronics & Tech',
+  description: 'Discover premium electronics and technology products',
+}
 
 export default function RootLayout({
   children,
@@ -10,10 +16,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <head>
-        <title>SmartMart - Premium Electronics & Tech</title>
-        <meta name="description" content="Discover premium electronics and technology products" />
-      </head>
       <body className="h-full bg-white text-gray-900 antialiased">
         <CartProvider>
           <ClientHeader />

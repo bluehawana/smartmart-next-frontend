@@ -23,6 +23,11 @@ const nextConfig = {
         hostname: '*.vercel.app',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'mqkoydypybxgcwxioqzc.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
     ],
   },
   eslint: {

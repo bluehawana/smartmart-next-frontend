@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from 'next/link';
+import { EmblaOptionsType } from "embla-carousel";
 
 // API base URL
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1'
@@ -118,7 +119,7 @@ function getMockProducts(): Product[] {
 async function getFeaturedProducts() {
   try {
     console.log('Fetching featured products...');
-    const res = await fetch(`${BASE_URL}/products/featured?limit=6`, {
+    const res = await fetch(`${BASE_URL}/products?featured=true&limit=6`, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -131,9 +132,9 @@ async function getFeaturedProducts() {
     }
 
     const response = await res.json();
-    if (response.success && response.data) {
+    if (response.success && response.data && response.data.data) {
       // Extract image URLs from featured products
-      return response.data.map((product: Product) => 
+      return response.data.data.map((product: Product) => 
         product.images && product.images.length > 0 ? product.images[0] : '/placeholder-product.svg'
       );
     }
@@ -221,8 +222,8 @@ export default function Home() {
                 <div className="relative w-full pt-[100%]">
                   <Image
                     src={product.images && product.images.length > 0 
-                      ? `${process.env.NEXT_PUBLIC_IMAGE_BASE_URL}/${product.images[0]}`
-                      : '/placeholder-product.jpg'
+                      ? product.images[0]
+                      : '/placeholder-product.svg'
                     }
                     alt={product.name}
                     fill

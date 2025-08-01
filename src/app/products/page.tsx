@@ -52,7 +52,7 @@ export default function ProductsPage() {
     { value: 'audio', label: 'Audio' },
     { value: 'wearables', label: 'Wearables' },
     { value: 'monitors', label: 'Monitors' },
-    { value: 'tablets', label: 'Tablets' },
+    { value: 'networking', label: 'Networking' },
     { value: 'accessories', label: 'Accessories' },
   ];
 
@@ -213,16 +213,16 @@ export default function ProductsPage() {
       },
       {
         id: "8",
-        name: "ASUS ROG Gaming Laptop",
-        price: 1599,
-        compare_price: 1799,
+        name: "ASUS ROG Rapture GT-BE98 Gaming Router",
+        price: 8990,
+        compare_price: 9990,
         images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/asus.jpg"],
-        description: "High-performance gaming laptop with RTX graphics, RGB keyboard, and advanced cooling system.",
-        stock: 12,
+        description: "ASUS ROG Rapture GT-BE98 Quad-band Gaming Router with WiFi 7, advanced QoS, and ultra-low latency for competitive gaming.",
+        stock: 8,
         status: "active",
         featured: false,
-        category: "computers",
-        tags: ["asus", "rog", "gaming", "laptop", "rtx", "rgb"]
+        category: "networking",
+        tags: ["asus", "rog", "router", "gaming", "wifi7", "networking"]
       },
       {
         id: "9",

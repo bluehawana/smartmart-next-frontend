@@ -62,11 +62,11 @@ const MOCK_PRODUCTS: Record<string, any> = {
   },
   "8": {
     id: 8,
-    name: "ASUS ROG Gaming Laptop",
-    price: 1599.99,
-    description: "High-performance gaming laptop with RTX graphics, RGB keyboard, and advanced cooling system.",
+    name: "ASUS ROG Rapture GT-BE98 Gaming Router",
+    price: 8990.99,
+    description: "ASUS ROG Rapture GT-BE98 Quad-band Gaming Router with WiFi 7, advanced QoS, and ultra-low latency for competitive gaming.",
     image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/asus.jpg",
-    stock: 12
+    stock: 8
   },
   "9": {
     id: 9,

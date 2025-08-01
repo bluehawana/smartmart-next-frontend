@@ -177,14 +177,14 @@ function getMockProducts(): Product[] {
     },
     {
       id: "asus-rog-laptop-001",
-      name: "ASUS ROG Gaming Laptop",
-      price: 1599,
+      name: "ASUS ROG Rapture GT-BE98 Gaming Router",
+      price: 8990,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/asus.jpg"],
-      description: "High-performance gaming laptop with RTX graphics, RGB keyboard, and advanced cooling system.",
-      stock: 12,
+      description: "Quad-band Gaming Router with WiFi 7 and ultra-low latency for competitive gaming.",
+      stock: 8,
       status: "active",
       featured: false,
-      category: "computers"
+      category: "networking"
     },
     {
       id: "iphone-15-pro-max-001",

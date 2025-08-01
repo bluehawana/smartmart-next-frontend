@@ -9,11 +9,11 @@ export const metadata: Metadata = {
   description: 'Discover premium electronics and technology products',
 }
 
-export default function RootLayout({
-  children,
-}: {
+interface RootLayoutProps {
   children: React.ReactNode;
-}) {
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className="h-full">
       <body className="h-full bg-white text-gray-900 antialiased">
@@ -24,7 +24,6 @@ export default function RootLayout({
               {children}
             </main>
             
-            {/* Footer */}
             <footer className="border-t border-gray-200 bg-gray-50">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">

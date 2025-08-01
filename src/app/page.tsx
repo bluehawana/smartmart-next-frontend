@@ -332,7 +332,7 @@ export default function Home() {
               ))
             ) : products.length > 0 ? products.slice(0, 6).map((product) => (
               <Link 
-                href={`/products/${product.id}`}
+                href={getProductUrl(product.id)}
                 key={`product-${product.id}`}
                 className="group"
               >

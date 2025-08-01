@@ -83,7 +83,7 @@ function getMockProducts(): Product[] {
       id: "1",
       name: "MacBook Pro 16-inch",
       price: 2499,
-      images: ["/placeholder-product.svg"],
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/macbook.jpg"],
       description: "Apple MacBook Pro 16-inch with M3 Pro chip",
       stock: 15,
       status: "active",
@@ -94,7 +94,7 @@ function getMockProducts(): Product[] {
       id: "2", 
       name: "AirPods Pro 2nd Generation",
       price: 249,
-      images: ["/placeholder-product.svg"],
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/airpods2.jpg"],
       description: "Apple AirPods Pro with Active Noise Cancellation",
       stock: 50,
       status: "active",
@@ -105,8 +105,41 @@ function getMockProducts(): Product[] {
       id: "3",
       name: "Sony WH-1000XM5 Headphones", 
       price: 399,
-      images: ["/placeholder-product.svg"],
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/sony.jpg"],
       description: "Industry-leading noise canceling headphones",
+      stock: 25,
+      status: "active",
+      featured: true,
+      category: "audio"
+    },
+    {
+      id: "4",
+      name: "Dell Alienware 34 Monitor", 
+      price: 899,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell.jpg"],
+      description: "34-inch curved gaming monitor with 144Hz",
+      stock: 10,
+      status: "active",
+      featured: true,
+      category: "monitors"
+    },
+    {
+      id: "5",
+      name: "Apple Watch Ultra", 
+      price: 799,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ultra.jpg"],
+      description: "Most rugged Apple Watch for athletes",
+      stock: 30,
+      status: "active",
+      featured: true,
+      category: "wearables"
+    },
+    {
+      id: "6",
+      name: "AI Translate Earphones Pro", 
+      price: 199,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ai-translate-pro.jpg"],
+      description: "Real-time translation earphones in 40+ languages",
       stock: 25,
       status: "active",
       featured: true,
@@ -148,12 +181,12 @@ async function getFeaturedProducts() {
 
 function getMockPhotos(): string[] {
   return [
-    '/placeholder-product.svg',
-    '/placeholder-product.svg', 
-    '/placeholder-product.svg',
-    '/placeholder-product.svg',
-    '/placeholder-product.svg',
-    '/placeholder-product.svg'
+    'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/macbook.jpg',
+    'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/airpods2.jpg', 
+    'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/sony.jpg',
+    'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell.jpg',
+    'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ultra.jpg',
+    'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ai-translate-pro.jpg'
   ]
 }
 
@@ -184,8 +217,10 @@ export default function Home() {
         ]);
         setProducts(productsData);
         setPhotos(photosData);
-        console.log('Products:', productsData);
-        console.log('Featured photos:', photosData);
+        console.log('Products loaded:', productsData.length);
+        console.log('Sample product images:', productsData[0]?.images);
+        console.log('Featured photos loaded:', photosData.length);
+        console.log('Sample photo URL:', photosData[0]);
       } catch (e) {
         setError(e as Error);
         console.error('Data fetch failed:', e);
@@ -220,16 +255,17 @@ export default function Home() {
                 className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
               >
                 <div className="relative w-full pt-[100%]">
-                  <Image
+                  <img
                     src={product.images && product.images.length > 0 
                       ? product.images[0]
                       : '/placeholder-product.svg'
                     }
                     alt={product.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="absolute inset-0 w-full h-full object-contain p-4 group-hover:opacity-75 transition-opacity duration-300"
-                    priority
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/placeholder-product.svg';
+                    }}
                   />
                 </div>
                 <div className="p-4">
@@ -260,11 +296,14 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {photos.map((photo, index) => (
             <div key={index} className="relative h-64 bg-gray-200 rounded-lg overflow-hidden">
-              <Image
+              <img
                 src={photo}
                 alt={`Featured product ${index + 1}`}
-                fill
-                className="object-cover"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = '/placeholder-product.svg';
+                }}
               />
             </div>
           ))}

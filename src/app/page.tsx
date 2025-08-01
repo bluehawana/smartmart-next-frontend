@@ -1,13 +1,8 @@
 'use client';
 
 import Image from "next/image";
-import { Suspense, useEffect, useState } from "react";
-import useEmblaCarousel from 'embla-carousel-react';
-import Autoplay from 'embla-carousel-autoplay';
-import { PhotoGallery } from "@/components/PhotoGallery";
-import { useCartStore } from '@/lib/store/cart';
+import { useEffect, useState } from "react";
 import Link from 'next/link';
-import { EmblaOptionsType } from 'embla-carousel-react'
 
 // API base URL
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1'
@@ -56,14 +51,13 @@ async function getProducts() {
     const res = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
-      }
+      },
+      mode: 'cors'
     })
 
     if (!res.ok) {
       console.error(`API Error: ${res.status}`)
-      const errorText = await res.text()
-      console.error('Error details:', errorText)
-      return []
+      return getMockProducts()
     }
 
     const response = await res.json()
@@ -74,42 +68,92 @@ async function getProducts() {
       return response.data.data
     }
     
-    return []
+    return getMockProducts()
   } catch (error) {
     console.error('Error fetching products:', error)
-    // Return empty array during build when API is not available
-    return []
+    // Return mock data for local development
+    return getMockProducts()
   }
+}
+
+function getMockProducts(): Product[] {
+  return [
+    {
+      id: "1",
+      name: "MacBook Pro 16-inch",
+      price: 2499,
+      images: ["/placeholder-product.svg"],
+      description: "Apple MacBook Pro 16-inch with M3 Pro chip",
+      stock: 15,
+      status: "active",
+      featured: true,
+      category: "computers"
+    },
+    {
+      id: "2", 
+      name: "AirPods Pro 2nd Generation",
+      price: 249,
+      images: ["/placeholder-product.svg"],
+      description: "Apple AirPods Pro with Active Noise Cancellation",
+      stock: 50,
+      status: "active",
+      featured: true,
+      category: "audio"
+    },
+    {
+      id: "3",
+      name: "Sony WH-1000XM5 Headphones", 
+      price: 399,
+      images: ["/placeholder-product.svg"],
+      description: "Industry-leading noise canceling headphones",
+      stock: 25,
+      status: "active",
+      featured: true,
+      category: "audio"
+    }
+  ]
 }
 
 // Get featured products for gallery
 async function getFeaturedProducts() {
   try {
     console.log('Fetching featured products...');
-    const res = await fetch(`${BASE_URL}/products/featured?limit=6`, {
+    const res = await fetch(`${BASE_URL}/products?featured=true&limit=6`, {
       headers: {
         'Content-Type': 'application/json',
-      }
+      },
+      mode: 'cors'
     });
 
     if (!res.ok) {
       console.error(`Featured products API error: ${res.status}`);
-      return [];
+      return getMockPhotos();
     }
 
     const response = await res.json();
-    if (response.success && response.data) {
+    if (response.success && response.data && response.data.data) {
       // Extract image URLs from featured products
-      return response.data.map((product: Product) => 
-        product.images && product.images.length > 0 ? product.images[0] : 'placeholder.jpg'
+      return response.data.data.map((product: Product) => 
+        product.images && product.images.length > 0 ? product.images[0] : '/placeholder-product.svg'
       );
     }
-    return [];
+    return getMockPhotos();
   } catch (error) {
     console.error('Error fetching featured products:', error);
-    // Return empty array during build when API is not available
-    return [];
+    // Return mock photos for local development
+    return getMockPhotos();
   }
+}
+
+function getMockPhotos(): string[] {
+  return [
+    '/placeholder-product.svg',
+    '/placeholder-product.svg', 
+    '/placeholder-product.svg',
+    '/placeholder-product.svg',
+    '/placeholder-product.svg',
+    '/placeholder-product.svg'
+  ]
 }
 
 const autoplayOptions = {
@@ -212,9 +256,18 @@ export default function Home() {
           <h2 className="text-2xl font-bold">Weekly Picks</h2>
         </div>
         
-        <Suspense fallback={<div className="h-64 bg-gray-200 animate-pulse rounded-lg" />}>
-          <PhotoGallery photos={photos} />
-        </Suspense>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {photos.map((photo, index) => (
+            <div key={index} className="relative h-64 bg-gray-200 rounded-lg overflow-hidden">
+              <Image
+                src={photo}
+                alt={`Featured product ${index + 1}`}
+                fill
+                className="object-cover"
+              />
+            </div>
+          ))}
+        </div>
       </section>
     </div>
   );

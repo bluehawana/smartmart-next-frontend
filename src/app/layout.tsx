@@ -1,11 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-import { NavigationLayout } from "@/components/layout/NavigationLayout";
-import { Toaster } from 'react-hot-toast'
-import { CartProvider } from "@/components/providers/CartProvider";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "SmartMart - Premium Lifestyle Products",
@@ -19,13 +13,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <CartProvider>
-          <NavigationLayout>
-            {children}
-          </NavigationLayout>
-          <Toaster position="top-right" />
-        </CartProvider>
+      <body>
+        <nav className="bg-blue-600 text-white p-4">
+          <div className="max-w-7xl mx-auto">
+            <h1 className="text-2xl font-bold">SmartMart</h1>
+          </div>
+        </nav>
+        <main>
+          {children}
+        </main>
       </body>
     </html>
   );

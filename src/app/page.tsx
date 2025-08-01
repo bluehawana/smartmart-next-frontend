@@ -8,6 +8,25 @@ import { EmblaOptionsType } from "embla-carousel";
 // API base URL
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1'
 
+// UUID to numeric ID mapping for clean URLs - 9 products total
+const UUID_TO_NUMERIC: Record<string, string> = {
+  "88d35c54-ce2d-40d5-92e9-4af5c7e5e330": "1",
+  "c0d069ee-031f-4340-8588-4706103e6b04": "2", 
+  "7a82d048-b478-4b4b-8b78-64eeb3a7ab86": "3",
+  "a4e33218-57c3-4133-ac51-ca9aa711eddb": "4",
+  "ff5c7fc1-c3c7-4b35-9e21-15ba9d1c71d1": "5",
+  "a87117d8-e9dd-49ab-a131-245cff3cbf2d": "6",
+  "611bac4c-ef16-484e-899d-1e7992819a88": "7",
+  "asus-rog-laptop-001": "8",
+  "iphone-15-pro-max-001": "9"
+}
+
+// Helper function to get clean product URL
+const getProductUrl = (productId: string): string => {
+  const numericId = UUID_TO_NUMERIC[productId] || productId
+  return `/products/${numericId}`
+}
+
 // Product interface matching Go backend
 interface Product {
   id: string;
@@ -178,17 +197,7 @@ function getMockProducts(): Product[] {
       featured: false,
       category: "smartphones"
     },
-    {
-      id: "smart-translator-001",
-      name: "Smart Translator Device",
-      price: 299,
-      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/smart-translator.jpg"],
-      description: "Portable smart translator with voice recognition, supporting 100+ languages for seamless communication.",
-      stock: 35,
-      status: "active",
-      featured: false,
-      category: "accessories"
-    }
+
   ]
 }
 

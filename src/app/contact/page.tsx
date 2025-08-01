@@ -36,9 +36,9 @@ export default function ContactPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-light text-black mb-6">Contact Us</h1>
+          <h1 className="text-4xl font-light text-black mb-6">Let's Transform Your Business</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Get in touch with our team. We're here to help with any questions about our products or services.
+            Ready to digitalize your business? We've helped restaurants, SMEs, and entrepreneurs achieve remarkable growth through technology. Let's discuss your vision.
           </p>
         </div>
 
@@ -46,7 +46,32 @@ export default function ContactPage() {
           {/* Contact Information */}
           <div className="space-y-8">
             <div>
-              <h2 className="text-2xl font-light text-black mb-8">Get in Touch</h2>
+              <h2 className="text-2xl font-light text-black mb-8">Our Success Story</h2>
+              <div className="bg-gray-50 p-6 mb-8 rounded-lg">
+                <h3 className="text-lg font-medium text-black mb-3">Ichiban Sushi: From Local Restaurant to Top 5 in Gothenburg</h3>
+                <p className="text-gray-600 text-sm mb-4">
+                  We transformed our own restaurant through digital innovation - achieving 15% growth and reaching top 5 status in just 4 years. 
+                  Our website revolutionized our sales, marketing, CRM, and customer engagement.
+                </p>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium text-black">✓ Online Ordering</span>
+                    <p className="text-gray-600">Integrated with Uber Eats, Foodora, Wolt</p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-black">✓ Customer Management</span>
+                    <p className="text-gray-600">CRM system for loyalty & retention</p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-black">✓ Digital Marketing</span>
+                    <p className="text-gray-600">SEO, social media integration</p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-black">✓ Analytics & Growth</span>
+                    <p className="text-gray-600">Data-driven business decisions</p>
+                  </div>
+                </div>
+              </div>
               
               <div className="space-y-6">
                 {/* Phone */}
@@ -57,13 +82,13 @@ export default function ContactPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-black mb-1">Phone</h3>
+                    <h3 className="text-sm font-medium text-black mb-1">Direct Line</h3>
                     <p className="text-gray-600">+46 760067977</p>
-                    <p className="text-sm text-gray-500 mt-1">8am - 8pm, Working days</p>
+                    <p className="text-sm text-gray-500 mt-1">Available for consultations</p>
                   </div>
                 </div>
 
-                {/* Address */}
+                {/* Location */}
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0 w-6 h-6 mt-1">
                     <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,13 +97,12 @@ export default function ContactPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-black mb-1">Address</h3>
+                    <h3 className="text-sm font-medium text-black mb-1">Location</h3>
                     <p className="text-gray-600">
                       Södra vägen 91<br />
-                      SmrtMart<br />
-                      412 63, Göteborg<br />
-                      Sweden
+                      412 63, Göteborg, Sweden
                     </p>
+                    <p className="text-sm text-gray-500 mt-1">🇸🇪 🇪🇺 🇺🇸 Remote work available</p>
                   </div>
                 </div>
 
@@ -97,21 +121,25 @@ export default function ContactPage() {
               </div>
             </div>
 
-            {/* Business Hours */}
+            {/* Services Overview */}
             <div>
-              <h3 className="text-lg font-medium text-black mb-4">Business Hours</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Monday - Friday</span>
-                  <span className="text-black">8:00 AM - 8:00 PM</span>
+              <h3 className="text-lg font-medium text-black mb-4">How We Can Help</h3>
+              <div className="space-y-4 text-sm">
+                <div className="border-l-4 border-black pl-4">
+                  <h4 className="font-medium text-black">Restaurant & SME Digitalization</h4>
+                  <p className="text-gray-600">Complete digital transformation based on our proven restaurant success</p>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Saturday</span>
-                  <span className="text-black">10:00 AM - 6:00 PM</span>
+                <div className="border-l-4 border-gray-300 pl-4">
+                  <h4 className="font-medium text-black">Full Stack Development</h4>
+                  <p className="text-gray-600">Java Spring Boot, React/Next.js, TypeScript, AWS cloud solutions</p>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Sunday</span>
-                  <span className="text-black">Closed</span>
+                <div className="border-l-4 border-gray-300 pl-4">
+                  <h4 className="font-medium text-black">Business Bridging</h4>
+                  <p className="text-gray-600">China-Global market entry, cultural adaptation, partnership facilitation</p>
+                </div>
+                <div className="border-l-4 border-gray-300 pl-4">
+                  <h4 className="font-medium text-black">Immigration Support</h4>
+                  <p className="text-gray-600">Helping immigrants achieve their business dreams and set examples for their children</p>
                 </div>
               </div>
             </div>
@@ -119,7 +147,7 @@ export default function ContactPage() {
 
           {/* Contact Form */}
           <div>
-            <h2 className="text-2xl font-light text-black mb-8">Send us a Message</h2>
+            <h2 className="text-2xl font-light text-black mb-8">Start Your Digital Journey</h2>
             
             {submitted ? (
               <div className="bg-gray-50 p-8 text-center">
@@ -128,13 +156,13 @@ export default function ContactPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-medium text-black mb-2">Message Sent!</h3>
-                <p className="text-gray-600">Thank you for contacting us. We'll get back to you soon.</p>
+                <h3 className="text-lg font-medium text-black mb-2">Let's Build Something Amazing!</h3>
+                <p className="text-gray-600">Thank you for reaching out. We'll contact you within 24 hours to discuss your digitalization goals.</p>
                 <button 
                   onClick={() => setSubmitted(false)}
                   className="mt-4 text-sm text-gray-600 hover:text-black border-b border-gray-300 hover:border-black transition-colors"
                 >
-                  Send another message
+                  Discuss another project
                 </button>
               </div>
             ) : (
@@ -172,22 +200,29 @@ export default function ContactPage() {
                 
                 <div>
                   <label htmlFor="subject" className="block text-sm font-medium text-black mb-2">
-                    Subject
+                    Project Type
                   </label>
-                  <input
-                    type="text"
+                  <select
                     id="subject"
                     name="subject"
                     value={formData.subject}
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none text-sm"
-                  />
+                  >
+                    <option value="">Select your project type</option>
+                    <option value="restaurant-digitalization">Restaurant Digitalization</option>
+                    <option value="sme-transformation">SME Digital Transformation</option>
+                    <option value="full-stack-development">Full Stack Development</option>
+                    <option value="china-global-bridging">China-Global Business Bridging</option>
+                    <option value="consultation">Technology Consultation</option>
+                    <option value="other">Other</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label htmlFor="message" className="block text-sm font-medium text-black mb-2">
-                    Message
+                    Tell us about your business goals
                   </label>
                   <textarea
                     id="message"
@@ -196,6 +231,7 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     rows={6}
+                    placeholder="Describe your current business, digitalization goals, challenges you're facing, or how we can help transform your vision into reality..."
                     className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none text-sm resize-none"
                   />
                 </div>
@@ -205,7 +241,7 @@ export default function ContactPage() {
                   disabled={isSubmitting}
                   className="w-full bg-black text-white py-4 text-sm font-medium hover:bg-gray-800 transition-colors disabled:bg-gray-400"
                 >
-                  {isSubmitting ? 'Sending...' : 'Send Message'}
+                  {isSubmitting ? 'Connecting...' : 'Start Your Digital Transformation'}
                 </button>
               </form>
             )}

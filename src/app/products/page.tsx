@@ -5,6 +5,25 @@ import Link from 'next/link';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://smrtmart-go-backend-1753976056-b4c4ef7e5ab7.herokuapp.com/api/v1';
 
+// UUID to numeric ID mapping for clean URLs - 9 products total
+const UUID_TO_NUMERIC: Record<string, string> = {
+  "88d35c54-ce2d-40d5-92e9-4af5c7e5e330": "1",
+  "c0d069ee-031f-4340-8588-4706103e6b04": "2", 
+  "7a82d048-b478-4b4b-8b78-64eeb3a7ab86": "3",
+  "a4e33218-57c3-4133-ac51-ca9aa711eddb": "4",
+  "ff5c7fc1-c3c7-4b35-9e21-15ba9d1c71d1": "5",
+  "a87117d8-e9dd-49ab-a131-245cff3cbf2d": "6",
+  "611bac4c-ef16-484e-899d-1e7992819a88": "7",
+  "asus-rog-laptop-001": "8",
+  "iphone-15-pro-max-001": "9"
+}
+
+// Helper function to get clean product URL
+const getProductUrl = (productId: string): string => {
+  const numericId = UUID_TO_NUMERIC[productId] || productId
+  return `/products/${numericId}`
+}
+
 interface Product {
   id: string;
   name: string;
@@ -103,7 +122,7 @@ export default function ProductsPage() {
     return [
       {
         id: "1",
-        name: "MacBook Pro 16-inch",
+        name: "Apple MacBook Pro 16-inch",
         price: 2499,
         compare_price: 2799,
         images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/macbook.jpg"],
@@ -194,68 +213,29 @@ export default function ProductsPage() {
       },
       {
         id: "8",
-        name: "Samsung Galaxy S24 Ultra",
+        name: "ASUS ROG Gaming Laptop",
+        price: 1599,
+        compare_price: 1799,
+        images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/asus.jpg"],
+        description: "High-performance gaming laptop with RTX graphics, RGB keyboard, and advanced cooling system.",
+        stock: 12,
+        status: "active",
+        featured: false,
+        category: "computers",
+        tags: ["asus", "rog", "gaming", "laptop", "rtx", "rgb"]
+      },
+      {
+        id: "9",
+        name: "iPhone 15 Pro Max",
         price: 1199,
         compare_price: 1299,
-        images: ["/placeholder-product.svg"],
-        description: "The ultimate smartphone with S Pen, advanced AI features, and professional-grade camera system.",
+        images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/iphone.jpg"],
+        description: "The ultimate iPhone with titanium design, A17 Pro chip, and professional camera system.",
         stock: 18,
         status: "active",
         featured: false,
         category: "smartphones",
-        tags: ["samsung", "galaxy", "smartphone", "android", "s-pen"]
-      },
-      {
-        id: "9",
-        name: "iPad Pro 12.9-inch",
-        price: 1099,
-        compare_price: 1199,
-        images: ["/placeholder-product.svg"],
-        description: "The most advanced iPad with M2 chip, Liquid Retina XDR display, and Apple Pencil support.",
-        stock: 12,
-        status: "active",
-        featured: false,
-        category: "tablets",
-        tags: ["apple", "ipad", "tablet", "m2", "pencil"]
-      },
-      {
-        id: "10",
-        name: "Logitech MX Master 3S",
-        price: 99,
-        compare_price: 119,
-        images: ["/placeholder-product.svg"],
-        description: "Advanced wireless mouse with ultra-fast scrolling, customizable buttons, and multi-device connectivity.",
-        stock: 35,
-        status: "active",
-        featured: false,
-        category: "accessories",
-        tags: ["logitech", "mouse", "wireless", "productivity", "ergonomic"]
-      },
-      {
-        id: "11",
-        name: "Mechanical Keyboard RGB",
-        price: 149,
-        compare_price: 179,
-        images: ["/placeholder-product.svg"],
-        description: "Premium mechanical gaming keyboard with RGB backlighting and tactile switches.",
-        stock: 22,
-        status: "active",
-        featured: false,
-        category: "accessories",
-        tags: ["keyboard", "mechanical", "gaming", "rgb", "tactile"]
-      },
-      {
-        id: "12",
-        name: "4K Webcam Pro",
-        price: 199,
-        compare_price: 229,
-        images: ["/placeholder-product.svg"],
-        description: "Professional 4K webcam with auto-focus, noise reduction, and wide-angle lens for streaming and video calls.",
-        stock: 15,
-        status: "active",
-        featured: false,
-        category: "accessories",
-        tags: ["webcam", "4k", "streaming", "video", "professional"]
+        tags: ["apple", "iphone", "smartphone", "titanium", "a17", "pro"]
       }
     ];
   };
@@ -339,7 +319,7 @@ export default function ProductsPage() {
           ))
         ) : products.map((product) => (
           <Link
-            href={`/products/${product.id}`}
+            href={getProductUrl(product.id)}
             key={product.id}
             className="group"
           >

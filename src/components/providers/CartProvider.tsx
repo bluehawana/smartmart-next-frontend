@@ -5,17 +5,13 @@ import { useCartStore } from '@/lib/store/cart'
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false)
-  const fetchCart = useCartStore(state => state.fetchCart)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  useEffect(() => {
-    if (mounted) {
-      fetchCart()
-    }
-  }, [mounted, fetchCart])
+  // Don't auto-fetch cart on mount, let individual pages handle it
+  // The Zustand persist middleware will automatically restore from localStorage
 
   return (
     <div className="min-h-screen">

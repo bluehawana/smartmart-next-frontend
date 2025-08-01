@@ -13,14 +13,13 @@ export default function CartPage() {
     isLoading, 
     updateQuantity, 
     removeFromCart, 
-    getTotalPrice,
-    fetchCart 
+    getTotalPrice 
   } = useCartStore();
 
-  useEffect(() => {
-    // Fetch cart items when page loads
-    fetchCart();
-  }, [fetchCart]);
+  // Don't auto-fetch cart - rely on persisted storage
+  // useEffect(() => {
+  //   fetchCart();
+  // }, [fetchCart]);
 
   const handleUpdateQuantity = async (id: string, newQuantity: number) => {
     if (newQuantity < 1) return;

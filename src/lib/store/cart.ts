@@ -110,23 +110,31 @@ export const useCartStore = create<CartStore>()(
           const items = await response.json()
           console.log('Cart data received:', items)
 
-          // 转换后端数据格式为前端格式
-          const cartItems = items.map((item: any) => ({
-            id: String(item.id),
-            productId: item.productId,
-            quantity: item.quantity,
-            ...PRODUCTS_MAP[item.productId] || {
-              name: `Product ${item.productId}`,
-              price: 0,
-              image: 'default.jpg',
-              description: ''
-            }
-          }))
+          // Only update if backend has items, otherwise keep local storage
+          if (items && items.length > 0) {
+            // 转换后端数据格式为前端格式
+            const cartItems = items.map((item: any) => ({
+              id: String(item.id),
+              productId: item.productId,
+              quantity: item.quantity,
+              ...PRODUCTS_MAP[item.productId] || {
+                name: `Product ${item.productId}`,
+                price: 0,
+                image: 'default.jpg',
+                description: ''
+              }
+            }))
 
-          set({ items: cartItems, error: null })
+            set({ items: cartItems, error: null })
+          } else {
+            // Backend is empty, keep existing local items
+            console.log('Backend cart empty, keeping local cart items')
+          }
         } catch (error) {
           console.error('Error fetching cart:', error)
-          set({ items: [], error: error instanceof Error ? error.message : 'Failed to fetch cart' })
+          // Don't clear local items on API error, just log it
+          console.log('API error, keeping local cart items')
+          set({ error: error instanceof Error ? error.message : 'Failed to fetch cart' })
         } finally {
           set({ isLoading: false })
         }

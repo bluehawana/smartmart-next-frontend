@@ -237,76 +237,115 @@ export default function Home() {
   }
 
   return (
-    <div className="max-w-[1200px] mx-auto px-4 py-8">
-      {/* Latest Drops Section */}
-      <section className="mb-12">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Latest Drops</h2>
-          <a href="/products" className="text-blue-600 hover:underline">View all</a>
+    <div>
+      {/* Hero Section */}
+      <section className="relative bg-gray-50 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-6xl font-light text-black mb-6">
+              Premium Electronics
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+              Discover the latest in technology and premium electronics, carefully curated for the modern lifestyle.
+            </p>
+            <Link 
+              href="/products"
+              className="inline-block bg-black text-white px-8 py-3 text-sm font-medium hover:bg-gray-800 transition-colors"
+            >
+              Shop Collection
+            </Link>
+          </div>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {loading ? (
-            [...Array(6)].map((_, i) => <LoadingCard key={`loading-${i}`} />)
-          ) : products.length > 0 ? products.map((product) => (
+      </section>
+
+      {/* Featured Products */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-12">
+            <h2 className="text-2xl font-light text-black">Featured Products</h2>
+            <Link href="/products" className="text-sm text-gray-600 hover:text-black border-b border-gray-300 hover:border-black transition-colors">
+              View All
+            </Link>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {loading ? (
+              [...Array(6)].map((_, i) => (
+                <div key={`loading-${i}`} className="group">
+                  <div className="aspect-square bg-gray-100 animate-pulse mb-4"></div>
+                  <div className="h-4 bg-gray-100 animate-pulse mb-2"></div>
+                  <div className="h-4 bg-gray-100 animate-pulse w-1/3"></div>
+                </div>
+              ))
+            ) : products.length > 0 ? products.slice(0, 6).map((product) => (
               <Link 
                 href={`/products/${product.id}`}
                 key={`product-${product.id}`}
-                className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                className="group"
               >
-                <div className="relative w-full pt-[100%]">
+                <div className="aspect-square bg-gray-50 mb-4 overflow-hidden">
                   <img
                     src={product.images && product.images.length > 0 
                       ? product.images[0]
                       : '/placeholder-product.svg'
                     }
                     alt={product.name}
-                    className="absolute inset-0 w-full h-full object-contain p-4 group-hover:opacity-75 transition-opacity duration-300"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = '/placeholder-product.svg';
                     }}
                   />
                 </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-medium text-gray-900">{product.name}</h3>
+                <div>
+                  <h3 className="text-sm font-medium text-black mb-1">{product.name}</h3>
                   <p className="text-sm text-gray-600 mb-2">{product.category}</p>
-                  <p className="mt-1 text-xl font-semibold text-gray-900">${product.price.toFixed(2)}</p>
-                  {product.stock > 0 ? (
-                    <p className="text-sm text-green-600">In Stock ({product.stock})</p>
-                  ) : (
-                    <p className="text-sm text-red-600">Out of Stock</p>
-                  )}
+                  <p className="text-sm font-medium text-black">${product.price.toFixed(2)}</p>
                 </div>
               </Link>
             )) : (
-              <div className="col-span-full text-center py-8">
+              <div className="col-span-full text-center py-12">
                 <p className="text-gray-500">No products available at the moment.</p>
               </div>
             )}
+          </div>
         </div>
       </section>
 
-      {/* Weekly Picks Section */}
-      <section>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Weekly Picks</h2>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {photos.map((photo, index) => (
-            <div key={index} className="relative h-64 bg-gray-200 rounded-lg overflow-hidden">
-              <img
-                src={photo}
-                alt={`Featured product ${index + 1}`}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = '/placeholder-product.svg';
-                }}
-              />
-            </div>
-          ))}
+      {/* Categories Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-light text-black mb-12 text-center">Shop by Category</h2>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {[
+              { name: 'Computers', image: photos[0] || '/placeholder-product.svg' },
+              { name: 'Audio', image: photos[1] || '/placeholder-product.svg' },
+              { name: 'Wearables', image: photos[2] || '/placeholder-product.svg' },
+              { name: 'Monitors', image: photos[3] || '/placeholder-product.svg' }
+            ].map((category, index) => (
+              <Link 
+                href={`/products?category=${category.name.toLowerCase()}`}
+                key={index}
+                className="group text-center"
+              >
+                <div className="aspect-square bg-white mb-4 overflow-hidden">
+                  <img
+                    src={category.image}
+                    alt={category.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/placeholder-product.svg';
+                    }}
+                  />
+                </div>
+                <h3 className="text-sm font-medium text-black group-hover:text-gray-600 transition-colors">
+                  {category.name}
+                </h3>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
     </div>

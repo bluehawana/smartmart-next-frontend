@@ -193,13 +193,13 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">All Products</h1>
+      <div className="mb-12">
+        <h1 className="text-3xl font-light text-black mb-8">All Products</h1>
         
         {/* Search and Filters */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="flex flex-col md:flex-row gap-4 mb-8">
           <form onSubmit={handleSearch} className="flex-1">
             <div className="flex">
               <input
@@ -207,11 +207,11 @@ export default function ProductsPage() {
                 placeholder="Search products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 px-4 py-2 border border-gray-300 focus:border-black focus:outline-none text-sm"
               />
               <button
                 type="submit"
-                className="px-6 py-2 bg-blue-600 text-white rounded-r-lg hover:bg-blue-700"
+                className="px-6 py-2 bg-black text-white text-sm font-medium hover:bg-gray-800 transition-colors"
               >
                 Search
               </button>
@@ -224,7 +224,7 @@ export default function ProductsPage() {
               setCategory(e.target.value);
               setPage(1);
             }}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 focus:border-black focus:outline-none text-sm"
           >
             {categories.map((cat) => (
               <option key={cat.value} value={cat.value}>
@@ -236,31 +236,39 @@ export default function ProductsPage() {
       </div>
 
       {/* Products Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {products.map((product) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {loading ? (
+          [...Array(12)].map((_, i) => (
+            <div key={`loading-${i}`} className="group">
+              <div className="aspect-square bg-gray-100 animate-pulse mb-4"></div>
+              <div className="h-4 bg-gray-100 animate-pulse mb-2"></div>
+              <div className="h-4 bg-gray-100 animate-pulse w-1/3"></div>
+            </div>
+          ))
+        ) : products.map((product) => (
           <Link
             href={`/products/${product.id}`}
             key={product.id}
-            className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+            className="group"
           >
-            <div className="relative w-full pt-[75%]">
+            <div className="aspect-square bg-gray-50 mb-4 overflow-hidden relative">
               <img
                 src={product.images[0] || '/placeholder-product.svg'}
                 alt={product.name}
-                className="absolute inset-0 w-full h-full object-cover group-hover:opacity-75 transition-opacity duration-300"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.src = '/placeholder-product.svg';
                 }}
               />
               {product.featured && (
-                <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 text-xs rounded">
+                <div className="absolute top-3 left-3 bg-black text-white px-2 py-1 text-xs font-medium">
                   Featured
                 </div>
               )}
             </div>
-            <div className="p-4">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <div>
+              <h3 className="text-sm font-medium text-black mb-1">
                 {product.name}
               </h3>
               <p className="text-sm text-gray-600 mb-2 line-clamp-2">
@@ -268,16 +276,16 @@ export default function ProductsPage() {
               </p>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <span className="text-xl font-bold text-gray-900">
+                  <span className="text-sm font-medium text-black">
                     ${product.price.toFixed(2)}
                   </span>
                   {product.compare_price > product.price && (
-                    <span className="text-sm text-gray-500 line-through">
+                    <span className="text-sm text-gray-400 line-through">
                       ${product.compare_price.toFixed(2)}
                     </span>
                   )}
                 </div>
-                <span className="text-sm text-gray-500">
+                <span className="text-xs text-gray-500">
                   {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
                 </span>
               </div>
@@ -287,9 +295,9 @@ export default function ProductsPage() {
       </div>
 
       {products.length === 0 && !loading && (
-        <div className="text-center py-12">
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
-          <p className="text-gray-500">Try adjusting your search or filters.</p>
+        <div className="text-center py-16">
+          <h3 className="text-lg font-medium text-black mb-2">No products found</h3>
+          <p className="text-gray-600">Try adjusting your search or filters.</p>
         </div>
       )}
     </div>

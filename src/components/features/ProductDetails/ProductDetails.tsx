@@ -1,11 +1,9 @@
 'use client'
 
-import Image from 'next/image'
 import { useState } from 'react'
 import { Plus, Minus, ShoppingCart } from 'lucide-react'
 import { useCartStore } from '@/lib/store/cart'
 import { toast } from 'react-hot-toast'
-import { getProductImageUrl } from '@/lib/utils'
 
 interface Product {
   id: number
@@ -33,7 +31,29 @@ export function ProductDetails({ product }: ProductDetailsProps) {
       await addToCart(product.id, quantity)
       toast.success('Added to cart!')
     } catch (error) {
-      toast.error('Failed to add to cart')
+      console.error('Cart API failed, using local storage fallback:', error)
+      // Fallback to local storage for development
+      const cartItem = {
+        id: `${product.id}-${Date.now()}`,
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: quantity,
+        image: product.image,
+        description: product.description
+      }
+      
+      const existingCart = JSON.parse(localStorage.getItem('local-cart') || '[]')
+      const existingItemIndex = existingCart.findIndex((item: any) => item.productId === product.id)
+      
+      if (existingItemIndex >= 0) {
+        existingCart[existingItemIndex].quantity += quantity
+      } else {
+        existingCart.push(cartItem)
+      }
+      
+      localStorage.setItem('local-cart', JSON.stringify(existingCart))
+      toast.success('Added to cart (local storage)!')
     } finally {
       setIsAddingToCart(false)
     }
@@ -47,41 +67,42 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* 左侧：产品图片 */}
-        <div className="relative aspect-square bg-white rounded-lg">
-          <Image
-            src={getProductImageUrl(product.image)}
+        <div className="aspect-square bg-gray-50 overflow-hidden">
+          <img
+            src={product.image || '/placeholder-product.svg'}
             alt={product.name}
-            fill
-            className="object-contain p-8"
-            priority
-            sizes="(max-width: 768px) 100vw, 50vw"
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = '/placeholder-product.svg';
+            }}
           />
         </div>
 
         {/* 右侧：产品信息 */}
         <div className="space-y-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
-            <p className="mt-4 text-2xl font-semibold">€{product.price.toFixed(2)}</p>
+            <h1 className="text-3xl font-light text-black">{product.name}</h1>
+            <p className="mt-4 text-2xl font-medium text-black">${product.price.toFixed(2)}</p>
           </div>
 
-          <p className="text-gray-600">{product.description}</p>
+          <p className="text-gray-600 leading-relaxed">{product.description}</p>
 
           {/* 数量选择器 */}
           <div className="flex items-center gap-4">
             <button
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="p-2 border rounded-md hover:bg-gray-50 active:bg-gray-100"
+              className="p-2 border border-gray-300 hover:border-black transition-colors"
               disabled={quantity <= 1}
             >
-              <Minus className="w-5 h-5" />
+              <Minus className="w-4 h-4" />
             </button>
-            <span className="text-xl font-medium w-12 text-center">{quantity}</span>
+            <span className="text-lg font-medium w-12 text-center">{quantity}</span>
             <button
               onClick={() => setQuantity(quantity + 1)}
-              className="p-2 border rounded-md hover:bg-gray-50 active:bg-gray-100"
+              className="p-2 border border-gray-300 hover:border-black transition-colors"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-4 h-4" />
             </button>
           </div>
 
@@ -89,12 +110,12 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           <button 
             onClick={handleAddToCart}
             disabled={isAddingToCart}
-            className="w-full bg-black text-white py-4 rounded-md flex items-center justify-center gap-2 hover:bg-gray-900 transition-colors active:bg-gray-800 disabled:bg-gray-400"
+            className="w-full bg-black text-white py-4 flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors disabled:bg-gray-400 text-sm font-medium"
           >
             {isAddingToCart ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : (
-              <ShoppingCart className="w-5 h-5" />
+              <ShoppingCart className="w-4 h-4" />
             )}
             {isAddingToCart ? 'Adding...' : 'Add to Cart'}
           </button>

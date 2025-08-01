@@ -2,55 +2,55 @@ import { ProductDetails } from "@/components/features/ProductDetails/ProductDeta
 import { notFound } from "next/navigation"
 import { use } from 'react'
 
-// 临时的模拟数据，包含所有产品
+// Mock products with correct Supabase image URLs
 const MOCK_PRODUCTS: Record<string, any> = {
   "1": {
     id: 1,
     name: "Apple MacBook Pro 16-inch",
-    price: 3499.99,
-    description: "Supercharged by M1 Max chip for groundbreaking performance and amazing battery life.",
-    image: "macbook.jpg",
-    stock: 10
+    price: 2499.99,
+    description: "Apple MacBook Pro 16-inch with M3 Pro chip, 18GB RAM, 512GB SSD. Perfect for professionals and creatives.",
+    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/macbook.jpg",
+    stock: 15
   },
   "2": {
     id: 2,
-    name: "Apple AirPods Pro",
+    name: "Apple AirPods Pro 2nd Generation",
     price: 249.99,
-    description: "Active Noise Cancellation for immersive sound.",
-    image: "airpods2.jpg",
-    stock: 20
+    description: "Apple AirPods Pro with Active Noise Cancellation, Transparency mode, and spatial audio.",
+    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/airpods2.jpg",
+    stock: 50
   },
   "3": {
     id: 3,
-    name: "Sony WH-1000XM5",
+    name: "Sony WH-1000XM5 Headphones",
     price: 399.99,
-    description: "Industry-leading noise cancellation with two processors and eight microphones.",
-    image: "sony.jpg",
-    stock: 15
+    description: "Industry-leading noise canceling headphones with exceptional sound quality and 30-hour battery life.",
+    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/sony.jpg",
+    stock: 25
   },
   "4": {
     id: 4,
-    name: "Dell XPS 13",
+    name: "Dell XPS 13 Laptop",
     price: 1299.99,
-    description: "13.4-inch FHD+ InfinityEdge Touch Anti-Reflective Display.",
-    image: "xps.jpg",
-    stock: 8
+    description: "Ultra-portable Dell XPS 13 with Intel Core i7, 16GB RAM, 512GB SSD, and stunning InfinityEdge display.",
+    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/xps.jpg",
+    stock: 20
   },
   "5": {
     id: 5,
-    name: "Dell Alienware 34",
-    price: 999.99,
-    description: "34-inch curved gaming monitor with WQHD resolution and 120Hz refresh rate.",
-    image: "dell.jpg",
-    stock: 12
+    name: "Dell Alienware 34 Curved Monitor",
+    price: 899.99,
+    description: "34-inch curved gaming monitor with 144Hz refresh rate, NVIDIA G-SYNC, and stunning WQHD resolution.",
+    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell.jpg",
+    stock: 10
   },
   "6": {
     id: 6,
     name: "Apple Watch Ultra",
     price: 799.99,
-    description: "The most rugged and capable Apple Watch with precision dual-frequency GPS.",
-    image: "ultra.jpg",
-    stock: 25
+    description: "The most rugged and capable Apple Watch, designed for endurance athletes and outdoor adventurers.",
+    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ultra.jpg",
+    stock: 30
   }
 }
 

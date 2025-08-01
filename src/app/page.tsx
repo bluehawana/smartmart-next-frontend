@@ -45,7 +45,7 @@ function ErrorCard({ error }: { error: Error }) {
 
 async function getProducts() {
   try {
-    const url = `${BASE_URL}/products?status=active&limit=6`
+    const url = `${BASE_URL}/products?limit=6`
     console.log('Fetching products from:', url)
 
     const res = await fetch(url, {
@@ -118,7 +118,7 @@ function getMockProducts(): Product[] {
 async function getFeaturedProducts() {
   try {
     console.log('Fetching featured products...');
-    const res = await fetch(`${BASE_URL}/products?featured=true&limit=6`, {
+    const res = await fetch(`${BASE_URL}/products/featured?limit=6`, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -131,9 +131,9 @@ async function getFeaturedProducts() {
     }
 
     const response = await res.json();
-    if (response.success && response.data && response.data.data) {
+    if (response.success && response.data) {
       // Extract image URLs from featured products
-      return response.data.data.map((product: Product) => 
+      return response.data.map((product: Product) => 
         product.images && product.images.length > 0 ? product.images[0] : '/placeholder-product.svg'
       );
     }

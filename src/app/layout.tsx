@@ -1,10 +1,6 @@
-import type { Metadata } from "next";
-import "./globals.css";
+'use client';
 
-export const metadata: Metadata = {
-  title: "SmartMart - Premium Electronics & Tech",
-  description: "Discover premium electronics and technology products",
-};
+import "./globals.css";
 
 export default function RootLayout({
   children,
@@ -13,6 +9,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
+      <head>
+        <title>SmartMart - Premium Electronics & Tech</title>
+        <meta name="description" content="Discover premium electronics and technology products" />
+      </head>
       <body className="h-full bg-white text-gray-900 antialiased">
         {/* Header */}
         <header className="border-b border-gray-200">

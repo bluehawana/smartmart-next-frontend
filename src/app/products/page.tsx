@@ -1,27 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://smrtmart-go-backend-1753976056-b4c4ef7e5ab7.herokuapp.com/api/v1';
 
-// UUID to numeric ID mapping for clean URLs - 9 products total
-const UUID_TO_NUMERIC: Record<string, string> = {
-  "88d35c54-ce2d-40d5-92e9-4af5c7e5e330": "1", // MacBook
-  "c0d069ee-031f-4340-8588-4706103e6b04": "2", // AirPods
-  "7a82d048-b478-4b4b-8b78-64eeb3a7ab86": "3", // Sony Headphones
-  "a4e33218-57c3-4133-ac51-ca9aa711eddb": "4", // Dell Monitor
-  "ff5c7fc1-c3c7-4b35-9e21-15ba9d1c71d1": "5", // Apple Watch
-  "a87117d8-e9dd-49ab-a131-245cff3cbf2d": "6", // AI Translate Earphones
-  "611bac4c-ef16-484e-899d-1e7992819a88": "7", // Dell XPS
-  "asus-rog-router-001": "8", // ASUS Router
-  "iphone-15-pro-max-001": "9"  // iPhone
-}
-
 // Helper function to get clean product URL
 const getProductUrl = (productId: string): string => {
-  const numericId = UUID_TO_NUMERIC[productId] || productId
-  return `/products/${numericId}`
+  return `/products/${productId}`
 }
 
 interface Product {
@@ -246,6 +232,32 @@ export default function ProductsPage() {
         featured: false,
         category: "smartphones",
         tags: ["apple", "iphone", "smartphone", "titanium", "a17", "pro"]
+      },
+      {
+        id: "10",
+        name: "Smart Language Translator Buds",
+        price: 149,
+        compare_price: 199,
+        images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/smart-translator.jpg"],
+        description: "Next-generation wireless earbuds with built-in AI translator. Supports conversation mode, offline translation for 12 languages, and crystal-clear audio quality.",
+        stock: 40,
+        status: "active",
+        featured: true,
+        category: "audio",
+        tags: ["translator", "earbuds", "ai", "language", "wireless", "travel"]
+      },
+      {
+        id: "11",
+        name: "Dell XPS 15 Developer Edition",
+        price: 1899,
+        compare_price: 2199,
+        images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell-xps-15-2023.jpg"],
+        description: "Dell XPS 15 Developer Edition with Ubuntu, Intel Core i7, 32GB RAM, 1TB SSD, NVIDIA GeForce RTX 4050. Perfect for developers and content creators.",
+        stock: 12,
+        status: "active",
+        featured: true,
+        category: "computers",
+        tags: ["dell", "xps", "laptop", "developer", "ubuntu", "nvidia"]
       }
     ];
   };
@@ -335,7 +347,10 @@ export default function ProductsPage() {
           >
             <div className="aspect-square bg-gray-50 mb-4 overflow-hidden relative">
               <img
-                src={product.images[0] || '/placeholder-product.svg'}
+                src={product.images && product.images.length > 0 
+                  ? getProductImageUrl(product.images[0])
+                  : '/placeholder-product.svg'
+                }
                 alt={product.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 onError={(e) => {

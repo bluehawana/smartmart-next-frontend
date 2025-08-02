@@ -45,7 +45,7 @@ export function ProductCard({ id, name, price, images, description, stock }: Pro
       <div className="relative h-80 bg-gray-50 flex-shrink-0">
         <Image
           src={images && images.length > 0 
-            ? `${process.env.NEXT_PUBLIC_IMAGE_BASE_URL}/${images[0]}`
+            ? (images[0].startsWith('http') ? images[0] : `${process.env.NEXT_PUBLIC_IMAGE_BASE_URL}/${images[0]}`)
             : '/placeholder-product.jpg'
           }
           alt={name}

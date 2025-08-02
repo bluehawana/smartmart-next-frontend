@@ -4,13 +4,14 @@ import { useState } from 'react'
 import { Plus, Minus, ShoppingCart } from 'lucide-react'
 import { useCartStore } from '@/lib/store/cart'
 import { toast } from 'react-hot-toast'
+import { getProductImageUrl } from '@/lib/utils'
 
 interface Product {
-  id: number
+  id: string
   name: string
   price: number
   description: string
-  image: string
+  images: string[]  // Changed from image to images array
   stock: number
 }
 
@@ -28,9 +29,8 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     
     setIsAddingToCart(true)
     try {
-      // Convert product.id to number for the cart store
-      const numericProductId = Number(product.id)
-      await addToCart(numericProductId, quantity)
+      // Use product ID directly (already numeric)
+      await addToCart(Number(product.id), quantity)
       toast.success('Added to cart!')
     } catch (error) {
       console.error('Error adding to cart:', error)
@@ -50,7 +50,10 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         {/* 左侧：产品图片 */}
         <div className="aspect-square bg-gray-50 overflow-hidden">
           <img
-            src={product.image || '/placeholder-product.svg'}
+            src={product.images && product.images.length > 0 
+              ? getProductImageUrl(product.images[0])
+              : '/placeholder-product.svg'
+            }
             alt={product.name}
             className="w-full h-full object-cover"
             onError={(e) => {

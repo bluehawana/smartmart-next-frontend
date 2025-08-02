@@ -3,27 +3,15 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from 'next/link';
+import { getProductImageUrl } from '@/lib/utils';
 import { EmblaOptionsType } from "embla-carousel";
 
 // API base URL
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1'
 
-// UUID to numeric ID mapping for clean URLs - based on actual API data
-const UUID_TO_NUMERIC: Record<string, string> = {
-  "88d35c54-ce2d-40d5-92e9-4af5c7e5e330": "1", // MacBook
-  "c0d069ee-031f-4340-8588-4706103e6b04": "2", // AirPods
-  "7a82d048-b478-4b4b-8b78-64eeb3a7ab86": "3", // Sony Headphones
-  "611bac4c-ef16-484e-899d-1e7992819a88": "4", // Dell XPS
-  "a4e33218-57c3-4133-ac51-ca9aa711eddb": "5", // Dell Monitor
-  "ff5c7fc1-c3c7-4b35-9e21-15ba9d1c71d1": "6", // Apple Watch
-  "a87117d8-e9dd-49ab-a131-245cff3cbf2d": "7", // AI Translate Earphones
-  "eed7ffb1-5dc5-45fe-8e77-63430419dce3": "8"  // Smart Language Translator Buds
-}
-
 // Helper function to get clean product URL
 const getProductUrl = (productId: string): string => {
-  const numericId = UUID_TO_NUMERIC[productId] || productId
-  return `/products/${numericId}`
+  return `/products/${productId}`
 }
 
 // Product interface matching Go backend
@@ -184,6 +172,39 @@ function getMockProducts(): Product[] {
       status: "active",
       featured: true,
       category: "audio"
+    },
+    {
+      id: "13e2b89d-4f65-4ad0-8c4a-5150657e5bde",
+      name: "ASUS ROG Rapture GT-BE98 Gaming Router",
+      price: 8990,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/asus.jpg"],
+      description: "ASUS ROG Rapture GT-BE98 Quad-band Gaming Router with WiFi 7, advanced QoS, and ultra-low latency for competitive gaming.",
+      stock: 8,
+      status: "active",
+      featured: false,
+      category: "networking"
+    },
+    {
+      id: "4dc6d3bf-ec23-4c1b-b47d-f156c82e92fa",
+      name: "iPhone 15 Pro Max",
+      price: 1199,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/iphone.jpg"],
+      description: "The ultimate iPhone with titanium design, A17 Pro chip, and professional camera system.",
+      stock: 18,
+      status: "active",
+      featured: false,
+      category: "smartphones"
+    },
+    {
+      id: "a3f5302f-f496-4211-9737-e55de3b526c2",
+      name: "Dell XPS 15 Developer Edition",
+      price: 1899,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell-xps-15-2023.jpg"],
+      description: "Dell XPS 15 Developer Edition with Ubuntu, Intel Core i7, 32GB RAM, 1TB SSD, NVIDIA GeForce RTX 4050. Perfect for developers and content creators.",
+      stock: 12,
+      status: "active",
+      featured: true,
+      category: "computers"
     }
   ]
 }
@@ -206,9 +227,11 @@ async function getFeaturedProducts() {
 
     const response = await res.json();
     if (response.success && response.data && response.data.data) {
-      // Extract image URLs from featured products
+      // Extract image URLs from featured products and process them
       return response.data.data.map((product: Product) => 
-        product.images && product.images.length > 0 ? product.images[0] : '/placeholder-product.svg'
+        product.images && product.images.length > 0 
+          ? getProductImageUrl(product.images[0]) 
+          : '/placeholder-product.svg'
       );
     }
     return getMockPhotos();
@@ -326,7 +349,7 @@ export default function Home() {
                 <div className="aspect-square bg-gray-50 mb-4 overflow-hidden">
                   <img
                     src={product.images && product.images.length > 0 
-                      ? product.images[0]
+                      ? getProductImageUrl(product.images[0])
                       : '/placeholder-product.svg'
                     }
                     alt={product.name}

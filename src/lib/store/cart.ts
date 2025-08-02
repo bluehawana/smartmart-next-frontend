@@ -67,6 +67,18 @@ const PRODUCTS_MAP: Record<number, { name: string; price: number; image: string;
     price: 1199, 
     image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/iphone.jpg",
     description: "The ultimate iPhone with titanium design, A17 Pro chip, and professional camera system."
+  },
+  10: { 
+    name: "Smart Language Translator Buds", 
+    price: 149, 
+    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/smart-translator.jpg",
+    description: "Next-generation wireless earbuds with built-in AI translator. Supports conversation mode, offline translation for 12 languages, and crystal-clear audio quality."
+  },
+  11: { 
+    name: "Dell XPS 15 Developer Edition", 
+    price: 1899, 
+    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell-xps-15-2023.jpg",
+    description: "Dell XPS 15 Developer Edition with Ubuntu, Intel Core i7, 32GB RAM, 1TB SSD, NVIDIA GeForce RTX 4050. Perfect for developers and content creators."
   }
 }
 
@@ -156,6 +168,7 @@ export const useCartStore = create<CartStore>()(
       },
 
       addToCart: async (productId: number, quantity: number) => {
+        console.log('Adding to cart:', productId, quantity)
         set({ isLoading: true, error: null })
         try {
           const response = await fetch(`${API_BASE}/cart/items`, {
@@ -180,6 +193,7 @@ export const useCartStore = create<CartStore>()(
 
           // 更新本地状态
           set((state) => {
+            console.log('Current cart state before update:', state.items)
             const existingItem = state.items.find(item => item.productId === productId)
             let newState;
             if (existingItem) {
@@ -205,6 +219,8 @@ export const useCartStore = create<CartStore>()(
                 }]
               }
             }
+            
+            console.log('New cart state after update:', newState.items)
             
             // Dispatch custom event to update cart count in header
             if (typeof window !== 'undefined') {

@@ -79,6 +79,18 @@ const PRODUCTS_MAP: Record<number, { name: string; price: number; image: string;
     price: 1899, 
     image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell-xps-15-2023.jpg",
     description: "Dell XPS 15 Developer Edition with Ubuntu, Intel Core i7, 32GB RAM, 1TB SSD, NVIDIA GeForce RTX 4050. Perfect for developers and content creators."
+  },
+  10: { 
+    name: "Smart Language Translator Buds", 
+    price: 149, 
+    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/smart-translator.jpg",
+    description: "Next-generation wireless earbuds with built-in AI translator. Supports conversation mode, offline translation for 12 languages, and crystal-clear audio quality."
+  },
+  11: { 
+    name: "Dell XPS 15 Developer Edition", 
+    price: 1899, 
+    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell-xps-15-2023.jpg",
+    description: "Dell XPS 15 Developer Edition with Ubuntu, Intel Core i7, 32GB RAM, 1TB SSD, NVIDIA GeForce RTX 4050. Perfect for developers and content creators."
   }
 }
 

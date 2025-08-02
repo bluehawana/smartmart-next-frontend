@@ -2,6 +2,101 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useCartStore } from '@/lib/store/cart';
+import { toast } from 'react-hot-toast';
+
+// ProductCard component
+function ProductCard({ id, name, price, imageUrl, description, comparePrice, stock, featured }: {
+  id: string;
+  name: string;
+  price: number;
+  imageUrl: string;
+  description: string;
+  comparePrice: number;
+  stock: number;
+  featured: boolean;
+}) {
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const addToCart = useCartStore((state) => state.addToCart);
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setIsAddingToCart(true);
+    try {
+      await addToCart(Number(id), 1);
+      toast.success('Added to cart!');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      toast.error('Failed to add to cart');
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
+
+  return (
+    <div className="group">
+      <Link href={`/products/${id}`}>
+        <div className="aspect-square bg-gray-50 mb-4 overflow-hidden relative">
+          <img
+            src={imageUrl || '/placeholder-product.svg'}
+            alt={name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = '/placeholder-product.svg';
+            }}
+          />
+          {featured && (
+            <div className="absolute top-3 left-3 bg-black text-white px-2 py-1 text-xs font-medium">
+              Featured
+            </div>
+          )}
+        </div>
+      </Link>
+      <div>
+        <Link href={`/products/${id}`}>
+          <h3 className="text-sm font-medium text-black mb-1 hover:text-gray-700">
+            {name}
+          </h3>
+        </Link>
+        <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+          {description}
+        </p>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center space-x-2">
+            <span className="text-sm font-medium text-black">
+              ${price.toFixed(2)}
+            </span>
+            {comparePrice > price && (
+              <span className="text-sm text-gray-400 line-through">
+                ${comparePrice.toFixed(2)}
+              </span>
+            )}
+          </div>
+          <span className="text-xs text-gray-500">
+            {stock > 0 ? 'In Stock' : 'Out of Stock'}
+          </span>
+        </div>
+        <button
+          onClick={handleAddToCart}
+          disabled={isAddingToCart || stock <= 0}
+          className="w-full bg-black text-white py-2 px-4 text-sm font-medium hover:bg-gray-800 transition-colors disabled:bg-gray-400 flex items-center justify-center gap-2"
+        >
+          {isAddingToCart ? (
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 11-4 0v-6m4 0V9a2 2 0 10-4 0v4.01" />
+            </svg>
+          )}
+          {isAddingToCart ? 'Adding...' : 'Add to Cart'}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://smrtmart-go-backend-1753976056-b4c4ef7e5ab7.herokuapp.com/api/v1';
 
@@ -340,54 +435,17 @@ export default function ProductsPage() {
             </div>
           ))
         ) : products.map((product) => (
-          <Link
-            href={getProductUrl(product.id)}
+          <ProductCard
             key={product.id}
-            className="group"
-          >
-            <div className="aspect-square bg-gray-50 mb-4 overflow-hidden relative">
-              <img
-                src={product.images && product.images.length > 0 
-                  ? getProductImageUrl(product.images[0])
-                  : '/placeholder-product.svg'
-                }
-                alt={product.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = '/placeholder-product.svg';
-                }}
-              />
-              {product.featured && (
-                <div className="absolute top-3 left-3 bg-black text-white px-2 py-1 text-xs font-medium">
-                  Featured
-                </div>
-              )}
-            </div>
-            <div>
-              <h3 className="text-sm font-medium text-black mb-1">
-                {product.name}
-              </h3>
-              <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                {product.description}
-              </p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium text-black">
-                    ${product.price.toFixed(2)}
-                  </span>
-                  {product.compare_price > product.price && (
-                    <span className="text-sm text-gray-400 line-through">
-                      ${product.compare_price.toFixed(2)}
-                    </span>
-                  )}
-                </div>
-                <span className="text-xs text-gray-500">
-                  {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                </span>
-              </div>
-            </div>
-          </Link>
+            id={product.id}
+            name={product.name}
+            price={product.price}
+            imageUrl={product.images && product.images.length > 0 ? product.images[0] : ''}
+            description={product.description}
+            comparePrice={product.compare_price}
+            stock={product.stock}
+            featured={product.featured}
+          />
         ))}
       </div>
 

@@ -15,19 +15,23 @@ export function CheckoutButton() {
       setLoading(true)
       setError(null)
       
-      const response = await fetch(`${API_BASE}/checkout`, {
+      const response = await fetch(`${API_BASE}/orders/checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           items: items.map(item => ({
-            id: item.id,
+            product_id: item.productId?.toString() || item.id.toString(),
             name: item.name,
-            quantity: item.quantity,
+            description: item.description || '',
             price: item.price,
-            image: `${process.env.NEXT_PUBLIC_IMAGE_BASE_URL}/${item.image}`
-          }))
+            quantity: item.quantity,
+            images: item.image ? [item.image] : []
+          })),
+          customer_email: 'guest@example.com',
+          success_url: `${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${window.location.origin}/checkout/cancel`
         }),
       })
 
@@ -38,11 +42,11 @@ export function CheckoutButton() {
         throw new Error(data.error || data.message || 'Failed to create checkout session')
       }
 
-      if (!data.success || !data.url) {
+      if (!data.success || !data.data?.session_url) {
         throw new Error('Invalid response from checkout API')
       }
 
-      window.location.href = data.url
+      window.location.href = data.data.session_url
 
     } catch (error) {
       console.error('Checkout error:', error)

@@ -12,7 +12,7 @@ interface CartItem {
   description: string
 }
 
-// 产品数据映射 - Updated with correct product data
+// 产品数据映射 - FIXED IMAGE ASSIGNMENTS
 const PRODUCTS_MAP: Record<number, { name: string; price: number; image: string; description: string }> = {
   1: { 
     name: "Apple MacBook Pro 16-inch", 
@@ -67,18 +67,6 @@ const PRODUCTS_MAP: Record<number, { name: string; price: number; image: string;
     price: 1199, 
     image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/iphone.jpg",
     description: "The ultimate iPhone with titanium design, A17 Pro chip, and professional camera system."
-  },
-  10: { 
-    name: "Smart Language Translator Buds", 
-    price: 149, 
-    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/smart-translator.jpg",
-    description: "Next-generation wireless earbuds with built-in AI translator. Supports conversation mode, offline translation for 12 languages, and crystal-clear audio quality."
-  },
-  11: { 
-    name: "Dell XPS 15 Developer Edition", 
-    price: 1899, 
-    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell-xps-15-2023.jpg",
-    description: "Dell XPS 15 Developer Edition with Ubuntu, Intel Core i7, 32GB RAM, 1TB SSD, NVIDIA GeForce RTX 4050. Perfect for developers and content creators."
   },
   10: { 
     name: "Smart Language Translator Buds", 
@@ -182,6 +170,47 @@ export const useCartStore = create<CartStore>()(
       addToCart: async (productId: number, quantity: number) => {
         console.log('Adding to cart:', productId, quantity)
         set({ isLoading: true, error: null })
+        
+        // Add to local state immediately (fallback approach)
+        set((state) => {
+          console.log('Current cart state before update:', state.items)
+          const existingItem = state.items.find(item => item.productId === productId)
+          let newState;
+          if (existingItem) {
+            newState = {
+              items: state.items.map(item => 
+                item.productId === productId 
+                  ? { ...item, quantity: item.quantity + quantity }
+                  : item
+              )
+            }
+          } else {
+            newState = {
+              items: [...state.items, {
+                id: `local-${productId}-${Date.now()}`,
+                productId,
+                quantity,
+                ...PRODUCTS_MAP[productId] || {
+                  name: `Product ${productId}`,
+                  price: 0,
+                  image: '/placeholder-product.svg',
+                  description: ''
+                }
+              }]
+            }
+          }
+          
+          console.log('New cart state after update:', newState.items)
+          
+          // Dispatch custom event to update cart count in header
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('cartUpdated'));
+          }
+          
+          return { ...newState, isLoading: false }
+        })
+        
+        // Try to sync with backend but don't fail if it errors
         try {
           const response = await fetch(`${API_BASE}/cart/items`, {
             method: 'POST',
@@ -196,93 +225,11 @@ export const useCartStore = create<CartStore>()(
             })
           })
 
-          if (!response.ok) {
-            throw new Error(`Failed to add to cart: ${response.status}`)
+          if (response.ok) {
+            console.log('Successfully synced with backend')
           }
-
-          const addedItem = await response.json()
-          console.log('Added item response:', addedItem)
-
-          // 更新本地状态
-          set((state) => {
-            console.log('Current cart state before update:', state.items)
-            const existingItem = state.items.find(item => item.productId === productId)
-            let newState;
-            if (existingItem) {
-              newState = {
-                items: state.items.map(item => 
-                  item.productId === productId 
-                    ? { ...item, quantity: item.quantity + quantity }
-                    : item
-                )
-              }
-            } else {
-              newState = {
-                items: [...state.items, {
-                  id: String(addedItem.id || Date.now()),
-                  productId,
-                  quantity,
-                  ...PRODUCTS_MAP[productId] || {
-                    name: `Product ${productId}`,
-                    price: 0,
-                    image: '/placeholder-product.svg',
-                    description: ''
-                  }
-                }]
-              }
-            }
-            
-            console.log('New cart state after update:', newState.items)
-            
-            // Dispatch custom event to update cart count in header
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(new CustomEvent('cartUpdated'));
-            }
-            
-            return newState;
-          })
         } catch (error) {
-          console.error('Error adding to cart:', error)
-          
-          // Fallback: Add to local state only
-          set((state) => {
-            const existingItem = state.items.find(item => item.productId === productId)
-            let newState;
-            if (existingItem) {
-              newState = {
-                items: state.items.map(item => 
-                  item.productId === productId 
-                    ? { ...item, quantity: item.quantity + quantity }
-                    : item
-                ),
-                error: null
-              }
-            } else {
-              newState = {
-                items: [...state.items, {
-                  id: `local-${productId}-${Date.now()}`,
-                  productId,
-                  quantity,
-                  ...PRODUCTS_MAP[productId] || {
-                    name: `Product ${productId}`,
-                    price: 0,
-                    image: '/placeholder-product.svg',
-                    description: ''
-                  }
-                }],
-                error: null
-              }
-            }
-            
-            // Dispatch custom event to update cart count in header
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(new CustomEvent('cartUpdated'));
-            }
-            
-            return newState;
-          })
-        } finally {
-          set({ isLoading: false })
+          console.log('Backend sync failed, but local cart updated:', error)
         }
       },
 
@@ -368,7 +315,7 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: 'cart-storage',
-      skipHydration: true
+      skipHydration: false
     }
   )
 )

@@ -8,11 +8,19 @@ function CartIcon() {
   const [mounted, setMounted] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const getCartItemsCount = useCartStore((state) => state.getCartItemsCount);
+  const items = useCartStore((state) => state.items);
 
   useEffect(() => {
     setMounted(true);
     setCartCount(getCartItemsCount());
   }, [getCartItemsCount]);
+
+  // Update cart count when items change
+  useEffect(() => {
+    if (mounted) {
+      setCartCount(getCartItemsCount());
+    }
+  }, [items, mounted, getCartItemsCount]);
 
   useEffect(() => {
     if (mounted) {

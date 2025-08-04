@@ -202,6 +202,9 @@ export default function CheckoutPage() {
       if (result.success && result.data?.session_url) {
         // Redirect to Stripe checkout
         window.location.href = result.data.session_url
+      } else if (result.success && result.data?.SessionURL) {
+        // Handle capitalized response format from Go backend
+        window.location.href = result.data.SessionURL
       } else {
         throw new Error('Invalid response from checkout endpoint')
       }
@@ -274,6 +277,9 @@ export default function CheckoutPage() {
       if (result.success && result.data?.session_url) {
         // Redirect to Stripe checkout
         window.location.href = result.data.session_url
+      } else if (result.success && result.data?.SessionURL) {
+        // Handle capitalized response format from Go backend
+        window.location.href = result.data.SessionURL
       } else {
         throw new Error('Invalid response from checkout endpoint')
       }
@@ -553,6 +559,13 @@ export default function CheckoutPage() {
                   <option value="ES">Spain</option>
                   <option value="IT">Italy</option>
                   <option value="NL">Netherlands</option>
+                  <option value="BE">Belgium</option>
+                  <option value="AT">Austria</option>
+                  <option value="CH">Switzerland</option>
+                  <option value="SE">Sweden</option>
+                  <option value="NO">Norway</option>
+                  <option value="DK">Denmark</option>
+                  <option value="FI">Finland</option>
                   <option value="AU">Australia</option>
                 </select>
               </div>
@@ -719,6 +732,13 @@ export default function CheckoutPage() {
                       <option value="ES">Spain</option>
                       <option value="IT">Italy</option>
                       <option value="NL">Netherlands</option>
+                      <option value="BE">Belgium</option>
+                      <option value="AT">Austria</option>
+                      <option value="CH">Switzerland</option>
+                      <option value="SE">Sweden</option>
+                      <option value="NO">Norway</option>
+                      <option value="DK">Denmark</option>
+                      <option value="FI">Finland</option>
                       <option value="AU">Australia</option>
                     </select>
                   </div>

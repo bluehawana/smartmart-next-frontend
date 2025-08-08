@@ -198,14 +198,16 @@ export default function CheckoutPage() {
       }
 
       const result = await response.json()
+      console.log('Backend response:', result)
       
-      if (result.success && result.data?.session_url) {
-        // Redirect to Stripe checkout
-        window.location.href = result.data.session_url
-      } else if (result.success && result.data?.SessionURL) {
+      if (result.success && result.data?.SessionURL) {
         // Handle capitalized response format from Go backend
         window.location.href = result.data.SessionURL
+      } else if (result.success && result.data?.session_url) {
+        // Redirect to Stripe checkout
+        window.location.href = result.data.session_url
       } else {
+        console.error('Invalid response structure:', result)
         throw new Error('Invalid response from checkout endpoint')
       }
     } catch (error) {
@@ -273,14 +275,16 @@ export default function CheckoutPage() {
       }
 
       const result = await response.json()
+      console.log('Direct checkout response:', result)
       
-      if (result.success && result.data?.session_url) {
-        // Redirect to Stripe checkout
-        window.location.href = result.data.session_url
-      } else if (result.success && result.data?.SessionURL) {
+      if (result.success && result.data?.SessionURL) {
         // Handle capitalized response format from Go backend
         window.location.href = result.data.SessionURL
+      } else if (result.success && result.data?.session_url) {
+        // Redirect to Stripe checkout
+        window.location.href = result.data.session_url
       } else {
+        console.error('Invalid response structure:', result)
         throw new Error('Invalid response from checkout endpoint')
       }
 

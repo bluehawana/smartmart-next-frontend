@@ -1,16 +1,15 @@
 {
   "framework": "nextjs",
   "buildCommand": "npm run build",
-  "installCommand": "npm install",
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/$1"
-    }
-  ],
+  "installCommand": "npm install --prefer-offline --no-audit --progress=false",
   "functions": {
     "app/**/*.tsx": {
       "maxDuration": 30
+    }
+  },
+  "build": {
+    "env": {
+      "NEXT_TELEMETRY_DISABLED": "1"
     }
   }
 }

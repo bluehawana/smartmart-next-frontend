@@ -25,8 +25,8 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'mqkoydypybxgcwxioqzc.supabase.co',
-        pathname: '/storage/v1/object/public/**',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
       },
     ],
   },
@@ -37,6 +37,12 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   serverExternalPackages: ['@stripe/stripe-js'],
+  // Performance optimizations
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
+  },
+  // Faster builds
+  swcMinify: true,
 }
 
 module.exports = nextConfig

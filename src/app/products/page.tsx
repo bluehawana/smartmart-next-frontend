@@ -22,7 +22,7 @@ function ProductCard({ id, name, price, imageUrl, description, comparePrice, sto
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     setIsAddingToCart(true);
     try {
       await addToCart(Number(id), 1);
@@ -155,7 +155,7 @@ export default function ProductsPage() {
     try {
       setLoading(true);
       let url = `${BASE_URL}/products?page=${page}&limit=12`;
-      
+
       if (category) url += `&category=${category}`;
       if (searchTerm) url += `&search=${encodeURIComponent(searchTerm)}`;
 
@@ -165,7 +165,7 @@ export default function ProductsPage() {
         },
         mode: 'cors'
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
@@ -187,14 +187,14 @@ export default function ProductsPage() {
 
   const getFilteredMockProducts = () => {
     let filtered = getMockProducts();
-    
+
     // Filter by category
     if (category) {
-      filtered = filtered.filter(product => 
+      filtered = filtered.filter(product =>
         product.category.toLowerCase() === category.toLowerCase()
       );
     }
-    
+
     // Filter by search term
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
@@ -205,7 +205,7 @@ export default function ProductsPage() {
         product.tags.some(tag => tag.toLowerCase().includes(searchLower))
       );
     }
-    
+
     return filtered;
   };
 
@@ -225,7 +225,7 @@ export default function ProductsPage() {
         tags: ["apple", "macbook", "laptop", "professional"]
       },
       {
-        id: "2", 
+        id: "2",
         name: "AirPods Pro 2nd Generation",
         price: 249,
         compare_price: 279,
@@ -239,7 +239,7 @@ export default function ProductsPage() {
       },
       {
         id: "3",
-        name: "Sony WH-1000XM5 Headphones", 
+        name: "Sony WH-1000XM5 Headphones",
         price: 399,
         compare_price: 449,
         images: ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop&crop=center"],
@@ -252,7 +252,7 @@ export default function ProductsPage() {
       },
       {
         id: "4",
-        name: "Dell Alienware 34 Curved Monitor", 
+        name: "Dell Alienware 34 Curved Monitor",
         price: 899,
         compare_price: 1099,
         images: ["https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500&h=500&fit=crop&crop=center"],
@@ -265,7 +265,7 @@ export default function ProductsPage() {
       },
       {
         id: "5",
-        name: "Apple Watch Ultra", 
+        name: "Apple Watch Ultra",
         price: 799,
         compare_price: 849,
         images: ["https://images.unsplash.com/photo-1551816230-ef5deaed4a26?w=500&h=500&fit=crop&crop=center"],
@@ -278,7 +278,7 @@ export default function ProductsPage() {
       },
       {
         id: "6",
-        name: "AI Translate Earphones Pro", 
+        name: "AI Translate Earphones Pro",
         price: 199,
         compare_price: 249,
         images: ["https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500&h=500&fit=crop&crop=center"],
@@ -386,7 +386,7 @@ export default function ProductsPage() {
       {/* Header */}
       <div className="mb-12">
         <h1 className="text-3xl font-light text-black mb-8">All Products</h1>
-        
+
         {/* Search and Filters */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <form onSubmit={handleSearch} className="flex-1">
@@ -406,7 +406,7 @@ export default function ProductsPage() {
               </button>
             </div>
           </form>
-          
+
           <select
             value={category}
             onChange={(e) => {

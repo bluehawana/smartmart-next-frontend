@@ -26,10 +26,21 @@ export default function AboutPage() {
               achieving a remarkable 15% growth rate from 2017 to 2020.
             </p>
             <p className="text-gray-600 leading-relaxed mb-6">
+              Our digital transformation journey began with implementing online ordering and table booking systems. 
+              Customers can now easily book a table or order dishes directly through our website at{' '}
+              <a href="https://www.ichiban.biz" className="text-black hover:underline" target="_blank" rel="noopener noreferrer">
+                ichiban.biz
+              </a>{' '}
+              or through Google Maps. This virtual presence has been a game-changer - when we first bought the restaurant, 
+              our daily income was around 4-5k SEK. Now, with our strong online presence, many tourists discover us while 
+              visiting Liseberg. During summer vacation, our daily income has almost tripled. This impressive and promising 
+              transformation demonstrates how we can help you achieve the same revolutionary results.
+            </p>
+            <p className="text-gray-600 leading-relaxed mb-6">
               Today, we continue to innovate and push boundaries, partnering with industry leaders such as Wix, Zettle, 
               Uber Eats, Foodora, Wolt, and more. But our goal extends beyond running a successful restaurant - we're 
-              passionate about helping SMEs achieve their digitalization dreams, launch their businesses through good 
-              localization, and transform from traditional business models to thrive in the new world.
+              passionate about helping SMEs achieve their digitalization dreams, launch their businesses through effective 
+              localization, and transform from traditional business models to thrive in the digital world.
             </p>
           </div>
         </div>

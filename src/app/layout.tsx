@@ -5,7 +5,7 @@ import { CartProvider } from '@/components/providers/CartProvider';
 import { ClientHeader } from '@/components/layout/ClientHeader';
 
 export const metadata: Metadata = {
-  title: 'SmartMart - Premium Electronics & Tech',
+  title: 'SmrtMart - Premium Electronics & Tech',
   description: 'Discover premium electronics and technology products',
 }
 
@@ -60,7 +60,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                   </div>
                 </div>
                 <div className="mt-8 pt-8 border-t border-gray-200">
-                  <p className="text-gray-500 text-sm text-center">© 2025 SmartMart. All rights reserved.</p>
+                  <p className="text-gray-500 text-sm text-center">© 2025 SmrtMart. All rights reserved.</p>
                 </div>
               </div>
             </footer>

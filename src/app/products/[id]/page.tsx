@@ -16,7 +16,7 @@ const NUMERIC_TO_UUID: Record<string, string> = {
   "11": "a3f5302f-f496-4211-9737-e55de3b526c2"  // Dell XPS 15 Developer Edition
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://smrtmart-go-backend-1753976056-b4c4ef7e5ab7.herokuapp.com/api/v1';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://smrtmart-backend-1757499174-0dfbd8d4731e.herokuapp.com/api/v1';
 
 async function fetchProduct(numericId: string) {
   // Convert numeric ID to UUID for API call

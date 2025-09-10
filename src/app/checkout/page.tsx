@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useCartStore } from '@/lib/store/cart'
+import { API_BASE } from '@/lib/config'
 import { loadStripe } from '@stripe/stripe-js'
 
 const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
@@ -184,7 +185,7 @@ export default function CheckoutPage() {
       console.log('Creating backend checkout session with data:', checkoutData)
 
       // Call backend checkout endpoint
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/checkout`, {
+      const response = await fetch(`${API_BASE}/orders/checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -261,7 +262,7 @@ export default function CheckoutPage() {
       console.log('Creating direct checkout session (using backend):', checkoutData)
 
       // Call the original backend checkout endpoint (without full customer info)
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/checkout`, {
+      const response = await fetch(`${API_BASE}/orders/checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -349,13 +350,13 @@ export default function CheckoutPage() {
               <h3 className="font-medium">{item.name}</h3>
               <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
             </div>
-            <p className="font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
+            <p className="font-semibold">{(item.price * item.quantity).toLocaleString('sv-SE')} kr</p>
           </div>
         ))}
         
         <div className="flex justify-between items-center pt-4 mt-4 border-t border-gray-300">
           <span className="text-xl font-bold">Total:</span>
-          <span className="text-xl font-bold">${getTotalPrice().toFixed(2)}</span>
+          <span className="text-xl font-bold">{getTotalPrice().toLocaleString('sv-SE')} kr</span>
         </div>
       </div>
 

@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCartStore } from '@/lib/store/cart';
+import { API_BASE } from '@/lib/config'
+import { getProductImageUrl } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 
 // ProductCard component
@@ -40,7 +42,7 @@ function ProductCard({ id, name, price, imageUrl, description, comparePrice, sto
       <Link href={`/products/${id}`}>
         <div className="aspect-square bg-gray-50 mb-4 overflow-hidden relative">
           <img
-            src={imageUrl || '/placeholder-product.svg'}
+            src={getProductImageUrl(imageUrl) || '/placeholder-product.svg'}
             alt={name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             onError={(e) => {
@@ -67,11 +69,11 @@ function ProductCard({ id, name, price, imageUrl, description, comparePrice, sto
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-2">
             <span className="text-sm font-medium text-black">
-              ${price.toFixed(2)}
+              {price.toLocaleString('sv-SE')} kr
             </span>
             {comparePrice > price && (
               <span className="text-sm text-gray-400 line-through">
-                ${comparePrice.toFixed(2)}
+                {comparePrice.toLocaleString('sv-SE')} kr
               </span>
             )}
           </div>
@@ -98,7 +100,7 @@ function ProductCard({ id, name, price, imageUrl, description, comparePrice, sto
   );
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://smrtmart-go-backend-1753976056-b4c4ef7e5ab7.herokuapp.com/api/v1';
+const BASE_URL = API_BASE;
 
 // Helper function to get clean product URL
 const getProductUrl = (productId: string): string => {

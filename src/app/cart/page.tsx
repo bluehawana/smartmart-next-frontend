@@ -99,7 +99,7 @@ export default function CartPage() {
                 
                 <div className="flex-1">
                   <h3 className="text-lg font-medium text-black">{item.name}</h3>
-                  <p className="text-gray-600 text-sm">€{item.price.toFixed(2)}</p>
+                  <p className="text-gray-600 text-sm">{item.price.toLocaleString('sv-SE')} kr</p>
                 </div>
                 
                 <div className="flex items-center space-x-2">
@@ -122,7 +122,7 @@ export default function CartPage() {
                 
                 <div className="text-right">
                   <p className="text-lg font-medium text-black">
-                    €{(item.price * item.quantity).toFixed(2)}
+                    {(item.price * item.quantity).toLocaleString('sv-SE')} kr
                   </p>
                   <button
                     onClick={() => handleRemoveItem(item.id)}
@@ -145,7 +145,7 @@ export default function CartPage() {
           <div className="space-y-2 mb-4">
             <div className="flex justify-between">
               <span className="text-gray-600">Subtotal</span>
-              <span className="text-black">€{getTotalPrice().toFixed(2)}</span>
+              <span className="text-black">{getTotalPrice().toLocaleString('sv-SE')} kr</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Shipping</span>
@@ -154,7 +154,7 @@ export default function CartPage() {
             <div className="border-t pt-2">
               <div className="flex justify-between font-medium">
                 <span className="text-black">Total</span>
-                <span className="text-black">€{getTotalPrice().toFixed(2)}</span>
+                <span className="text-black">{getTotalPrice().toLocaleString('sv-SE')} kr</span>
               </div>
             </div>
           </div>

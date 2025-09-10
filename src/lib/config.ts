@@ -1,1 +1,15 @@
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1' 
+function resolveApiBase() {
+  const fallback = 'http://localhost:8080/api/v1'
+  const raw = process.env.NEXT_PUBLIC_API_URL
+  if (!raw) return fallback
+  try {
+    const u = new URL(raw)
+    const host = (u.hostname || '').trim()
+    if (!host || host.startsWith('.')) return fallback
+    return raw.replace(/\/$/, '')
+  } catch {
+    return fallback
+  }
+}
+
+export const API_BASE = resolveApiBase()

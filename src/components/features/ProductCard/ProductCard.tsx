@@ -32,6 +32,9 @@ interface ProductCardProps {
 
 export function ProductCard({ id, name, price, imageUrl }: ProductCardProps) {
   const [isAddingToCart, setIsAddingToCart] = useState(false)
+  const [imgSrc, setImgSrc] = useState(
+    imageUrl ? getProductImageUrl(imageUrl) : '/placeholder-product.svg'
+  )
   const addToCart = useCartStore((state) => state.addToCart)
 
   const handleAddToCart = async (e: React.MouseEvent) => {
@@ -57,19 +60,20 @@ export function ProductCard({ id, name, price, imageUrl }: ProductCardProps) {
       <Link href={`/products/${id}`} className="block">
         <div className="relative w-full pt-[100%]">
           <Image
-            src={getProductImageUrl(imageUrl)}
+            src={imgSrc}
             alt={name}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="absolute inset-0 w-full h-full object-contain p-4 group-hover:opacity-75 transition-opacity duration-300"
             priority
+            onError={() => setImgSrc('/placeholder-product.svg')}
           />
         </div>
       </Link>
       <div className="p-4">
         <Link href={`/products/${id}`}>
           <h3 className="text-sm font-medium text-gray-900 hover:text-gray-700">{name}</h3>
-          <p className="mt-1 text-lg font-medium text-gray-900">€{price.toFixed(2)}</p>
+          <p className="mt-1 text-lg font-medium text-gray-900">{price.toLocaleString('sv-SE')} kr</p>
         </Link>
         <button
           onClick={handleAddToCart}

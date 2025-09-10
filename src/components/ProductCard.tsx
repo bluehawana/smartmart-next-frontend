@@ -15,6 +15,11 @@ interface ProductCardProps {
 
 export function ProductCard({ id, name, price, images, description, stock }: ProductCardProps) {
   const [isAdding, setIsAdding] = useState(false);
+  const [imgSrc, setImgSrc] = useState(
+    images && images.length > 0
+      ? (images[0].startsWith('http') ? images[0] : `${process.env.NEXT_PUBLIC_IMAGE_BASE_URL}/${images[0]}`)
+      : '/placeholder-product.svg'
+  );
   const addToCart = useCartStore(state => state.addToCart);
 
   const handleAddToCart = async () => {
@@ -44,21 +49,19 @@ export function ProductCard({ id, name, price, images, description, stock }: Pro
     <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-[600px]">
       <div className="relative h-80 bg-gray-50 flex-shrink-0">
         <Image
-          src={images && images.length > 0 
-            ? (images[0].startsWith('http') ? images[0] : `${process.env.NEXT_PUBLIC_IMAGE_BASE_URL}/${images[0]}`)
-            : '/placeholder-product.jpg'
-          }
+          src={imgSrc}
           alt={name}
           fill
           className="object-contain p-6"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          onError={() => setImgSrc('/placeholder-product.svg')}
         />
       </div>
       <div className="p-6 flex flex-col flex-grow">
         <div className="flex-grow">
           <h3 className="text-lg font-semibold mb-2 line-clamp-2">{name}</h3>
           <p className="text-sm text-gray-500 mb-4 line-clamp-3">{description}</p>
-          <p className="text-xl font-semibold text-gray-900">${price.toFixed(2)}</p>
+          <p className="text-xl font-semibold text-gray-900">{price.toLocaleString('sv-SE')} kr</p>
         </div>
         {stock > 0 ? (
           <button 

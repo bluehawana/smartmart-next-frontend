@@ -1,4 +1,4 @@
-import { ProductDetails } from "@/components/features/ProductDetails/ProductDetails"
+import { EnhancedProductDetails } from "@/components/features/ProductDetails/EnhancedProductDetails"
 import { notFound } from "next/navigation"
 
 // Numeric ID to UUID mapping for backend API calls
@@ -63,5 +63,5 @@ export default async function ProductPage({
     notFound()
   }
 
-  return <ProductDetails product={product} />
+  return <EnhancedProductDetails product={product} />
 }

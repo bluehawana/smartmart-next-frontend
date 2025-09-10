@@ -359,7 +359,7 @@ export default function Home() {
                 <div>
                   <h3 className="text-sm font-medium text-black mb-1">{product.name}</h3>
                   <p className="text-sm text-gray-600 mb-2">{product.category}</p>
-                  <p className="text-sm font-medium text-black">${product.price.toFixed(2)}</p>
+                  <p className="text-sm font-medium text-black">{product.price.toLocaleString('sv-SE')} kr</p>
                 </div>
               </Link>
             )) : (

@@ -67,11 +67,11 @@ function ProductCard({ id, name, price, imageUrl, description, comparePrice, sto
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-2">
             <span className="text-sm font-medium text-black">
-              ${price.toFixed(2)}
+              {price.toLocaleString('sv-SE')} kr
             </span>
             {comparePrice > price && (
               <span className="text-sm text-gray-400 line-through">
-                ${comparePrice.toFixed(2)}
+                {comparePrice.toLocaleString('sv-SE')} kr
               </span>
             )}
           </div>

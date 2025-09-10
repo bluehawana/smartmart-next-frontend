@@ -67,7 +67,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         <div className="space-y-8">
           <div>
             <h1 className="text-3xl font-light text-black">{product.name}</h1>
-            <p className="mt-4 text-2xl font-medium text-black">${product.price.toFixed(2)}</p>
+            <p className="mt-4 text-2xl font-medium text-black">{product.price.toLocaleString('sv-SE')} kr</p>
           </div>
 
           <p className="text-gray-600 leading-relaxed">{product.description}</p>

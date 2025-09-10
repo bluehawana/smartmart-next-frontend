@@ -349,13 +349,13 @@ export default function CheckoutPage() {
               <h3 className="font-medium">{item.name}</h3>
               <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
             </div>
-            <p className="font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
+            <p className="font-semibold">{(item.price * item.quantity).toLocaleString('sv-SE')} kr</p>
           </div>
         ))}
         
         <div className="flex justify-between items-center pt-4 mt-4 border-t border-gray-300">
           <span className="text-xl font-bold">Total:</span>
-          <span className="text-xl font-bold">${getTotalPrice().toFixed(2)}</span>
+          <span className="text-xl font-bold">{getTotalPrice().toLocaleString('sv-SE')} kr</span>
         </div>
       </div>
 
@@ -781,7 +781,7 @@ export default function CheckoutPage() {
             : 'bg-black hover:bg-gray-800'
         }`}
       >
-        {isLoading ? 'Processing...' : `Pay $${getTotalPrice().toFixed(2)} with ${useBackend ? 'Backend' : 'Direct'} Stripe`}
+        {isLoading ? 'Processing...' : `Pay ${getTotalPrice().toLocaleString('sv-SE')} kr with ${useBackend ? 'Backend' : 'Direct'} Stripe`}
       </button>
 
       <div className="mt-4 text-center text-sm text-gray-600">

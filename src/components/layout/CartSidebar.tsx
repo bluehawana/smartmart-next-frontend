@@ -82,7 +82,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                     </div>
                     <div className="flex-1">
                       <h3 className="font-medium">{item.name}</h3>
-                      <p className="text-gray-600">€{Number(item.price).toFixed(2)}</p>
+                      <p className="text-gray-600">{Number(item.price).toLocaleString('sv-SE')} kr</p>
                       <div className="flex items-center gap-2 mt-2">
                         <button
                           onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
@@ -118,7 +118,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
           <div className="border-t p-4">
             <div className="flex justify-between mb-4">
               <span>Total</span>
-              <span className="font-bold">€{getCartTotal().toFixed(2)}</span>
+              <span className="font-bold">{getCartTotal().toLocaleString('sv-SE')} kr</span>
             </div>
             <CheckoutButton />
           </div>

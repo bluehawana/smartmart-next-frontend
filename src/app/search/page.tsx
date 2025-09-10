@@ -125,14 +125,14 @@ export default function SearchPage() {
               <div className="grid grid-cols-2 gap-2">
                 <input
                   type="number"
-                  placeholder="Min $"
+                  placeholder="Min kr"
                   value={minPrice}
                   onChange={(e) => setMinPrice(e.target.value)}
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <input
                   type="number"
-                  placeholder="Max $"
+                  placeholder="Max kr"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(e.target.value)}
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -230,11 +230,11 @@ export default function SearchPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <span className="text-xl font-bold text-gray-900">
-                        ${product.price.toFixed(2)}
+                        {product.price.toLocaleString('sv-SE')} kr
                       </span>
                       {product.compare_price > product.price && (
                         <span className="text-sm text-gray-500 line-through">
-                          ${product.compare_price.toFixed(2)}
+                          {product.compare_price.toLocaleString('sv-SE')} kr
                         </span>
                       )}
                     </div>

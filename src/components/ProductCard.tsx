@@ -58,7 +58,7 @@ export function ProductCard({ id, name, price, images, description, stock }: Pro
         <div className="flex-grow">
           <h3 className="text-lg font-semibold mb-2 line-clamp-2">{name}</h3>
           <p className="text-sm text-gray-500 mb-4 line-clamp-3">{description}</p>
-          <p className="text-xl font-semibold text-gray-900">${price.toFixed(2)}</p>
+          <p className="text-xl font-semibold text-gray-900">{price.toLocaleString('sv-SE')} kr</p>
         </div>
         {stock > 0 ? (
           <button 

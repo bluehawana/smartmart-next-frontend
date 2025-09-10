@@ -7,7 +7,7 @@ import { getProductImageUrl } from '@/lib/utils';
 import { EmblaOptionsType } from "embla-carousel";
 
 // API base URL
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1'
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://smrtmart-backend-1757499174-0dfbd8d4731e.herokuapp.com/api/v1'
 
 // UUID to numeric ID mapping - CORRECTED ORDER (1-11)
 const UUID_TO_NUMERIC: Record<string, string> = {
@@ -110,7 +110,7 @@ async function getProducts() {
         return {
           ...product,
           id: numericId,
-          images: correctImages[numericId] ? [correctImages[numericId]] : product.images
+          images: product.images // Use API images directly from CloudFlare R2
         }
       }).sort((a, b) => Number(a.id) - Number(b.id)) // Sort by numeric ID 1,2,3,4,5...11
     }
@@ -251,9 +251,14 @@ function getMockProducts(): Product[] {
 
 // Get featured products for gallery
 async function getFeaturedProducts() {
-  // Skip API call and use mock photos since API returns 500 error
-  console.log('Using mock photos due to API issues');
-  return getMockPhotos();
+  try {
+    const products = await getProducts();
+    const featuredProducts = products.filter(p => p.featured).slice(0, 6);
+    return featuredProducts.map(p => p.images[0]).filter(Boolean);
+  } catch (error) {
+    console.error('Error getting featured products:', error);
+    return [];
+  }
 }
 
 function getMockPhotos(): string[] {
@@ -396,10 +401,10 @@ export default function Home() {
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { name: 'Computers', image: 'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/macbook.jpg' },
-              { name: 'Audio', image: 'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/sony.jpg' },
-              { name: 'Smartphones', image: 'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/iphone.jpg' },
-              { name: 'Wearables', image: 'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ultra.jpg' }
+              { name: 'Computers', image: 'https://2a35af424f8734e497a5d707344d79d5.r2.cloudflarestorage.com/smrtmart/macbook.jpg' },
+              { name: 'Audio', image: 'https://2a35af424f8734e497a5d707344d79d5.r2.cloudflarestorage.com/smrtmart/sony.jpg' },
+              { name: 'Smartphones', image: 'https://2a35af424f8734e497a5d707344d79d5.r2.cloudflarestorage.com/smrtmart/iphone.jpg' },
+              { name: 'Wearables', image: 'https://2a35af424f8734e497a5d707344d79d5.r2.cloudflarestorage.com/smrtmart/ultra.jpg' }
             ].map((category, index) => (
               <Link 
                 href={`/products?category=${category.name.toLowerCase()}`}

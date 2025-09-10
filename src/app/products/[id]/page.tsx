@@ -18,27 +18,33 @@ const NUMERIC_TO_UUID: Record<string, string> = {
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://smrtmart-backend-1757499174-0dfbd8d4731e.herokuapp.com/api/v1';
 
-async function fetchProduct(numericId: string) {
-  // Convert numeric ID to UUID for API call
-  const uuid = NUMERIC_TO_UUID[numericId]
-  if (!uuid) {
-    return null
-  }
-
+async function fetchProduct(productId: string) {
   try {
-    const response = await fetch(`${BASE_URL}/products/${uuid}`, {
+    // Try to fetch by UUID first
+    let response = await fetch(`${BASE_URL}/products/${productId}`, {
       next: { revalidate: 3600 } // Cache for 1 hour
     })
     
     if (!response.ok) {
-      throw new Error('Product not found')
+      // If UUID doesn't work, try the numeric mapping
+      const uuid = NUMERIC_TO_UUID[productId]
+      if (uuid) {
+        response = await fetch(`${BASE_URL}/products/${uuid}`, {
+          next: { revalidate: 3600 }
+        })
+      }
+      
+      if (!response.ok) {
+        throw new Error('Product not found')
+      }
     }
     
     const result = await response.json()
-    // Convert the product ID back to numeric for frontend
-    const product = result.data
-    product.id = numericId
-    return product
+    if (result.success && result.data) {
+      return result.data
+    }
+    
+    throw new Error('Invalid API response')
   } catch (error) {
     console.error('Error fetching product:', error)
     return null

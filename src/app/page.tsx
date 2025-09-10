@@ -24,10 +24,10 @@ const UUID_TO_NUMERIC: Record<string, string> = {
   "a3f5302f-f496-4211-9737-e55de3b526c2": "11"  // Dell XPS 15 Developer Edition
 }
 
-// Helper function to get clean product URL
+// Helper function to get clean product URL  
 const getProductUrl = (productId: string): string => {
-  const numericId = UUID_TO_NUMERIC[productId] || productId
-  return `/products/${numericId}`
+  // Use UUID directly since we now support UUID routing
+  return `/products/${productId}`
 }
 
 // Product interface matching Go backend
@@ -88,31 +88,8 @@ async function getProducts() {
     
     // The Go API returns data in response.data.data format
     if (response.success && response.data && response.data.data) {
-      // Convert UUID IDs to numeric IDs for frontend AND fix image assignments
-      return response.data.data.map((product: Product) => {
-        const numericId = UUID_TO_NUMERIC[product.id] || product.id
-        
-        // Fix image assignments - override API images with correct ones
-        const correctImages: Record<string, string> = {
-          "1": "macbook.jpg",           // MacBook Pro 16-inch
-          "2": "airpods2.jpg",          // AirPods Pro 2nd Generation
-          "3": "sony.jpg",              // Sony WH-1000XM5 Headphones
-          "4": "dell.jpg",              // Dell Alienware 34 Monitor
-          "5": "ultra.jpg",             // Apple Watch Ultra
-          "6": "ai-translate-pro.jpg",  // AI Translate Earphones Pro
-          "7": "xps.jpg",               // Dell XPS 13 Laptop
-          "8": "asus.jpg",              // ASUS ROG Gaming Router
-          "9": "iphone.jpg",            // iPhone 15 Pro Max
-          "10": "smart-translator.jpg", // Smart Language Translator Buds
-          "11": "dell-xps-15-2023.jpg"  // Dell XPS 15 Developer Edition
-        }
-        
-        return {
-          ...product,
-          id: numericId,
-          images: product.images // Use API images directly from CloudFlare R2
-        }
-      }).sort((a, b) => Number(a.id) - Number(b.id)) // Sort by numeric ID 1,2,3,4,5...11
+      // Return products as-is with UUID IDs and API images
+      return response.data.data
     }
     
     return getMockProducts()

@@ -245,36 +245,25 @@ function getMockProducts(): Product[] {
   ]
 }
 
-// Get featured products for gallery
-async function getFeaturedProducts() {
-  try {
-    const url = `${BASE_URL}/products?featured=true&limit=10`
-    const res = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      mode: 'cors'
-    })
-
-    if (!res.ok) {
-      console.log('Featured products API failed, using mock photos');
-      return getMockPhotos();
-    }
-
-    const response = await res.json()
-    if (response.success && response.data && response.data.data) {
-      return response.data.data.map((product: Product) => 
-        product.images && product.images.length > 0 
-          ? getProductImageUrl(product.images[0])
-          : '/placeholder-product.svg'
-      )
-    }
-    
+// Get featured products for gallery from already loaded products
+function getFeaturedProductPhotos(products: Product[]): string[] {
+  // Filter featured products and map to their image URLs
+  const featuredProducts = products.filter(product => product.featured);
+  
+  if (featuredProducts.length === 0) {
+    console.log('No featured products found, using mock photos');
     return getMockPhotos();
-  } catch (error) {
-    console.error('Error fetching featured products:', error)
-    return getMockPhotos()
   }
+  
+  // Map featured products to their image URLs
+  const photos = featuredProducts.map((product) => 
+    product.images && product.images.length > 0 
+      ? getProductImageUrl(product.images[0])
+      : '/placeholder-product.svg'
+  );
+  
+  console.log(`Found ${featuredProducts.length} featured products`);
+  return photos;
 }
 
 function getMockPhotos(): string[] {
@@ -309,12 +298,14 @@ export default function Home() {
     async function fetchData() {
       try {
         console.log('Fetching data...');
-        const [productsData, photosData] = await Promise.all([
-          getProducts(),
-          getFeaturedProducts()
-        ]);
+        // Fetch all products once
+        const productsData = await getProducts();
         setProducts(productsData);
+        
+        // Extract featured product photos from the loaded products
+        const photosData = getFeaturedProductPhotos(productsData);
         setPhotos(photosData);
+        
         console.log('Products loaded:', productsData.length);
         console.log('Sample product images:', productsData[0]?.images);
         console.log('Featured photos loaded:', photosData.length);

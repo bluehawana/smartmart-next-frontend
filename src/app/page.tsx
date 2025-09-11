@@ -13,6 +13,21 @@ const BASE_URL = API_BASE
 // Helper function to get product URL
 const getProductUrl = (productId: string): string => `/products/${productId}`
 
+// UUID to numeric ID mapping
+const UUID_TO_NUMERIC: Record<string, string> = {
+  "88d35c54-ce2d-40d5-92e9-4af5c7e5e330": "1", // MacBook Pro 16-inch
+  "c0d069ee-031f-4340-8588-4706103e6b04": "2", // AirPods Pro 2nd Generation  
+  "7a82d048-b478-4b4b-8b78-64eeb3a7ab86": "3", // Sony WH-1000XM5 Headphones
+  "a4e33218-57c3-4133-ac51-ca9aa711eddb": "4", // Dell Alienware 34 Curved Monitor
+  "ff5c7fc1-c3c7-4b35-9e21-15ba9d1c71d1": "5", // Apple Watch Ultra
+  "2cd8e26f-2f66-4a13-8c2f-e656e36e2ebc": "6", // iPhone 15 Pro Max
+  "5d4c7090-d4e5-4c37-afbd-cd4b93a7e63f": "7", // Dell XPS 13 Laptop
+  "e8f1b0a0-9234-4bca-8e3a-1c3e5f7a9b8c": "8", // Dell XPS 15 Developer Edition
+  "34d5e6f7-8901-2345-bcde-f0123456789a": "9", // Smart Language Translator Buds
+  "90abcdef-1234-5678-9012-bcdef0123456": "10", // AI Translate Earphones Pro
+  "f1e2d3c4-b5a6-9788-9102-aabbccddeeff": "11"  // ASUS ROG Rapture Gaming Router
+}
+
 // Product interface matching Go backend
 interface Product {
   id: string;
@@ -71,33 +86,12 @@ async function getProducts() {
     
     // The Go API returns data in response.data.data format
     if (response.success && response.data && response.data.data) {
-      // Convert UUID IDs to numeric IDs for frontend AND fix image assignments
-      return response.data.data.map((product: Product) => {
-        const numericId = UUID_TO_NUMERIC[product.id] || product.id
-        
-        // Fix image assignments - override API images with correct ones
-        const correctImages: Record<string, string> = {
-          "1": "macbook.jpg",           // MacBook Pro 16-inch
-          "2": "airpods2.jpg",          // AirPods Pro 2nd Generation
-          "3": "sony.jpg",              // Sony WH-1000XM5 Headphones
-          "4": "dell.jpg",              // Dell Alienware 34 Monitor
-          "5": "ultra.jpg",             // Apple Watch Ultra
-          "6": "ai-translate-pro.jpg",  // AI Translate Earphones Pro
-          "7": "xps.jpg",               // Dell XPS 13 Laptop
-          "8": "asus.jpg",              // ASUS ROG Gaming Router
-          "9": "iphone.jpg",            // iPhone 15 Pro Max
-          "10": "smart-translator.jpg", // Smart Language Translator Buds
-          "11": "dell-xps-15-2023.jpg"  // Dell XPS 15 Developer Edition
-        }
-        
-        return {
-          ...product,
-          id: numericId,
-          images: correctImages[numericId] ? [correctImages[numericId]] : product.images
-        }
-      }).sort((a, b) => Number(a.id) - Number(b.id)) // Sort by numeric ID 1,2,3,4,5...11
+      // Return the products directly from API
+      return response.data.data || []
     }
     
+    // Only return mock products if API completely fails
+    console.log('API failed completely, using mock products')
     return getMockProducts()
   } catch (error) {
     console.error('Error fetching products:', error)

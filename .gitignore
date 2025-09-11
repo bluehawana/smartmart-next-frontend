@@ -35,3 +35,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Environment files that may contain secrets
+.env.production.vercel
+.env.*.vercel

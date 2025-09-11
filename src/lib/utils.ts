@@ -10,14 +10,8 @@ function normalizeBase(base: string) {
 
 const IMAGE_BASE_URL = normalizeBase(RAW_IMAGE_BASE)
 
-const IMAGE_OVERRIDES: Record<string, string> = {
-  '8k-data-cable-dell.jpg': `${R2_PUBLIC_BASE}/uploads/${encodeURIComponent('8k data cable dell.jpg')}`,
-  'iphone16-promaxcase.jpg': `${R2_PUBLIC_BASE}/uploads/${encodeURIComponent('iphone16 promaxcase.jpg')}`,
-  'macbookair-adaptor-and-cable.png': `${R2_PUBLIC_BASE}/uploads/${encodeURIComponent('macbookair adaptor and cable.png')}`,
-  'usb-c-iphone-cable.jpg': `${R2_PUBLIC_BASE}/uploads/${encodeURIComponent('usb c iphone cable.jpg')}`,
-  'macbookair-m3-weaving-case.jpg': `${R2_PUBLIC_BASE}/uploads/${encodeURIComponent('macbookair m3 weaving case.jpg')}`,
-  'macbook-m4-charging-cable.png': `${R2_PUBLIC_BASE}/uploads/${encodeURIComponent('macbook m4 charging cable.png')}`,
-}
+// No image overrides - all images are now in Supabase
+const IMAGE_OVERRIDES: Record<string, string> = {}
 
 // 产品图片URL
 export function getProductImageUrl(filename: string) {
@@ -30,22 +24,13 @@ export function getProductImageUrl(filename: string) {
     return IMAGE_OVERRIDES[last]
   }
 
-  // If it's already a full URL (starts with http), return as is
+  // If it's already a full URL (starts with http), extract the filename and use Supabase
   if (filename.startsWith('http')) {
     try {
       const u = new URL(filename)
-      if (u.hostname.includes('r2.cloudflarestorage.com')) {
-        const clean = decodeURIComponent(u.pathname.split('/').pop() || '')
-        if (R2_PUBLIC_BASE && clean) {
-          return `${R2_PUBLIC_BASE}/uploads/${encodeURIComponent(clean)}`
-        }
-        if (clean) return `${IMAGE_BASE_URL}/${encodeURIComponent(clean)}`
-      }
-      if (u.hostname.includes('cloudfront.net')) {
-        const clean = decodeURIComponent(u.pathname.split('/').pop() || '')
-        if (clean && IMAGE_OVERRIDES[clean]) return IMAGE_OVERRIDES[clean]
-        if (clean) return `${IMAGE_BASE_URL}/${encodeURIComponent(clean)}`
-      }
+      // Extract just the filename from any URL and use Supabase
+      const clean = decodeURIComponent(u.pathname.split('/').pop() || '')
+      if (clean) return `${IMAGE_BASE_URL}/${clean}`
     } catch {}
     return filename
   }

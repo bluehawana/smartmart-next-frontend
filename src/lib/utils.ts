@@ -41,6 +41,11 @@ export function getProductImageUrl(filename: string) {
         }
         if (clean) return `${IMAGE_BASE_URL}/${encodeURIComponent(clean)}`
       }
+      if (u.hostname.includes('cloudfront.net')) {
+        const clean = decodeURIComponent(u.pathname.split('/').pop() || '')
+        if (clean && IMAGE_OVERRIDES[clean]) return IMAGE_OVERRIDES[clean]
+        if (clean) return `${IMAGE_BASE_URL}/${encodeURIComponent(clean)}`
+      }
     } catch {}
     return filename
   }

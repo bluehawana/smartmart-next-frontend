@@ -6,7 +6,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://smrtmart-go-backend
 async function fetchProduct(productId: string) {
   try {
     const response = await fetch(`${BASE_URL}/products/${productId}`, {
-      next: { revalidate: 3600 }
+      cache: 'no-store'
     })
 
     if (!response.ok) {

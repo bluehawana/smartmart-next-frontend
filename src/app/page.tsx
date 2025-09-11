@@ -10,8 +10,15 @@ import { API_BASE } from '@/lib/config'
 // API base URL
 const BASE_URL = API_BASE
 
-// Helper function to get product URL
-const getProductUrl = (productId: string): string => `/products/${productId}`
+// Helper function to get product URL - use numeric_id or fallback to mapped UUID
+const getProductUrl = (product: Product): string => {
+  if (product.numeric_id) {
+    return `/products/${product.numeric_id}`
+  }
+  // Fallback to UUID mapping for mock data
+  const numericId = UUID_TO_NUMERIC[product.id]
+  return `/products/${numericId || product.id}`
+}
 
 // UUID to numeric ID mapping
 const UUID_TO_NUMERIC: Record<string, string> = {
@@ -31,6 +38,7 @@ const UUID_TO_NUMERIC: Record<string, string> = {
 // Product interface matching Go backend
 interface Product {
   id: string;
+  numeric_id: number;
   name: string;
   price: number;
   images: string[];
@@ -104,6 +112,7 @@ function getMockProducts(): Product[] {
   return [
     {
       id: "88d35c54-ce2d-40d5-92e9-4af5c7e5e330",
+      numeric_id: 1,
       name: "MacBook Pro 16-inch",
       price: 2499,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/macbook.jpg"],
@@ -114,7 +123,8 @@ function getMockProducts(): Product[] {
       category: "computers"
     },
     {
-      id: "c0d069ee-031f-4340-8588-4706103e6b04", 
+      id: "c0d069ee-031f-4340-8588-4706103e6b04",
+      numeric_id: 2,
       name: "AirPods Pro 2nd Generation",
       price: 249,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/airpods2.jpg"],
@@ -126,7 +136,8 @@ function getMockProducts(): Product[] {
     },
     {
       id: "7a82d048-b478-4b4b-8b78-64eeb3a7ab86",
-      name: "Sony WH-1000XM5 Headphones", 
+      numeric_id: 3,
+      name: "Sony WH-1000XM5 Headphones",
       price: 399,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/sony.jpg"],
       description: "Industry-leading noise canceling headphones with exceptional sound quality and 30-hour battery life.",
@@ -137,6 +148,7 @@ function getMockProducts(): Product[] {
     },
     {
       id: "611bac4c-ef16-484e-899d-1e7992819a88",
+      numeric_id: 7,
       name: "Dell XPS 13 Laptop",
       price: 1299,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/xps.jpg"],
@@ -148,7 +160,8 @@ function getMockProducts(): Product[] {
     },
     {
       id: "a4e33218-57c3-4133-ac51-ca9aa711eddb",
-      name: "Dell Alienware 34 Curved Monitor", 
+      numeric_id: 4,
+      name: "Dell Alienware 34 Curved Monitor",
       price: 899,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell.jpg"],
       description: "34-inch curved gaming monitor with 144Hz refresh rate, NVIDIA G-SYNC, and stunning WQHD resolution.",
@@ -159,7 +172,8 @@ function getMockProducts(): Product[] {
     },
     {
       id: "ff5c7fc1-c3c7-4b35-9e21-15ba9d1c71d1",
-      name: "Apple Watch Ultra", 
+      numeric_id: 5,
+      name: "Apple Watch Ultra",
       price: 799,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ultra.jpg"],
       description: "The most rugged and capable Apple Watch, designed for endurance athletes and outdoor adventurers.",
@@ -170,7 +184,8 @@ function getMockProducts(): Product[] {
     },
     {
       id: "a87117d8-e9dd-49ab-a131-245cff3cbf2d",
-      name: "AI Translate Earphones Pro", 
+      numeric_id: 6,
+      name: "AI Translate Earphones Pro",
       price: 199,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ai-translate-pro.jpg"],
       description: "Revolutionary intelligent translate earphones with real-time translation in 40+ languages.",
@@ -181,6 +196,7 @@ function getMockProducts(): Product[] {
     },
     {
       id: "eed7ffb1-5dc5-45fe-8e77-63430419dce3",
+      numeric_id: 10,
       name: "Smart Language Translator Buds",
       price: 149,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/smart-translator.jpg"],
@@ -192,6 +208,7 @@ function getMockProducts(): Product[] {
     },
     {
       id: "13e2b89d-4f65-4ad0-8c4a-5150657e5bde",
+      numeric_id: 8,
       name: "ASUS ROG Rapture GT-BE98 Gaming Router",
       price: 8990,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/asus.jpg"],
@@ -203,6 +220,7 @@ function getMockProducts(): Product[] {
     },
     {
       id: "4dc6d3bf-ec23-4c1b-b47d-f156c82e92fa",
+      numeric_id: 9,
       name: "iPhone 15 Pro Max",
       price: 1199,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/iphone.jpg"],
@@ -214,6 +232,7 @@ function getMockProducts(): Product[] {
     },
     {
       id: "a3f5302f-f496-4211-9737-e55de3b526c2",
+      numeric_id: 11,
       name: "Dell XPS 15 Developer Edition",
       price: 1899,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell-xps-15-2023.jpg"],
@@ -358,7 +377,7 @@ export default function Home() {
               ))
             ) : products.length > 0 ? products.map((product) => (
               <Link 
-                href={getProductUrl(product.id)}
+                href={getProductUrl(product)}
                 key={`product-${product.id}`}
                 className="group"
               >

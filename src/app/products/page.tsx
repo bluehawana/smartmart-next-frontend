@@ -8,8 +8,9 @@ import { getProductImageUrl } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 
 // ProductCard component
-function ProductCard({ id, name, price, imageUrl, description, comparePrice, stock, featured }: {
+function ProductCard({ id, numeric_id, name, price, imageUrl, description, comparePrice, stock, featured }: {
   id: string;
+  numeric_id: number;
   name: string;
   price: number;
   imageUrl: string;
@@ -27,7 +28,7 @@ function ProductCard({ id, name, price, imageUrl, description, comparePrice, sto
 
     setIsAddingToCart(true);
     try {
-      await addToCart(Number(id), 1);
+      await addToCart(numeric_id, 1);
       toast.success('Added to cart!');
     } catch (error) {
       console.error('Error adding to cart:', error);
@@ -39,7 +40,7 @@ function ProductCard({ id, name, price, imageUrl, description, comparePrice, sto
 
   return (
     <div className="group">
-      <Link href={`/products/${id}`}>
+      <Link href={`/products/${numeric_id}`}>
         <div className="aspect-square bg-gray-50 mb-4 overflow-hidden relative">
           <img
             src={getProductImageUrl(imageUrl) || '/placeholder-product.svg'}
@@ -58,7 +59,7 @@ function ProductCard({ id, name, price, imageUrl, description, comparePrice, sto
         </div>
       </Link>
       <div>
-        <Link href={`/products/${id}`}>
+        <Link href={`/products/${numeric_id}`}>
           <h3 className="text-sm font-medium text-black mb-1 hover:text-gray-700">
             {name}
           </h3>
@@ -109,6 +110,7 @@ const getProductUrl = (productId: string): string => {
 
 interface Product {
   id: string;
+  numeric_id: number;
   name: string;
   description: string;
   price: number;
@@ -215,6 +217,7 @@ export default function ProductsPage() {
     return [
       {
         id: "1",
+        numeric_id: 1,
         name: "Apple MacBook Pro 16-inch",
         price: 2499,
         compare_price: 2799,
@@ -228,6 +231,7 @@ export default function ProductsPage() {
       },
       {
         id: "2",
+        numeric_id: 2,
         name: "AirPods Pro 2nd Generation",
         price: 249,
         compare_price: 279,
@@ -241,6 +245,7 @@ export default function ProductsPage() {
       },
       {
         id: "3",
+        numeric_id: 3,
         name: "Sony WH-1000XM5 Headphones",
         price: 399,
         compare_price: 449,
@@ -254,6 +259,7 @@ export default function ProductsPage() {
       },
       {
         id: "4",
+        numeric_id: 4,
         name: "Dell Alienware 34 Curved Monitor",
         price: 899,
         compare_price: 1099,
@@ -267,6 +273,7 @@ export default function ProductsPage() {
       },
       {
         id: "5",
+        numeric_id: 5,
         name: "Apple Watch Ultra",
         price: 799,
         compare_price: 849,
@@ -280,6 +287,7 @@ export default function ProductsPage() {
       },
       {
         id: "6",
+        numeric_id: 6,
         name: "AI Translate Earphones Pro",
         price: 199,
         compare_price: 249,
@@ -293,6 +301,7 @@ export default function ProductsPage() {
       },
       {
         id: "7",
+        numeric_id: 7,
         name: "Dell XPS 13 Laptop",
         price: 1299,
         compare_price: 1499,
@@ -306,6 +315,7 @@ export default function ProductsPage() {
       },
       {
         id: "8",
+        numeric_id: 8,
         name: "ASUS ROG Rapture GT-BE98 Gaming Router",
         price: 8990,
         compare_price: 9990,
@@ -319,6 +329,7 @@ export default function ProductsPage() {
       },
       {
         id: "9",
+        numeric_id: 9,
         name: "iPhone 15 Pro Max",
         price: 1199,
         compare_price: 1299,
@@ -332,6 +343,7 @@ export default function ProductsPage() {
       },
       {
         id: "10",
+        numeric_id: 10,
         name: "Smart Language Translator Buds",
         price: 149,
         compare_price: 199,
@@ -345,6 +357,7 @@ export default function ProductsPage() {
       },
       {
         id: "11",
+        numeric_id: 11,
         name: "Dell XPS 15 Developer Edition",
         price: 1899,
         compare_price: 2199,
@@ -440,6 +453,7 @@ export default function ProductsPage() {
           <ProductCard
             key={product.id}
             id={product.id}
+            numeric_id={product.numeric_id}
             name={product.name}
             price={product.price}
             imageUrl={product.images && product.images.length > 0 ? product.images[0] : ''}

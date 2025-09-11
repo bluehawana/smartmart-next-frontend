@@ -25,12 +25,13 @@ const UUID_TO_NUMERIC: Record<string, string> = {
 
 interface ProductCardProps {
   id: string
+  numeric_id?: number
   name: string
   price: number
   imageUrl: string
 }
 
-export function ProductCard({ id, name, price, imageUrl }: ProductCardProps) {
+export function ProductCard({ id, numeric_id, name, price, imageUrl }: ProductCardProps) {
   const [isAddingToCart, setIsAddingToCart] = useState(false)
   const [imgSrc, setImgSrc] = useState(
     imageUrl ? getProductImageUrl(imageUrl) : '/placeholder-product.svg'
@@ -43,9 +44,9 @@ export function ProductCard({ id, name, price, imageUrl }: ProductCardProps) {
     
     setIsAddingToCart(true)
     try {
-      // Convert UUID to numeric ID for cart system
-      const numericId = UUID_TO_NUMERIC[id] || id
-      await addToCart(Number(numericId), 1)
+      // Use numeric_id if available, otherwise fall back to UUID mapping
+      const numericIdToUse = numeric_id || Number(UUID_TO_NUMERIC[id]) || Number(id)
+      await addToCart(numericIdToUse, 1)
       toast.success('Added to cart!')
     } catch (error) {
       console.error('Error adding to cart:', error)
@@ -55,9 +56,12 @@ export function ProductCard({ id, name, price, imageUrl }: ProductCardProps) {
     }
   }
 
+  // Use numeric_id for URL if available, otherwise use id
+  const linkId = numeric_id || id
+
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-lg border hover:shadow-lg transition-shadow duration-300">
-      <Link href={`/products/${id}`} className="block">
+      <Link href={`/products/${linkId}`} className="block">
         <div className="relative w-full pt-[100%]">
           <Image
             src={imgSrc}
@@ -71,7 +75,7 @@ export function ProductCard({ id, name, price, imageUrl }: ProductCardProps) {
         </div>
       </Link>
       <div className="p-4">
-        <Link href={`/products/${id}`}>
+        <Link href={`/products/${linkId}`}>
           <h3 className="text-sm font-medium text-gray-900 hover:text-gray-700">{name}</h3>
           <p className="mt-1 text-lg font-medium text-gray-900">{price.toLocaleString('sv-SE')} kr</p>
         </Link>

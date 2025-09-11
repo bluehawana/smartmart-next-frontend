@@ -66,7 +66,7 @@ function ErrorCard({ error }: { error: Error }) {
 
 async function getProducts() {
   try {
-    const url = `${BASE_URL}/products`
+    const url = `${BASE_URL}/products?limit=30`  // Get all products
     console.log('Fetching products from:', url)
 
     const res = await fetch(url, {
@@ -228,9 +228,34 @@ function getMockProducts(): Product[] {
 
 // Get featured products for gallery
 async function getFeaturedProducts() {
-  // Skip API call and use mock photos since API returns 500 error
-  console.log('Using mock photos due to API issues');
-  return getMockPhotos();
+  try {
+    const url = `${BASE_URL}/products?featured=true&limit=10`
+    const res = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      mode: 'cors'
+    })
+
+    if (!res.ok) {
+      console.log('Featured products API failed, using mock photos');
+      return getMockPhotos();
+    }
+
+    const response = await res.json()
+    if (response.success && response.data && response.data.data) {
+      return response.data.data.map((product: Product) => 
+        product.images && product.images.length > 0 
+          ? getProductImageUrl(product.images[0])
+          : '/placeholder-product.svg'
+      )
+    }
+    
+    return getMockPhotos();
+  } catch (error) {
+    console.error('Error fetching featured products:', error)
+    return getMockPhotos()
+  }
 }
 
 function getMockPhotos(): string[] {

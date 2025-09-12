@@ -8,6 +8,7 @@ import { getProductImageUrl } from '@/lib/utils'
 
 interface Product {
   id: string
+  numeric_id?: number
   name: string
   price: number
   description: string
@@ -29,8 +30,9 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     
     setIsAddingToCart(true)
     try {
-      // Use product ID directly (already numeric)
-      await addToCart(Number(product.id), quantity)
+      // Use numeric_id for cart operations
+      const cartId = product.numeric_id || Number(product.id)
+      await addToCart(cartId, quantity)
       toast.success('Added to cart!')
     } catch (error) {
       console.error('Error adding to cart:', error)

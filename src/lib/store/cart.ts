@@ -79,6 +79,12 @@ const PRODUCTS_MAP: Record<number, { name: string; price: number; image: string;
     price: 1899, 
     image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell-xps-15-2023.jpg",
     description: "Dell XPS 15 Developer Edition with Ubuntu, Intel Core i7, 32GB RAM, 1TB SSD, NVIDIA GeForce RTX 4050. Perfect for developers and content creators."
+  },
+  21: { 
+    name: "MacBook Air M3 Case", 
+    price: 890, 
+    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/macbookair case.png",
+    description: "Precise fit and design cover for MacBook Air M3. Durable protective case with easy installation, lightweight design, and enhanced grip for stability."
   }
 }
 

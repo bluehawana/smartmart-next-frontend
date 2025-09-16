@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useCartStore } from '@/lib/store/cart'
+import { API_BASE } from '@/lib/config'
 import { loadStripe } from '@stripe/stripe-js'
 
 const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
@@ -184,7 +185,7 @@ export default function CheckoutPage() {
       console.log('Creating backend checkout session with data:', checkoutData)
 
       // Call backend checkout endpoint
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/checkout`, {
+      const response = await fetch(`${API_BASE}/orders/checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -261,7 +262,7 @@ export default function CheckoutPage() {
       console.log('Creating direct checkout session (using backend):', checkoutData)
 
       // Call the original backend checkout endpoint (without full customer info)
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/checkout`, {
+      const response = await fetch(`${API_BASE}/orders/checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

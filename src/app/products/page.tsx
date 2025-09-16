@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCartStore } from '@/lib/store/cart';
+import { API_BASE } from '@/lib/config'
+import { getProductImageUrl } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 
 // ProductCard component
@@ -40,7 +42,7 @@ function ProductCard({ id, name, price, imageUrl, description, comparePrice, sto
       <Link href={`/products/${id}`}>
         <div className="aspect-square bg-gray-50 mb-4 overflow-hidden relative">
           <img
-            src={imageUrl || '/placeholder-product.svg'}
+            src={getProductImageUrl(imageUrl) || '/placeholder-product.svg'}
             alt={name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             onError={(e) => {
@@ -98,7 +100,7 @@ function ProductCard({ id, name, price, imageUrl, description, comparePrice, sto
   );
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://smrtmart-backend-1757499174-0dfbd8d4731e.herokuapp.com/api/v1';
+const BASE_URL = API_BASE;
 
 // Helper function to get clean product URL
 const getProductUrl = (productId: string): string => {

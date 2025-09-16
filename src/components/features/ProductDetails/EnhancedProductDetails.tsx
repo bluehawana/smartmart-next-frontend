@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Plus, Minus, ShoppingCart, Heart, Share2, ZoomIn, Star, Truck, Shield, RotateCcw } from 'lucide-react'
 import { useCartStore } from '@/lib/store/cart'
+import { getProductImageUrl } from '@/lib/utils'
 import { toast } from 'react-hot-toast'
 
 interface Product {
@@ -76,7 +77,7 @@ export function EnhancedProductDetails({ product }: ProductDetailsProps) {
     }
   }
 
-  const currentImage = product.images?.[selectedImageIndex] || product.images?.[0] || '/placeholder-product.svg'
+  const currentImage = getProductImageUrl(product.images?.[selectedImageIndex] || product.images?.[0] || '') || '/placeholder-product.svg'
   const hasDiscount = product.compare_price && product.compare_price > product.price
   const discountPercentage = hasDiscount 
     ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100)
@@ -140,7 +141,7 @@ export function EnhancedProductDetails({ product }: ProductDetailsProps) {
                   }`}
                 >
                   <img
-                    src={image}
+                    src={getProductImageUrl(image) || '/placeholder-product.svg'}
                     alt={`${product.name} ${index + 1}`}
                     className="w-full h-full object-cover"
                     onError={(e) => {

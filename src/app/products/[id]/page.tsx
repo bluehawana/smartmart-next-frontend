@@ -20,9 +20,9 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://smrtmart-backend-17
 
 async function fetchProduct(productId: string) {
   try {
-    // The backend now supports both UUID and numeric ID, so pass the ID directly
+    // Always fetch fresh product details to avoid stale content
     const response = await fetch(`${BASE_URL}/products/${productId}`, {
-      next: { revalidate: 3600 } // Cache for 1 hour
+      cache: 'no-store'
     })
     
     if (!response.ok) {

@@ -49,7 +49,13 @@ export function EnhancedProductDetails({ product }: ProductDetailsProps) {
     
     setIsAddingToCart(true)
     try {
-      await addToCart(Number(product.id), quantity)
+      await addToCart(product.id, quantity, {
+        name: product.name,
+        price: product.price,
+        description: product.description,
+        image: product.images && product.images.length > 0 ? product.images[0] : '',
+        comparePrice: product.compare_price,
+      })
       toast.success(`${quantity} ${quantity === 1 ? 'item' : 'items'} added to cart!`)
     } catch (error) {
       console.error('Error adding to cart:', error)

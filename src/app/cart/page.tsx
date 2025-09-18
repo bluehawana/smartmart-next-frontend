@@ -13,13 +13,24 @@ export default function CartPage() {
     isLoading, 
     updateQuantity, 
     removeFromCart, 
-    getTotalPrice 
+    getTotalPrice,
+    refreshItemDetails
   } = useCartStore();
 
   // Don't auto-fetch cart - rely on persisted storage
   // useEffect(() => {
   //   fetchCart();
   // }, [fetchCart]);
+
+  useEffect(() => {
+    if (!items.length) return;
+    const needsRefresh = items.some((item) => !item.name || item.name.startsWith('Product ') || item.price === 0);
+    if (!needsRefresh) return;
+
+    refreshItemDetails().catch(() => {
+      // Intentionally swallow errors to avoid breaking cart rendering
+    });
+  }, [items, refreshItemDetails]);
 
   const handleUpdateQuantity = async (id: string, newQuantity: number) => {
     if (newQuantity < 1) return;

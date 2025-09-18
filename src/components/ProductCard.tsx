@@ -22,7 +22,12 @@ export function ProductCard({ id, name, price, images, description, stock }: Pro
     
     setIsAdding(true);
     try {
-      await addToCart(Number(id), 1);
+      await addToCart(id, 1, {
+        name,
+        price,
+        description,
+        image: images && images.length > 0 ? images[0] : '',
+      });
       
       // 显示成功反馈
       const button = document.activeElement as HTMLButtonElement;

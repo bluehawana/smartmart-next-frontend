@@ -2,98 +2,190 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { API_BASE } from '../config'
 
-interface CartItem {
+type ProductIdentifier = string
+
+export interface CartItem {
   id: string
-  productId: number
+  productId: ProductIdentifier
   name: string
   price: number
   quantity: number
   image: string
   description: string
+  comparePrice?: number
 }
 
-// 产品数据映射 - FIXED IMAGE ASSIGNMENTS
-const PRODUCTS_MAP: Record<number, { name: string; price: number; image: string; description: string }> = {
-  1: { 
-    name: "Apple MacBook Pro 16-inch", 
-    price: 2499, 
-    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/macbook.jpg",
-    description: "Apple MacBook Pro 16-inch with M3 Pro chip, 18GB RAM, 512GB SSD. Perfect for professionals and creatives."
-  },
-  2: { 
-    name: "AirPods Pro 2nd Generation", 
-    price: 249, 
-    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/airpods2.jpg",
-    description: "Apple AirPods Pro with Active Noise Cancellation, Transparency mode, and spatial audio."
-  },
-  3: { 
-    name: "Sony WH-1000XM5 Headphones", 
-    price: 399, 
-    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/sony.jpg",
-    description: "Industry-leading noise canceling headphones with exceptional sound quality and 30-hour battery life."
-  },
-  4: { 
-    name: "Dell Alienware 34 Curved Monitor", 
-    price: 899, 
-    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell.jpg",
-    description: "34-inch curved gaming monitor with 144Hz refresh rate, NVIDIA G-SYNC, and stunning WQHD resolution."
-  },
-  5: { 
-    name: "Apple Watch Ultra", 
-    price: 799, 
-    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ultra.jpg",
-    description: "The most rugged and capable Apple Watch, designed for endurance athletes and outdoor adventurers."
-  },
-  6: { 
-    name: "AI Translate Earphones Pro", 
-    price: 199, 
-    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ai-translate-pro.jpg",
-    description: "Revolutionary intelligent translate earphones with real-time translation in 40+ languages."
-  },
-  7: { 
-    name: "Dell XPS 13 Laptop", 
-    price: 1299, 
-    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/xps.jpg",
-    description: "Ultra-portable Dell XPS 13 with Intel Core i7, 16GB RAM, 512GB SSD, and stunning InfinityEdge display."
-  },
-  8: { 
-    name: "ASUS ROG Rapture GT-BE98 Gaming Router", 
-    price: 8990, 
-    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/asus.jpg",
-    description: "ASUS ROG Rapture GT-BE98 Quad-band Gaming Router with WiFi 7, advanced QoS, and ultra-low latency for competitive gaming."
-  },
-  9: { 
-    name: "iPhone 15 Pro Max", 
-    price: 1199, 
-    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/iphone.jpg",
-    description: "The ultimate iPhone with titanium design, A17 Pro chip, and professional camera system."
-  },
-  10: { 
-    name: "Smart Language Translator Buds", 
-    price: 149, 
-    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/smart-translator.jpg",
-    description: "Next-generation wireless earbuds with built-in AI translator. Supports conversation mode, offline translation for 12 languages, and crystal-clear audio quality."
-  },
-  11: { 
-    name: "Dell XPS 15 Developer Edition", 
-    price: 1899, 
-    image: "https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell-xps-15-2023.jpg",
-    description: "Dell XPS 15 Developer Edition with Ubuntu, Intel Core i7, 32GB RAM, 1TB SSD, NVIDIA GeForce RTX 4050. Perfect for developers and content creators."
-  }
+interface CartItemDetails {
+  name: string
+  price: number
+  image: string
+  description: string
+  comparePrice?: number
 }
+
+export type CartItemDetailsInput = Partial<CartItemDetails>
 
 interface CartStore {
   items: CartItem[]
   isLoading: boolean
   error: string | null
-  addToCart: (productId: number, quantity: number) => Promise<void>
+  addToCart: (productId: string | number, quantity: number, details?: CartItemDetailsInput) => Promise<void>
   removeFromCart: (id: string) => Promise<void>
   updateQuantity: (id: string, quantity: number) => Promise<void>
   fetchCart: () => Promise<void>
+  refreshItemDetails: () => Promise<void>
   getCartTotal: () => number
   getTotalPrice: () => number
   getCartItemsCount: () => number
   clearCart: () => void
+}
+
+const FALLBACK_IMAGE = '/placeholder-product.svg'
+
+const productDetailsCache: Record<ProductIdentifier, CartItemDetails> = {}
+
+const buildFallbackDetails = (productId: ProductIdentifier): CartItemDetails => ({
+  name: `Product ${productId}`,
+  price: 0,
+  image: FALLBACK_IMAGE,
+  description: '',
+})
+
+const sanitizeCartItemDetails = (
+  productId: ProductIdentifier,
+  details?: CartItemDetailsInput
+): CartItemDetails => {
+  const fallback = buildFallbackDetails(productId)
+  if (!details) return fallback
+
+  const sanitized: CartItemDetails = {
+    name: typeof details.name === 'string' && details.name.trim() ? details.name.trim() : fallback.name,
+    price: typeof details.price === 'number' && Number.isFinite(details.price) ? details.price : fallback.price,
+    image: typeof details.image === 'string' && details.image ? details.image : fallback.image,
+    description: typeof details.description === 'string' && details.description ? details.description : fallback.description,
+  }
+
+  if (typeof details.comparePrice === 'number' && Number.isFinite(details.comparePrice)) {
+    sanitized.comparePrice = details.comparePrice
+  }
+
+  return sanitized
+}
+
+const normalizeProductId = (raw: number | string): ProductIdentifier => {
+  if (typeof raw === 'number') {
+    return Number.isFinite(raw) ? String(raw) : ''
+  }
+
+  if (typeof raw === 'string') {
+    const trimmed = raw.trim()
+    if (trimmed) return trimmed
+  }
+
+  return ''
+}
+
+const hasMeaningfulDetails = (
+  productId: ProductIdentifier,
+  details: CartItemDetails
+) => {
+  const fallback = buildFallbackDetails(productId)
+  return (
+    details.name !== fallback.name ||
+    details.price !== fallback.price ||
+    details.image !== fallback.image ||
+    details.description !== fallback.description ||
+    details.comparePrice !== fallback.comparePrice
+  )
+}
+
+async function fetchProductDetails(productId: ProductIdentifier): Promise<CartItemDetails | null> {
+  if (!productId) return null
+
+  if (productDetailsCache[productId]) {
+    return productDetailsCache[productId]
+  }
+
+  const candidates: ProductIdentifier[] = [productId]
+  const numericCandidate = Number(productId)
+  if (Number.isFinite(numericCandidate)) {
+    const numericId = String(numericCandidate)
+    if (!candidates.includes(numericId)) {
+      candidates.push(numericId)
+    }
+  }
+
+  for (const candidate of candidates) {
+    try {
+      const url = `${API_BASE}/products/${encodeURIComponent(candidate)}`
+      const response = await fetch(url, {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-store',
+      })
+
+      if (!response.ok) {
+        continue
+      }
+
+      const payload = await response.json()
+      const product =
+        payload?.data ??
+        payload?.product ??
+        (payload?.success && payload?.data ? payload.data : null)
+
+      if (!product) {
+        continue
+      }
+
+      const images = Array.isArray(product.images) ? product.images : []
+      const fallback = buildFallbackDetails(productId)
+      const details: CartItemDetails = {
+        name: typeof product.name === 'string' && product.name ? product.name : fallback.name,
+        price: Number(product.price) || fallback.price,
+        image: typeof product.image === 'string' && product.image
+          ? product.image
+          : images.length > 0
+            ? images[0]
+            : fallback.image,
+        description: typeof product.description === 'string' ? product.description : fallback.description,
+      }
+
+      if (product.compare_price !== undefined) {
+        const comparePriceNumber = Number(product.compare_price)
+        if (Number.isFinite(comparePriceNumber)) {
+          details.comparePrice = comparePriceNumber
+        }
+      }
+
+      productDetailsCache[productId] = details
+      return details
+    } catch (error) {
+      console.error(`Error fetching product ${candidate} for cart:`, error)
+    }
+  }
+
+  return null
+}
+
+async function resolveCartItemDetails(
+  productId: ProductIdentifier,
+  provided?: CartItemDetailsInput
+): Promise<CartItemDetails> {
+  const sanitized = sanitizeCartItemDetails(productId, provided)
+  if (hasMeaningfulDetails(productId, sanitized)) {
+    productDetailsCache[productId] = sanitized
+    return sanitized
+  }
+
+  const fetched = await fetchProductDetails(productId)
+  if (fetched) {
+    return fetched
+  }
+
+  return sanitized
 }
 
 export const useCartStore = create<CartStore>()(
@@ -110,43 +202,85 @@ export const useCartStore = create<CartStore>()(
             method: 'GET',
             credentials: 'include',
             headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            }
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
           })
-          
+
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`)
           }
-          
-          const items = await response.json()
-          console.log('Cart data received:', items)
 
-          // Only update if backend has items, otherwise keep local storage
-          if (items && items.length > 0) {
-            // 转换后端数据格式为前端格式
-            const cartItems = items.map((item: any) => ({
-              id: String(item.id),
-              productId: item.productId,
-              quantity: item.quantity,
-              ...PRODUCTS_MAP[item.productId] || {
-                name: `Product ${item.productId}`,
-                price: 0,
-                image: 'default.jpg',
-                description: ''
-              }
-            }))
+          const rawItems = await response.json()
+
+          if (Array.isArray(rawItems) && rawItems.length > 0) {
+            const cartItems = await Promise.all(
+              rawItems.map(async (item: any) => {
+                const rawProductId =
+                  item.productId ??
+                  item.product_id ??
+                  item.product_id ??
+                  item.id ??
+                  ''
+                const productId =
+                  normalizeProductId(rawProductId) ||
+                  `unknown-${Date.now()}`
+
+                const quantityValue = Number(item.quantity)
+                const quantity =
+                  Number.isFinite(quantityValue) && quantityValue > 0
+                    ? quantityValue
+                    : 1
+
+                const providedDetails: CartItemDetailsInput | undefined = item.product
+                  ? (() => {
+                      const priceNumber = Number(item.product.price)
+                      const comparePriceRaw = item.product.compare_price
+                      const comparePriceNumber = Number(comparePriceRaw)
+                      const imageFromArray = Array.isArray(item.product.images) && item.product.images.length > 0
+                        ? item.product.images[0]
+                        : undefined
+
+                      const details: CartItemDetailsInput = {
+                        name: item.product.name,
+                        price: Number.isFinite(priceNumber) ? priceNumber : undefined,
+                        description: item.product.description,
+                        image: imageFromArray || item.product.image,
+                      }
+
+                      if (Number.isFinite(comparePriceNumber)) {
+                        details.comparePrice = comparePriceNumber
+                      }
+
+                      return details
+                    })()
+                  : undefined
+
+                const details = await resolveCartItemDetails(
+                  productId,
+                  providedDetails
+                )
+
+                return {
+                  id: String(item.id ?? `${productId}-${Date.now()}`),
+                  productId,
+                  quantity,
+                  ...details,
+                } as CartItem
+              })
+            )
 
             set({ items: cartItems, error: null })
           } else {
-            // Backend is empty, keep existing local items
             console.log('Backend cart empty, keeping local cart items')
           }
         } catch (error) {
           console.error('Error fetching cart:', error)
-          // Don't clear local items on API error, just log it
           console.log('API error, keeping local cart items')
-          set({ error: error instanceof Error ? error.message : 'Failed to fetch cart' })
+          set({
+            error:
+              error instanceof Error ? error.message : 'Failed to fetch cart',
+          })
         } finally {
           set({ isLoading: false })
         }
@@ -154,12 +288,12 @@ export const useCartStore = create<CartStore>()(
 
       getCartTotal: () => {
         const { items } = get()
-        return items.reduce((total, item) => total + (item.price * item.quantity), 0)
+        return items.reduce((total, item) => total + item.price * item.quantity, 0)
       },
 
       getTotalPrice: () => {
         const { items } = get()
-        return items.reduce((total, item) => total + (item.price * item.quantity), 0)
+        return items.reduce((total, item) => total + item.price * item.quantity, 0)
       },
 
       getCartItemsCount: () => {
@@ -167,69 +301,94 @@ export const useCartStore = create<CartStore>()(
         return items.reduce((count, item) => count + item.quantity, 0)
       },
 
-      addToCart: async (productId: number, quantity: number) => {
-        console.log('Adding to cart:', productId, quantity)
+      addToCart: async (productIdInput, quantityInput, detailsInput) => {
+        let productId = normalizeProductId(productIdInput)
+        if (!productId) {
+          productId =
+            typeof productIdInput === 'string' && productIdInput.trim()
+              ? productIdInput.trim()
+              : `custom-${Date.now()}`
+        }
+
+        const quantityParsed = Number(quantityInput)
+        const quantity =
+          Number.isFinite(quantityParsed) && quantityParsed > 0
+            ? Math.floor(quantityParsed)
+            : 1
+
         set({ isLoading: true, error: null })
-        
-        // Add to local state immediately (fallback approach)
-        set((state) => {
-          console.log('Current cart state before update:', state.items)
-          const existingItem = state.items.find(item => item.productId === productId)
-          let newState;
-          if (existingItem) {
-            newState = {
-              items: state.items.map(item => 
-                item.productId === productId 
-                  ? { ...item, quantity: item.quantity + quantity }
+
+        try {
+          const details = await resolveCartItemDetails(productId, detailsInput)
+
+          set((state) => {
+            const existingItem = state.items.find(
+              (item) => item.productId === productId
+            )
+
+            if (existingItem) {
+              const updatedItems = state.items.map((item) =>
+                item.productId === productId
+                  ? {
+                      ...item,
+                      ...details,
+                      quantity: item.quantity + quantity,
+                    }
                   : item
               )
+
+              return { items: updatedItems, isLoading: false }
             }
-          } else {
-            newState = {
-              items: [...state.items, {
-                id: `local-${productId}-${Date.now()}`,
-                productId,
-                quantity,
-                ...PRODUCTS_MAP[productId] || {
-                  name: `Product ${productId}`,
-                  price: 0,
-                  image: '/placeholder-product.svg',
-                  description: ''
-                }
-              }]
+
+            const newItem: CartItem = {
+              id: `local-${productId}-${Date.now()}`,
+              productId,
+              quantity,
+              ...details,
             }
-          }
-          
-          console.log('New cart state after update:', newState.items)
-          
-          // Dispatch custom event to update cart count in header
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('cartUpdated'));
-          }
-          
-          return { ...newState, isLoading: false }
-        })
-        
-        // Try to sync with backend but don't fail if it errors
-        try {
-          const response = await fetch(`${API_BASE}/cart/items`, {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({ 
-              productId: Number(productId),
-              quantity: Number(quantity)
-            })
+
+            return {
+              items: [...state.items, newItem],
+              isLoading: false,
+            }
           })
 
-          if (response.ok) {
-            console.log('Successfully synced with backend')
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('cartUpdated'))
+          }
+
+          const numericProductId = Number(productId)
+          if (Number.isFinite(numericProductId)) {
+            try {
+              const response = await fetch(`${API_BASE}/cart/items`, {
+                method: 'POST',
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                  productId: numericProductId,
+                  quantity,
+                }),
+              })
+
+              if (response.ok) {
+                console.log('Successfully synced with backend')
+              }
+            } catch (error) {
+              console.log('Backend sync failed, but local cart updated:', error)
+            }
           }
         } catch (error) {
-          console.log('Backend sync failed, but local cart updated:', error)
+          console.error('Error adding to cart:', error)
+          set({
+            error:
+              error instanceof Error
+                ? error.message
+                : 'Failed to add item to cart',
+            isLoading: false,
+          })
         }
       },
 
@@ -240,21 +399,30 @@ export const useCartStore = create<CartStore>()(
             method: 'DELETE',
             credentials: 'include',
             headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            }
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
           })
-          
+
           if (!response.ok) {
             throw new Error(`Failed to remove item: ${response.status}`)
           }
-          
-          set(state => ({
-            items: state.items.filter(item => item.id !== id)
+
+          set((state) => ({
+            items: state.items.filter((item) => item.id !== id),
           }))
+
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('cartUpdated'))
+          }
         } catch (error) {
           console.error('Error removing from cart:', error)
-          set({ error: error instanceof Error ? error.message : 'Failed to remove from cart' })
+          set({
+            error:
+              error instanceof Error
+                ? error.message
+                : 'Failed to remove from cart',
+          })
         } finally {
           set({ isLoading: false })
         }
@@ -262,60 +430,97 @@ export const useCartStore = create<CartStore>()(
 
       updateQuantity: async (id: string, quantity: number) => {
         if (quantity < 1) return
-        
+
         set({ isLoading: true, error: null })
         try {
           const response = await fetch(`${API_BASE}/cart/items/${id}`, {
             method: 'PUT',
             credentials: 'include',
             headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ quantity })
+            body: JSON.stringify({ quantity }),
           })
-          
+
           if (!response.ok) {
             throw new Error(`Failed to update quantity: ${response.status}`)
           }
-          
-          set(state => ({
-            items: state.items.map(item => 
+
+          set((state) => ({
+            items: state.items.map((item) =>
               item.id === id ? { ...item, quantity } : item
-            )
+            ),
           }))
+
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('cartUpdated'))
+          }
         } catch (error) {
           console.error('Error updating quantity:', error)
-          set({ error: error instanceof Error ? error.message : 'Failed to update quantity' })
+          set({
+            error:
+              error instanceof Error
+                ? error.message
+                : 'Failed to update quantity',
+          })
         } finally {
           set({ isLoading: false })
         }
       },
 
+      refreshItemDetails: async () => {
+        const { items } = get()
+        if (!items.length) return
+
+        const candidates = items.filter((item) => !hasMeaningfulDetails(item.productId, item))
+        if (!candidates.length) return
+
+        const updates = await Promise.all(
+          candidates.map(async (item) => {
+            const details = await resolveCartItemDetails(item.productId)
+            return { productId: item.productId, details }
+          })
+        )
+
+        set((state) => ({
+          items: state.items.map((item) => {
+            const update = updates.find((u) => u.productId === item.productId)
+            return update ? { ...item, ...update.details } : item
+          }),
+        }))
+      },
+
       clearCart: async () => {
         try {
-          // 清空本地状态
           set({ items: [], error: null })
-          
-          // 同步到后端
           await fetch(`${API_BASE}/cart/clear`, {
             method: 'POST',
             credentials: 'include',
             headers: {
-              'Content-Type': 'application/json'
-            }
+              'Content-Type': 'application/json',
+            },
           })
-          
+
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('cartUpdated'))
+          }
+
           console.log('Cart cleared successfully')
         } catch (error) {
           console.error('Error clearing cart:', error)
-          set({ error: error instanceof Error ? error.message : 'Failed to clear cart' })
+          set({
+            error:
+              error instanceof Error
+                ? error.message
+                : 'Failed to clear cart',
+          })
         }
       },
     }),
     {
       name: 'cart-storage',
-      skipHydration: false
+      skipHydration: false,
     }
   )
 )

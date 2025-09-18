@@ -42,7 +42,12 @@ export function ProductCard({ id, name, price, imageUrl }: ProductCardProps) {
     try {
       // Convert UUID to numeric ID for cart system
       const numericId = UUID_TO_NUMERIC[id] || id
-      await addToCart(Number(numericId), 1)
+      await addToCart(numericId, 1, {
+        name,
+        price,
+        image: imageUrl,
+        description: '',
+      })
       toast.success('Added to cart!')
     } catch (error) {
       console.error('Error adding to cart:', error)

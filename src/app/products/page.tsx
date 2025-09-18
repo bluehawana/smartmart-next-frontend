@@ -27,7 +27,13 @@ function ProductCard({ id, name, price, imageUrl, description, comparePrice, sto
 
     setIsAddingToCart(true);
     try {
-      await addToCart(Number(id), 1);
+      await addToCart(id, 1, {
+        name,
+        price,
+        description,
+        image: imageUrl,
+        comparePrice,
+      });
       toast.success('Added to cart!');
     } catch (error) {
       console.error('Error adding to cart:', error);

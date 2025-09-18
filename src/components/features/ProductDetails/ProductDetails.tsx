@@ -30,7 +30,12 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     setIsAddingToCart(true)
     try {
       // Use product ID directly (already numeric)
-      await addToCart(Number(product.id), quantity)
+      await addToCart(product.id, quantity, {
+        name: product.name,
+        price: product.price,
+        description: product.description,
+        image: product.images && product.images.length > 0 ? product.images[0] : '',
+      })
       toast.success('Added to cart!')
     } catch (error) {
       console.error('Error adding to cart:', error)

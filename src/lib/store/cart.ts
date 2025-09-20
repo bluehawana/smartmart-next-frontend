@@ -65,6 +65,26 @@ function productToCartItem(product: Product, quantity: number, cartItemId?: stri
   }
 }
 
+// Deduplicate cart items by productId, combining quantities
+function deduplicateCartItems(items: CartItem[]): CartItem[] {
+  const itemMap = new Map<number, CartItem>()
+
+  items.forEach(item => {
+    const existing = itemMap.get(item.productId)
+    if (existing) {
+      // Combine quantities and keep the most recent item data
+      itemMap.set(item.productId, {
+        ...item,
+        quantity: existing.quantity + item.quantity
+      })
+    } else {
+      itemMap.set(item.productId, item)
+    }
+  })
+
+  return Array.from(itemMap.values())
+}
+
 interface CartStore {
   items: CartItem[]
   isLoading: boolean
@@ -78,6 +98,7 @@ interface CartStore {
   getCartItemsCount: () => number
   clearCart: () => void
   fixCartItems: () => Promise<void>
+  deduplicateCart: () => void
 }
 
 export const useCartStore = create<CartStore>()(
@@ -313,7 +334,11 @@ export const useCartStore = create<CartStore>()(
           item.price === 0 || item.name.startsWith('Product ') || !item.image
         )
 
-        if (itemsToFix.length === 0) return
+        if (itemsToFix.length === 0) {
+          // Even if no items need fixing, deduplicate existing items
+          set(state => ({ items: deduplicateCartItems(state.items) }))
+          return
+        }
 
         console.log('Fixing cart items:', itemsToFix)
         set({ isLoading: true })
@@ -331,23 +356,35 @@ export const useCartStore = create<CartStore>()(
             })
           )
 
-          set({ items: fixedItems, isLoading: false })
-          console.log('Cart items fixed successfully')
+          // Deduplicate items after fixing
+          const deduplicatedItems = deduplicateCartItems(fixedItems)
+          set({ items: deduplicatedItems, isLoading: false })
+          console.log('Cart items fixed and deduplicated successfully')
         } catch (error) {
           console.error('Error fixing cart items:', error)
           set({ isLoading: false })
         }
+      },
+
+      // Deduplicate cart items manually
+      deduplicateCart: () => {
+        set(state => ({
+          items: deduplicateCartItems(state.items)
+        }))
+        console.log('Cart deduplicated successfully')
       },
     }),
     {
       name: 'cart-storage',
       skipHydration: false,
       migrate: (persistedState: { items?: CartItem[] } | undefined) => {
-        // Legacy migration - just return the state as is
-        // The fixCartItems function will handle updating product data from API
+        // Deduplicate any existing cart items from previous versions
+        if (persistedState && persistedState.items) {
+          persistedState.items = deduplicateCartItems(persistedState.items)
+        }
         return persistedState
       },
-      version: 3
+      version: 4
     }
   )
 )

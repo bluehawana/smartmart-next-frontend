@@ -9,13 +9,14 @@ import { Minus, Plus, Trash2 } from 'lucide-react';
 import { getProductImageUrl } from '@/lib/utils';
 
 export default function CartPage() {
-  const { 
-    items, 
-    isLoading, 
-    updateQuantity, 
-    removeFromCart, 
+  const {
+    items,
+    isLoading,
+    updateQuantity,
+    removeFromCart,
     getTotalPrice,
-    fixCartItems
+    fixCartItems,
+    deduplicateCart
   } = useCartStore();
 
   // Fix cart items on page load

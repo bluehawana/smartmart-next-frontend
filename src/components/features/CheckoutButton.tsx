@@ -4,6 +4,7 @@ import { useCartStore } from '@/lib/store/cart'
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { API_BASE } from '@/lib/config'
+import { getProductImageUrl } from '@/lib/utils'
 
 export function CheckoutButton() {
   const [loading, setLoading] = useState(false)
@@ -27,7 +28,7 @@ export function CheckoutButton() {
             description: item.description || '',
             price: item.price,
             quantity: item.quantity,
-            images: item.image ? [item.image] : []
+            images: item.image ? [getProductImageUrl(item.image)] : []
           })),
           customer_email: 'guest@example.com',
           success_url: `${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,

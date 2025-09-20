@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useCartStore } from '@/lib/store/cart'
 import { API_BASE } from '@/lib/config'
+import { getProductImageUrl } from '@/lib/utils'
 
 // Form data interfaces
 interface CustomerInfo {
@@ -137,7 +138,7 @@ export default function CheckoutPage() {
           description: item.description || '',
           price: item.price,
           quantity: item.quantity,
-          images: item.image ? [item.image] : []
+          images: item.image ? [getProductImageUrl(item.image)] : []
         })),
         customer_email: formData.customerInfo.email,
         customer_info: {
@@ -248,7 +249,7 @@ export default function CheckoutPage() {
           description: item.description || '',
           price: item.price,
           quantity: item.quantity,
-          images: item.image ? [item.image] : []
+          images: item.image ? [getProductImageUrl(item.image)] : []
         })),
         customer_email: formData.customerInfo.email,
         success_url: `${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,

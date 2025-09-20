@@ -4,36 +4,16 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from 'next/link';
 import { getProductImageUrl } from '@/lib/utils';
-import { EmblaOptionsType } from "embla-carousel";
 import { API_BASE } from '@/lib/config'
 
 // API base URL
 const BASE_URL = API_BASE
 
-// Helper function to get product URL - use numeric_id or fallback to mapped UUID
+// Helper function to get product URL - use numeric_id
 const getProductUrl = (product: Product): string => {
-  if (product.numeric_id) {
-    return `/products/${product.numeric_id}`
-  }
-  // Fallback to UUID mapping for mock data
-  const numericId = UUID_TO_NUMERIC[product.id]
-  return `/products/${numericId || product.id}`
+  return `/products/${product.numeric_id}`
 }
 
-// UUID to numeric ID mapping
-const UUID_TO_NUMERIC: Record<string, string> = {
-  "88d35c54-ce2d-40d5-92e9-4af5c7e5e330": "1", // MacBook Pro 16-inch
-  "c0d069ee-031f-4340-8588-4706103e6b04": "2", // AirPods Pro 2nd Generation  
-  "7a82d048-b478-4b4b-8b78-64eeb3a7ab86": "3", // Sony WH-1000XM5 Headphones
-  "a4e33218-57c3-4133-ac51-ca9aa711eddb": "4", // Dell Alienware 34 Curved Monitor
-  "ff5c7fc1-c3c7-4b35-9e21-15ba9d1c71d1": "5", // Apple Watch Ultra
-  "2cd8e26f-2f66-4a13-8c2f-e656e36e2ebc": "6", // iPhone 15 Pro Max
-  "5d4c7090-d4e5-4c37-afbd-cd4b93a7e63f": "7", // Dell XPS 13 Laptop
-  "e8f1b0a0-9234-4bca-8e3a-1c3e5f7a9b8c": "8", // Dell XPS 15 Developer Edition
-  "34d5e6f7-8901-2345-bcde-f0123456789a": "9", // Smart Language Translator Buds
-  "90abcdef-1234-5678-9012-bcdef0123456": "10", // AI Translate Earphones Pro
-  "f1e2d3c4-b5a6-9788-9102-aabbccddeeff": "11"  // ASUS ROG Rapture Gaming Router
-}
 
 // Product interface matching Go backend
 interface Product {
@@ -47,20 +27,6 @@ interface Product {
   status: string;
   featured: boolean;
   category: string;
-}
-
-// 加载状态组件
-function LoadingCard() {
-  return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
-      <div className="h-64 bg-gray-200"/>
-      <div className="p-4">
-        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"/>
-        <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"/>
-        <div className="h-10 bg-gray-200 rounded"/>
-      </div>
-    </div>
-  );
 }
 
 // 错误状态组件
@@ -245,52 +211,8 @@ function getMockProducts(): Product[] {
   ]
 }
 
-// Get featured products for gallery from already loaded products
-function getFeaturedProductPhotos(products: Product[]): string[] {
-  // Filter featured products and map to their image URLs
-  const featuredProducts = products.filter(product => product.featured);
-  
-  if (featuredProducts.length === 0) {
-    console.log('No featured products found, using mock photos');
-    return getMockPhotos();
-  }
-  
-  // Map featured products to their image URLs
-  const photos = featuredProducts.map((product) => 
-    product.images && product.images.length > 0 
-      ? getProductImageUrl(product.images[0])
-      : '/placeholder-product.svg'
-  );
-  
-  console.log(`Found ${featuredProducts.length} featured products`);
-  return photos;
-}
-
-function getMockPhotos(): string[] {
-  return [
-    'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/macbook.jpg',
-    'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/airpods2.jpg', 
-    'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/sony.jpg',
-    'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell.jpg',
-    'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ultra.jpg',
-    'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ai-translate-pro.jpg'
-  ]
-}
-
-const autoplayOptions = {
-  delay: 3000,
-  rootNode: (emblaRoot: HTMLElement) => emblaRoot.parentElement,
-}
-
-const carouselOptions: EmblaOptionsType = {
-  loop: true,
-  align: 'start',
-  slidesToScroll: 1,
-}
-
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [photos, setPhotos] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -301,15 +223,8 @@ export default function Home() {
         // Fetch all products once
         const productsData = await getProducts();
         setProducts(productsData);
-        
-        // Extract featured product photos from the loaded products
-        const photosData = getFeaturedProductPhotos(productsData);
-        setPhotos(photosData);
-        
         console.log('Products loaded:', productsData.length);
         console.log('Sample product images:', productsData[0]?.images);
-        console.log('Featured photos loaded:', photosData.length);
-        console.log('Sample photo URL:', photosData[0]);
       } catch (e) {
         setError(e as Error);
         console.error('Data fetch failed:', e);
@@ -372,16 +287,18 @@ export default function Home() {
                 key={`product-${product.id}`}
                 className="group"
               >
-                <div className="aspect-square bg-gray-50 mb-4 overflow-hidden">
-                  <img
+                <div className="aspect-square bg-gray-50 mb-4 overflow-hidden relative">
+                  <Image
                     src={product.images && product.images.length > 0 
                       ? getProductImageUrl(product.images[0])
                       : '/placeholder-product.svg'
                     }
                     alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(event) => {
+                      const target = event.currentTarget;
                       target.src = '/placeholder-product.svg';
                     }}
                   />
@@ -418,13 +335,15 @@ export default function Home() {
                 key={index}
                 className="group text-center"
               >
-                <div className="aspect-square bg-white mb-4 overflow-hidden">
-                  <img
+                <div className="aspect-square bg-white mb-4 overflow-hidden relative">
+                  <Image
                     src={category.image}
                     alt={category.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 25vw, 16vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(event) => {
+                      const target = event.currentTarget;
                       target.src = '/placeholder-product.svg';
                     }}
                   />

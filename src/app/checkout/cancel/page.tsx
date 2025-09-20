@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function CheckoutCancelPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-16 text-center">
@@ -14,19 +16,19 @@ export default function CheckoutCancelPage() {
       </div>
 
       <div className="space-y-4">
-        <a 
+        <Link 
           href="/checkout" 
           className="inline-block bg-black text-white px-8 py-3 rounded-md hover:bg-gray-800 transition-colors"
         >
           Try Again
-        </a>
+        </Link>
         <div>
-          <a 
+          <Link 
             href="/" 
             className="text-blue-600 hover:underline"
           >
             Continue Shopping
-          </a>
+          </Link>
         </div>
       </div>
     </div>

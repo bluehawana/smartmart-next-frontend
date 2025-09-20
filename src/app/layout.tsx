@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import "./globals.css";
 import { Toaster } from 'react-hot-toast';
+import Link from 'next/link';
 import { CartProvider } from '@/components/providers/CartProvider';
 import { ClientHeader } from '@/components/layout/ClientHeader';
 
@@ -30,24 +31,24 @@ export default function RootLayout({ children }: RootLayoutProps) {
                   <div>
                     <h3 className="text-sm font-semibold text-black uppercase tracking-wider">Company</h3>
                     <ul className="mt-4 space-y-2">
-                      <li><a href="/about" className="text-gray-600 hover:text-black text-sm">About</a></li>
-                      <li><a href="/careers" className="text-gray-600 hover:text-black text-sm">Careers</a></li>
-                      <li><a href="/press" className="text-gray-600 hover:text-black text-sm">Press</a></li>
+                      <li><Link href="/about" className="text-gray-600 hover:text-black text-sm">About</Link></li>
+                      <li><Link href="/careers" className="text-gray-600 hover:text-black text-sm">Careers</Link></li>
+                      <li><Link href="/press" className="text-gray-600 hover:text-black text-sm">Press</Link></li>
                     </ul>
                   </div>
                   <div>
                     <h3 className="text-sm font-semibold text-black uppercase tracking-wider">Support</h3>
                     <ul className="mt-4 space-y-2">
-                      <li><a href="/help" className="text-gray-600 hover:text-black text-sm">Help Center</a></li>
-                      <li><a href="/contact" className="text-gray-600 hover:text-black text-sm">Contact</a></li>
-                      <li><a href="/returns" className="text-gray-600 hover:text-black text-sm">Returns</a></li>
+                      <li><Link href="/help" className="text-gray-600 hover:text-black text-sm">Help Center</Link></li>
+                      <li><Link href="/contact" className="text-gray-600 hover:text-black text-sm">Contact</Link></li>
+                      <li><Link href="/returns" className="text-gray-600 hover:text-black text-sm">Returns</Link></li>
                     </ul>
                   </div>
                   <div>
                     <h3 className="text-sm font-semibold text-black uppercase tracking-wider">Legal</h3>
                     <ul className="mt-4 space-y-2">
-                      <li><a href="/privacy" className="text-gray-600 hover:text-black text-sm">Privacy</a></li>
-                      <li><a href="/terms" className="text-gray-600 hover:text-black text-sm">Terms</a></li>
+                      <li><Link href="/privacy" className="text-gray-600 hover:text-black text-sm">Privacy</Link></li>
+                      <li><Link href="/terms" className="text-gray-600 hover:text-black text-sm">Terms</Link></li>
                     </ul>
                   </div>
                   <div>

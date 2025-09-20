@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Plus, Minus, ShoppingCart } from 'lucide-react'
+import Image from 'next/image'
 import { useCartStore } from '@/lib/store/cart'
 import { toast } from 'react-hot-toast'
 import { getProductImageUrl } from '@/lib/utils'
@@ -50,16 +51,18 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* 左侧：产品图片 */}
-        <div className="aspect-square bg-gray-50 overflow-hidden">
-          <img
+        <div className="aspect-square bg-gray-50 overflow-hidden relative">
+          <Image
             src={product.images && product.images.length > 0 
               ? getProductImageUrl(product.images[0])
               : '/placeholder-product.svg'
             }
             alt={product.name}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover"
+            onError={(event) => {
+              const target = event.currentTarget;
               target.src = '/placeholder-product.svg';
             }}
           />

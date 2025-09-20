@@ -1,5 +1,5 @@
 import { ProductDetails } from "@/components/features/ProductDetails/ProductDetails"
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://smrtmart-backend-1757499174-0dfbd8d4731e.herokuapp.com/api/v1';
 
@@ -34,6 +34,11 @@ export default async function ProductPage({
   
   if (!product) {
     notFound()
+  }
+
+  const numericId = product.numeric_id ?? product.numericId ?? product.numericID
+  if (numericId && `${numericId}` !== params.id) {
+    redirect(`/products/${numericId}`)
   }
 
   return <ProductDetails product={product} />

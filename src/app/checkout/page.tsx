@@ -1,13 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useCartStore } from '@/lib/store/cart'
 import { API_BASE } from '@/lib/config'
-import { loadStripe } from '@stripe/stripe-js'
-
-const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
-  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
-  : null
 
 // Form data interfaces
 interface CustomerInfo {
@@ -326,12 +322,12 @@ export default function CheckoutPage() {
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <h1 className="text-2xl font-bold mb-4">Your cart is empty</h1>
         <p className="text-gray-600 mb-8">Add some products to your cart to proceed with checkout.</p>
-        <a 
+        <Link 
           href="/" 
           className="bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition-colors"
         >
           Continue Shopping
-        </a>
+        </Link>
       </div>
     )
   }

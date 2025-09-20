@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -8,6 +8,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://smrtmart-go-backend
 
 interface Product {
   id: string;
+  numeric_id?: number;
   name: string;
   description: string;
   price: number;
@@ -76,7 +77,7 @@ export default function SearchPage() {
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">Search Products</h1>
-        <p className="text-lg text-gray-600">Find exactly what you're looking for</p>
+        <p className="text-lg text-gray-600">Find exactly what you&apos;re looking for</p>
       </div>
 
       {/* Search Form */}
@@ -200,51 +201,56 @@ export default function SearchPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <Link
-                href={`/products/${product.id}`}
-                key={product.id}
-                className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-              >
-                <div className="relative w-full pt-[75%]">
-                  <Image
-                    src={product.images[0] || '/placeholder-product.jpg'}
-                    alt={product.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                    className="absolute inset-0 w-full h-full object-cover group-hover:opacity-75 transition-opacity duration-300"
-                  />
-                  {product.featured && (
-                    <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 text-xs rounded">
-                      Featured
-                    </div>
-                  )}
-                </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                    {product.description}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-xl font-bold text-gray-900">
-                        ${product.price.toFixed(2)}
-                      </span>
-                      {product.compare_price > product.price && (
-                        <span className="text-sm text-gray-500 line-through">
-                          ${product.compare_price.toFixed(2)}
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-sm text-gray-500">
-                      {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                    </span>
+            {products.map((product) => {
+              const linkTarget = product.numeric_id ?? product.id;
+              const linkSlug = typeof linkTarget === 'number' ? linkTarget.toString() : linkTarget;
+
+              return (
+                <Link
+                  key={linkSlug}
+                  href={`/products/${linkSlug}`}
+                  className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                >
+                  <div className="relative w-full pt-[75%]">
+                    <Image
+                      src={product.images[0] || '/placeholder-product.jpg'}
+                      alt={product.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                      className="absolute inset-0 w-full h-full object-cover group-hover:opacity-75 transition-opacity duration-300"
+                    />
+                    {product.featured && (
+                      <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 text-xs rounded">
+                        Featured
+                      </div>
+                    )}
                   </div>
-                </div>
-              </Link>
-            ))}
+                  <div className="p-4">
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      {product.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                      {product.description}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xl font-bold text-gray-900">
+                          ${product.price.toFixed(2)}
+                        </span>
+                        {product.compare_price > product.price && (
+                          <span className="text-sm text-gray-500 line-through">
+                            ${product.compare_price.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-sm text-gray-500">
+                        {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              )
+            })}
           </div>
         </div>
       )}
@@ -258,7 +264,7 @@ export default function SearchPage() {
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
           <p className="text-gray-500 mb-6">
-            We couldn't find any products matching "{searchTerm}". Try different keywords or adjust your filters.
+            We couldn&apos;t find any products matching &ldquo;{searchTerm}&rdquo;. Try different keywords or adjust your filters.
           </p>
           <button
             onClick={() => {

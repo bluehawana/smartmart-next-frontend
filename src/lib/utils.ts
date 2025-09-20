@@ -1,48 +1,57 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'
-const RAW_IMAGE_BASE = process.env.NEXT_PUBLIC_IMAGE_BASE_URL || 'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products'
-const R2_PUBLIC_BASE = (process.env.NEXT_PUBLIC_R2_PUBLIC_BASE || '').replace(/\/$/, '')
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://smrtmart-backend-1757499174-0dfbd8d4731e.herokuapp.com/api/v1'
+const SUPABASE_IMAGE_BASE = 'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products'
 
-function normalizeBase(base: string) {
-  if (!base) return ''
-  if (base.endsWith('/public')) return base + '/products'
-  return base.replace(/\/$/, '')
+// Specific filename -> absolute URL overrides
+const IMAGE_OVERRIDES: Record<string, string> = {
+  '8k-data-cable-dell.jpg': `${SUPABASE_IMAGE_BASE}/8k data cable dell.jpg`,
+  'iphone16-promaxcase.jpg': `${SUPABASE_IMAGE_BASE}/iphone16 promaxcase.jpg`,
+  'macbookair-adaptor-and-cable.png': `${SUPABASE_IMAGE_BASE}/macbookair adaptor and cable.png`,
+  'usb-c-iphone-cable.jpg': `${SUPABASE_IMAGE_BASE}/usb c iphone cable.jpg`,
+  'macbookair-m3-weaving-case.jpg': `${SUPABASE_IMAGE_BASE}/macbookair m3 weaving case.jpg`,
+  'macbook-m4-charging-cable.png': `${SUPABASE_IMAGE_BASE}/macbook m4 charging cable.png`,
+  'macbookair case.png': `${SUPABASE_IMAGE_BASE}/macbookair case.png`,
+  // Use monecard.png for tracking card products
+  'monecard.png': `${SUPABASE_IMAGE_BASE}/monecard.png`,
+  'mtrackingtag.png': `${SUPABASE_IMAGE_BASE}/mtrackingtag.png`,
 }
-
-const IMAGE_BASE_URL = normalizeBase(RAW_IMAGE_BASE)
-
-// No image overrides - all images are now in Supabase
-const IMAGE_OVERRIDES: Record<string, string> = {}
 
 // 产品图片URL
 export function getProductImageUrl(filename: string) {
   if (!filename) return ''
-  
-  const last = (() => {
-    try { return decodeURIComponent(new URL(filename).pathname.split('/').pop() || '') } catch { return filename.split('/').pop() || filename }
-  })()
-  if (last && IMAGE_OVERRIDES[last]) {
-    return IMAGE_OVERRIDES[last]
+
+  // Normalize to last path segment for override lookup
+  const cleanFilename = filename.split('/').pop() || filename
+
+  // Check for specific overrides first
+  if (IMAGE_OVERRIDES[cleanFilename]) {
+    return IMAGE_OVERRIDES[cleanFilename]
   }
 
-  // If it's already a full URL (starts with http), extract the filename and use Supabase
+  // If it's already a full URL (starts with http), return as is only if it's accessible
   if (filename.startsWith('http')) {
     try {
       const u = new URL(filename)
-      // Extract just the filename from any URL and use Supabase
-      const clean = decodeURIComponent(u.pathname.split('/').pop() || '')
-      if (clean) return `${IMAGE_BASE_URL}/${clean}`
+      // If it's an R2 URL, convert to Supabase equivalent
+      if (u.hostname.includes('r2.cloudflarestorage.com')) {
+        const cleanName = decodeURIComponent(u.pathname.split('/').pop() || '')
+        if (cleanName) return `${SUPABASE_IMAGE_BASE}/${cleanName}`
+      }
+      // If it's already Supabase, use it
+      if (u.hostname.includes('supabase.co')) {
+        return filename
+      }
     } catch {}
-    return filename
+    // For other URLs, fall back to Supabase with filename
+    return `${SUPABASE_IMAGE_BASE}/${cleanFilename}`
   }
-  
+
   // If it's a relative path starting with /, assume it's already correct
   if (filename.startsWith('/')) {
     return filename
   }
-  
-  // 确保文件名不包含完整路径
-  const cleanFilename = filename.split('/').pop() || filename
-  return `${IMAGE_BASE_URL}/${cleanFilename}`
+
+  // Default: use Supabase as the base
+  return `${SUPABASE_IMAGE_BASE}/${cleanFilename}`
 }
 
 // 走马灯图片URL

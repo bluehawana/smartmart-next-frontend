@@ -3,6 +3,7 @@
 import { useCartStore } from '@/lib/store/cart';
 import { ShoppingCart } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 function CartIcon() {
   const [mounted, setMounted] = useState(false);
@@ -31,14 +32,14 @@ function CartIcon() {
   }, [mounted, getCartItemsCount]);
 
   return (
-    <a href="/cart" className="text-gray-600 hover:text-black relative">
+    <Link href="/cart" className="text-gray-600 hover:text-black relative">
       <ShoppingCart className="w-5 h-5" />
       {mounted && cartCount > 0 && (
         <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
           {cartCount}
         </span>
       )}
-    </a>
+    </Link>
   );
 }
 
@@ -51,11 +52,11 @@ export function ClientHeader() {
             <h1 className="text-xl font-semibold text-black">SmartMart</h1>
           </div>
           <nav className="hidden md:flex space-x-8">
-            <a href="/" className="text-gray-600 hover:text-black transition-colors">Home</a>
-            <a href="/products" className="text-gray-600 hover:text-black transition-colors">Products</a>
-            <a href="/about" className="text-gray-600 hover:text-black transition-colors">About</a>
-            <a href="/contact" className="text-gray-600 hover:text-black transition-colors">Contact</a>
-            <a href="/cart" className="text-gray-600 hover:text-black transition-colors">Cart</a>
+            <Link href="/" className="text-gray-600 hover:text-black transition-colors">Home</Link>
+            <Link href="/products" className="text-gray-600 hover:text-black transition-colors">Products</Link>
+            <Link href="/about" className="text-gray-600 hover:text-black transition-colors">About</Link>
+            <Link href="/contact" className="text-gray-600 hover:text-black transition-colors">Contact</Link>
+            <Link href="/cart" className="text-gray-600 hover:text-black transition-colors">Cart</Link>
           </nav>
           <div className="flex items-center space-x-4">
             <div className="hidden md:block">

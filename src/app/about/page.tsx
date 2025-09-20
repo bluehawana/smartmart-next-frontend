@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function AboutPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -17,7 +19,7 @@ export default function AboutPage() {
             <p className="text-gray-600 leading-relaxed mb-6">
               Our story began in China, where Hongzhi and Yan shared a passion for culinary excellence and entrepreneurship. 
               In 2016, we embarked on a new adventure and moved to Gothenburg, Sweden, where Hongzhi pursued a second 
-              master's degree at Gothenburg University.
+              master&apos;s degree at Gothenburg University.
             </p>
             <p className="text-gray-600 leading-relaxed mb-6">
               In 2017, we acquired the charming Ichiban Sushi Bar, fueled by our love for Asian cuisine and our desire 
@@ -38,7 +40,7 @@ export default function AboutPage() {
             </p>
             <p className="text-gray-600 leading-relaxed mb-6">
               Today, we continue to innovate and push boundaries, partnering with industry leaders such as Wix, Zettle, 
-              Uber Eats, Foodora, Wolt, and more. But our goal extends beyond running a successful restaurant - we're 
+              Uber Eats, Foodora, Wolt, and more. But our goal extends beyond running a successful restaurant - we&apos;re 
               passionate about helping SMEs achieve their digitalization dreams, launch their businesses through effective 
               localization, and transform from traditional business models to thrive in the digital world.
             </p>
@@ -156,14 +158,14 @@ export default function AboutPage() {
         <div className="text-center">
           <h2 className="text-2xl font-light text-black mb-4">Ready to Transform Your Business?</h2>
           <p className="text-gray-600 mb-8">
-            Let's discuss how we can help you achieve your digitalization goals and business dreams.
+            Let&apos;s discuss how we can help you achieve your digitalization goals and business dreams.
           </p>
-          <a 
+          <Link 
             href="/contact"
             className="inline-block bg-black text-white px-8 py-3 text-sm font-medium hover:bg-gray-800 transition-colors"
           >
             Get in Touch
-          </a>
+          </Link>
         </div>
       </div>
     </div>

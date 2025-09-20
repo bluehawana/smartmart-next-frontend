@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCartStore } from '@/lib/store/cart';
 import { toast } from 'react-hot-toast';
 import { Minus, Plus, Trash2 } from 'lucide-react';
@@ -13,20 +14,21 @@ export default function CartPage() {
     isLoading, 
     updateQuantity, 
     removeFromCart, 
-    getTotalPrice 
+    getTotalPrice,
+    fixCartItems
   } = useCartStore();
 
-  // Don't auto-fetch cart - rely on persisted storage
-  // useEffect(() => {
-  //   fetchCart();
-  // }, [fetchCart]);
+  // Fix cart items on page load
+  useEffect(() => {
+    fixCartItems();
+  }, [fixCartItems]);
 
   const handleUpdateQuantity = async (id: string, newQuantity: number) => {
     if (newQuantity < 1) return;
     try {
       await updateQuantity(id, newQuantity);
       toast.success('Quantity updated');
-    } catch (error) {
+    } catch {
       toast.error('Failed to update quantity');
     }
   };
@@ -35,7 +37,7 @@ export default function CartPage() {
     try {
       await removeFromCart(id);
       toast.success('Item removed from cart');
-    } catch (error) {
+    } catch {
       toast.error('Failed to remove item');
     }
   };
@@ -85,13 +87,15 @@ export default function CartPage() {
           <div className="space-y-4">
             {items.map((item) => (
               <div key={item.id} className="flex items-center space-x-4 bg-white p-4 border border-gray-200 rounded-lg shadow-sm">
-                <div className="w-20 h-20 bg-gray-100 flex-shrink-0 rounded-md overflow-hidden">
-                  <img
+                <div className="w-20 h-20 bg-gray-100 flex-shrink-0 rounded-md overflow-hidden relative">
+                  <Image
                     src={getProductImageUrl(item.image) || '/placeholder-product.svg'}
                     alt={item.name}
-                    className="w-full h-full object-contain"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
+                    fill
+                    sizes="80px"
+                    className="object-contain"
+                    onError={(event) => {
+                      const target = event.currentTarget;
                       target.src = '/placeholder-product.svg';
                     }}
                   />

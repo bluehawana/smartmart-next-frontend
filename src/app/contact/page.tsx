@@ -36,9 +36,9 @@ export default function ContactPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-light text-black mb-6">Let's Transform Your Business</h1>
+          <h1 className="text-4xl font-light text-black mb-6">Let&apos;s Transform Your Business</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Ready to digitalize your business? We've helped restaurants, SMEs, and entrepreneurs achieve remarkable growth through technology. Let's discuss your vision.
+            Ready to digitalize your business? We&apos;ve helped restaurants, SMEs, and entrepreneurs achieve remarkable growth through technology. Let&apos;s discuss your vision.
           </p>
         </div>
 
@@ -142,8 +142,8 @@ export default function ContactPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-medium text-black mb-2">Let's Build Something Amazing!</h3>
-                <p className="text-gray-600">Thank you for reaching out. We'll contact you within 24 hours to discuss your digitalization goals.</p>
+                <h3 className="text-lg font-medium text-black mb-2">Let&apos;s Build Something Amazing!</h3>
+                <p className="text-gray-600">Thank you for reaching out. We&apos;ll contact you within 24 hours to discuss your digitalization goals.</p>
                 <button 
                   onClick={() => setSubmitted(false)}
                   className="mt-4 text-sm text-gray-600 hover:text-black border-b border-gray-300 hover:border-black transition-colors"
@@ -217,7 +217,7 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     rows={6}
-                    placeholder="Describe your current business, digitalization goals, challenges you're facing, or how we can help transform your vision into reality..."
+                    placeholder="Describe your current business, digitalization goals, challenges you&apos;re facing, or how we can help transform your vision into reality..."
                     className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none text-sm resize-none"
                   />
                 </div>

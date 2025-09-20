@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCartStore } from '@/lib/store/cart';
 import { API_BASE } from '@/lib/config'
 import { getProductImageUrl } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 
 // ProductCard component
-function ProductCard({ id, numeric_id, name, price, imageUrl, description, comparePrice, stock, featured }: {
-  id: string;
+function ProductCard({ numeric_id, name, price, imageUrl, description, comparePrice, stock, featured }: {
   numeric_id: number;
   name: string;
   price: number;
@@ -42,12 +42,14 @@ function ProductCard({ id, numeric_id, name, price, imageUrl, description, compa
     <div className="group">
       <Link href={`/products/${numeric_id}`}>
         <div className="aspect-square bg-gray-50 mb-4 overflow-hidden relative">
-          <img
+          <Image
             src={getProductImageUrl(imageUrl) || '/placeholder-product.svg'}
             alt={name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={(event) => {
+              const target = event.currentTarget;
               target.src = '/placeholder-product.svg';
             }}
           />
@@ -104,10 +106,6 @@ function ProductCard({ id, numeric_id, name, price, imageUrl, description, compa
 const BASE_URL = API_BASE;
 
 // Helper function to get clean product URL
-const getProductUrl = (productId: string): string => {
-  return `/products/${productId}`
-}
-
 interface Product {
   id: string;
   numeric_id: number;
@@ -121,6 +119,165 @@ interface Product {
   featured: boolean;
   category: string;
   tags: string[];
+}
+
+function getMockProducts(): Product[] {
+  return [
+    {
+      id: "1",
+      numeric_id: 1,
+      name: "Apple MacBook Pro 16-inch",
+      description: "Apple MacBook Pro 16-inch with M3 Pro chip, 18GB RAM, 512GB SSD. Perfect for professionals and creatives.",
+      price: 2499,
+      compare_price: 0,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/macbook.jpg"],
+      stock: 15,
+      status: "active",
+      featured: true,
+      category: "computers",
+      tags: ['apple', 'laptop', 'macbook']
+    },
+    {
+      id: "2",
+      numeric_id: 2,
+      name: "AirPods Pro 2nd Generation",
+      description: "Apple AirPods Pro with Active Noise Cancellation, Transparency mode, and spatial audio.",
+      price: 249,
+      compare_price: 0,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/airpods2.jpg"],
+      stock: 50,
+      status: "active",
+      featured: true,
+      category: "audio",
+      tags: ['earbuds', 'apple', 'audio']
+    },
+    {
+      id: "3",
+      numeric_id: 3,
+      name: "Sony WH-1000XM5 Headphones",
+      description: "Industry-leading noise canceling headphones with exceptional sound quality and 30-hour battery life.",
+      price: 399,
+      compare_price: 0,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/sony.jpg"],
+      stock: 25,
+      status: "active",
+      featured: false,
+      category: "audio",
+      tags: ['sony', 'headphones', 'audio']
+    },
+    {
+      id: "4",
+      numeric_id: 4,
+      name: "Dell Alienware 34 Curved Monitor",
+      description: "34-inch curved gaming monitor with 144Hz refresh rate, NVIDIA G-SYNC, and stunning WQHD resolution.",
+      price: 899,
+      compare_price: 949,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell.jpg"],
+      stock: 10,
+      status: "active",
+      featured: false,
+      category: "monitors",
+      tags: ['dell', 'monitor', 'gaming']
+    },
+    {
+      id: "5",
+      numeric_id: 5,
+      name: "Apple Watch Ultra",
+      description: "The most rugged and capable Apple Watch, designed for endurance athletes and outdoor adventurers.",
+      price: 799,
+      compare_price: 0,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ultra.jpg"],
+      stock: 30,
+      status: "active",
+      featured: true,
+      category: "wearables",
+      tags: ['apple', 'watch', 'wearable']
+    },
+    {
+      id: "6",
+      numeric_id: 6,
+      name: "AI Translate Earphones Pro",
+      description: "Revolutionary intelligent translate earphones with real-time translation in 40+ languages.",
+      price: 199,
+      compare_price: 0,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ai-translate-pro.jpg"],
+      stock: 60,
+      status: "active",
+      featured: false,
+      category: "audio",
+      tags: ['earphones', 'translation', 'audio']
+    },
+    {
+      id: "7",
+      numeric_id: 7,
+      name: "Dell XPS 13 Laptop",
+      description: "Ultra-portable Dell XPS 13 with Intel Core i7, 16GB RAM, 512GB SSD, and stunning InfinityEdge display.",
+      price: 1299,
+      compare_price: 0,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/xps.jpg"],
+      stock: 20,
+      status: "active",
+      featured: false,
+      category: "computers",
+      tags: ['dell', 'laptop', 'xps']
+    },
+    {
+      id: "8",
+      numeric_id: 8,
+      name: "ASUS ROG Rapture GT-BE98 Gaming Router",
+      description: "ASUS ROG Rapture GT-BE98 Quad-band Gaming Router with WiFi 7, advanced QoS, and ultra-low latency for competitive gaming.",
+      price: 8990,
+      compare_price: 0,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/asus.jpg"],
+      stock: 8,
+      status: "active",
+      featured: false,
+      category: "networking",
+      tags: ['asus', 'router', 'gaming']
+    },
+    {
+      id: "9",
+      numeric_id: 9,
+      name: "iPhone 15 Pro Max",
+      description: "The ultimate iPhone with titanium design, A17 Pro chip, and professional camera system.",
+      price: 1199,
+      compare_price: 0,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/iphone.jpg"],
+      stock: 18,
+      status: "active",
+      featured: false,
+      category: "smartphones",
+      tags: ['apple', 'iphone', 'smartphone']
+    },
+    {
+      id: "10",
+      numeric_id: 10,
+      name: "Smart Language Translator Buds",
+      description: "Next-generation wireless earbuds with built-in AI translator. Supports conversation mode, offline translation for 12 languages, and crystal-clear audio quality.",
+      price: 149,
+      compare_price: 0,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/smart-translator.jpg"],
+      stock: 40,
+      status: "active",
+      featured: true,
+      category: "audio",
+      tags: ['translator', 'audio', 'earbuds']
+    },
+    {
+      id: "11",
+      numeric_id: 11,
+      name: "Dell XPS 15 Developer Edition",
+      description: "Dell XPS 15 Developer Edition with Ubuntu, Intel Core i7, 32GB RAM, 1TB SSD, NVIDIA GeForce RTX 4050. Perfect for developers and content creators.",
+      price: 1899,
+      compare_price: 0,
+      images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell-xps-15-2023.jpg"],
+      stock: 12,
+      status: "active",
+      featured: true,
+      category: "computers",
+      tags: ['dell', 'laptop', 'developer']
+    }
+  ];
 }
 
 export default function ProductsPage() {
@@ -151,11 +308,29 @@ export default function ProductsPage() {
     return () => clearTimeout(timer);
   }, [searchInput]);
 
-  useEffect(() => {
-    fetchProducts();
-  }, [page, category, searchTerm]);
+  const getFilteredMockProducts = useCallback(() => {
+    let filtered = getMockProducts();
 
-  const fetchProducts = async () => {
+    if (category) {
+      filtered = filtered.filter(product =>
+        product.category.toLowerCase() === category.toLowerCase()
+      );
+    }
+
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(product =>
+        product.name.toLowerCase().includes(searchLower) ||
+        product.description.toLowerCase().includes(searchLower) ||
+        product.category.toLowerCase().includes(searchLower) ||
+        product.tags.some(tag => tag.toLowerCase().includes(searchLower))
+      );
+    }
+
+    return filtered;
+  }, [category, searchTerm]);
+
+  const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
       let url = `${BASE_URL}/products?page=${page}&limit=12`;
@@ -187,190 +362,13 @@ export default function ProductsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, category, searchTerm, getFilteredMockProducts]);
 
-  const getFilteredMockProducts = () => {
-    let filtered = getMockProducts();
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
-    // Filter by category
-    if (category) {
-      filtered = filtered.filter(product =>
-        product.category.toLowerCase() === category.toLowerCase()
-      );
-    }
-
-    // Filter by search term
-    if (searchTerm) {
-      const searchLower = searchTerm.toLowerCase();
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(searchLower) ||
-        product.description.toLowerCase().includes(searchLower) ||
-        product.category.toLowerCase().includes(searchLower) ||
-        product.tags.some(tag => tag.toLowerCase().includes(searchLower))
-      );
-    }
-
-    return filtered;
-  };
-
-  const getMockProducts = (): Product[] => {
-    return [
-      {
-        id: "1",
-        numeric_id: 1,
-        name: "Apple MacBook Pro 16-inch",
-        price: 2499,
-        compare_price: 2799,
-        images: ["https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&h=500&fit=crop&crop=center"],
-        description: "Apple MacBook Pro 16-inch with M3 Pro chip, 18GB RAM, 512GB SSD. Perfect for professionals and creatives.",
-        stock: 15,
-        status: "active",
-        featured: true,
-        category: "computers",
-        tags: ["apple", "macbook", "laptop", "professional"]
-      },
-      {
-        id: "2",
-        numeric_id: 2,
-        name: "AirPods Pro 2nd Generation",
-        price: 249,
-        compare_price: 279,
-        images: ["https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=500&h=500&fit=crop&crop=center"],
-        description: "Apple AirPods Pro with Active Noise Cancellation, Transparency mode, and spatial audio.",
-        stock: 50,
-        status: "active",
-        featured: true,
-        category: "audio",
-        tags: ["apple", "airpods", "wireless", "noise-cancellation"]
-      },
-      {
-        id: "3",
-        numeric_id: 3,
-        name: "Sony WH-1000XM5 Headphones",
-        price: 399,
-        compare_price: 449,
-        images: ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop&crop=center"],
-        description: "Industry-leading noise canceling headphones with exceptional sound quality and 30-hour battery life.",
-        stock: 25,
-        status: "active",
-        featured: true,
-        category: "audio",
-        tags: ["sony", "headphones", "noise-cancellation", "wireless"]
-      },
-      {
-        id: "4",
-        numeric_id: 4,
-        name: "Dell Alienware 34 Curved Monitor",
-        price: 899,
-        compare_price: 1099,
-        images: ["https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500&h=500&fit=crop&crop=center"],
-        description: "34-inch curved gaming monitor with 144Hz refresh rate, NVIDIA G-SYNC, and stunning WQHD resolution.",
-        stock: 10,
-        status: "active",
-        featured: true,
-        category: "monitors",
-        tags: ["dell", "alienware", "monitor", "gaming", "curved", "144hz"]
-      },
-      {
-        id: "5",
-        numeric_id: 5,
-        name: "Apple Watch Ultra",
-        price: 799,
-        compare_price: 849,
-        images: ["https://images.unsplash.com/photo-1551816230-ef5deaed4a26?w=500&h=500&fit=crop&crop=center"],
-        description: "The most rugged and capable Apple Watch, designed for endurance athletes and outdoor adventurers.",
-        stock: 30,
-        status: "active",
-        featured: true,
-        category: "wearables",
-        tags: ["apple", "watch", "ultra", "fitness", "rugged"]
-      },
-      {
-        id: "6",
-        numeric_id: 6,
-        name: "AI Translate Earphones Pro",
-        price: 199,
-        compare_price: 249,
-        images: ["https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500&h=500&fit=crop&crop=center"],
-        description: "Revolutionary intelligent translate earphones with real-time translation in 40+ languages.",
-        stock: 25,
-        status: "active",
-        featured: true,
-        category: "audio",
-        tags: ["translate", "earphones", "ai", "language", "travel", "wireless"]
-      },
-      {
-        id: "7",
-        numeric_id: 7,
-        name: "Dell XPS 13 Laptop",
-        price: 1299,
-        compare_price: 1499,
-        images: ["https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&h=500&fit=crop&crop=center"],
-        description: "Ultra-portable Dell XPS 13 with Intel Core i7, 16GB RAM, 512GB SSD, and stunning InfinityEdge display.",
-        stock: 20,
-        status: "active",
-        featured: false,
-        category: "computers",
-        tags: ["dell", "xps", "laptop", "ultrabook", "portable"]
-      },
-      {
-        id: "8",
-        numeric_id: 8,
-        name: "ASUS ROG Rapture GT-BE98 Gaming Router",
-        price: 8990,
-        compare_price: 9990,
-        images: ["https://images.unsplash.com/photo-1606904825846-647eb07f5be2?w=500&h=500&fit=crop&crop=center"],
-        description: "ASUS ROG Rapture GT-BE98 Quad-band Gaming Router with WiFi 7, advanced QoS, and ultra-low latency for competitive gaming.",
-        stock: 8,
-        status: "active",
-        featured: false,
-        category: "networking",
-        tags: ["asus", "rog", "router", "gaming", "wifi7", "networking"]
-      },
-      {
-        id: "9",
-        numeric_id: 9,
-        name: "iPhone 15 Pro Max",
-        price: 1199,
-        compare_price: 1299,
-        images: ["https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=500&h=500&fit=crop&crop=center"],
-        description: "The ultimate iPhone with titanium design, A17 Pro chip, and professional camera system.",
-        stock: 18,
-        status: "active",
-        featured: false,
-        category: "smartphones",
-        tags: ["apple", "iphone", "smartphone", "titanium", "a17", "pro"]
-      },
-      {
-        id: "10",
-        numeric_id: 10,
-        name: "Smart Language Translator Buds",
-        price: 149,
-        compare_price: 199,
-        images: ["https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=500&h=500&fit=crop&crop=center"],
-        description: "Next-generation wireless earbuds with built-in AI translator. Supports conversation mode, offline translation for 12 languages, and crystal-clear audio quality.",
-        stock: 40,
-        status: "active",
-        featured: true,
-        category: "audio",
-        tags: ["translator", "earbuds", "ai", "language", "wireless", "travel"]
-      },
-      {
-        id: "11",
-        numeric_id: 11,
-        name: "Dell XPS 15 Developer Edition",
-        price: 1899,
-        compare_price: 2199,
-        images: ["https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500&h=500&fit=crop&crop=center"],
-        description: "Dell XPS 15 Developer Edition with Ubuntu, Intel Core i7, 32GB RAM, 1TB SSD, NVIDIA GeForce RTX 4050. Perfect for developers and content creators.",
-        stock: 12,
-        status: "active",
-        featured: true,
-        category: "computers",
-        tags: ["dell", "xps", "laptop", "developer", "ubuntu", "nvidia"]
-      }
-    ];
-  };
+  
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

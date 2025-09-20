@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, Suspense } from 'react'
+import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useCartStore } from '@/lib/store/cart'
 
@@ -45,19 +46,19 @@ function CheckoutSuccessContent() {
       )}
 
       <div className="space-y-4">
-        <a 
+        <Link 
           href="/" 
           className="inline-block bg-black text-white px-8 py-3 rounded-md hover:bg-gray-800 transition-colors"
         >
           Continue Shopping
-        </a>
+        </Link>
         <div>
-          <a 
+          <Link 
             href="/orders" 
             className="text-blue-600 hover:underline"
           >
             View Your Orders
-          </a>
+          </Link>
         </div>
       </div>
     </div>

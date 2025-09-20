@@ -778,7 +778,7 @@ export default function CheckoutPage() {
             : 'bg-black hover:bg-gray-800'
         }`}
       >
-        {isLoading ? 'Processing...' : `Pay $${getTotalPrice().toFixed(2)} with ${useBackend ? 'Backend' : 'Direct'} Stripe`}
+        {isLoading ? 'Processing...' : `Pay ${getTotalPrice().toLocaleString('sv-SE')} kr with ${useBackend ? 'Backend' : 'Direct'} Stripe`}
       </button>
 
       <div className="mt-4 text-center text-sm text-gray-600">

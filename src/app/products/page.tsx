@@ -348,7 +348,30 @@ export default function ProductsPage() {
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
-          setProducts(data.data.data);
+          let products = data.data.data;
+
+          // Sort products to prioritize Mtag and tracking products
+          products = products.sort((a: Product, b: Product) => {
+            // Mtag (ID 19) comes first
+            if (a.numeric_id === 19) return -1
+            if (b.numeric_id === 19) return 1
+
+            // Then other tracking products (ID 20, 21, etc.)
+            const isTrackingA = a.name.toLowerCase().includes('track') || a.name.toLowerCase().includes('tag')
+            const isTrackingB = b.name.toLowerCase().includes('track') || b.name.toLowerCase().includes('tag')
+
+            if (isTrackingA && !isTrackingB) return -1
+            if (!isTrackingA && isTrackingB) return 1
+
+            // Then featured products
+            if (a.featured && !b.featured) return -1
+            if (!a.featured && b.featured) return 1
+
+            // Finally by numeric_id
+            return a.numeric_id - b.numeric_id
+          })
+
+          setProducts(products);
         }
       } else {
         console.error('API Error:', response.status);

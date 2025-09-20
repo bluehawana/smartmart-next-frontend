@@ -104,7 +104,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                         </div>
                         <div>
                           <h3 className="font-medium">{product.name}</h3>
-                          <p className="text-gray-500">${product.price.toFixed(2)}</p>
+                          <p className="text-gray-500">{product.price.toLocaleString('sv-SE')} kr</p>
                         </div>
                       </Link>
                     )

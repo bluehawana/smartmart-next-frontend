@@ -22,7 +22,7 @@ export function CheckoutButton() {
       href="/checkout"
       className="block w-full bg-black text-white text-center py-3 px-4 rounded-md hover:bg-gray-800 transition-colors"
     >
-      Checkout - ${getTotalPrice().toFixed(2)}
+      Checkout - {getTotalPrice().toLocaleString('sv-SE')} kr
     </Link>
   )
 }

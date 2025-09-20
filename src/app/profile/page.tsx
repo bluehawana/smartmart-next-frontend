@@ -170,7 +170,7 @@ export default function ProfilePage() {
                     {order.status}
                   </div>
                   <div className="text-lg font-semibold text-gray-900 mt-1">
-                    ${order.total.toFixed(2)}
+                    {order.total.toLocaleString('sv-SE')} kr
                   </div>
                 </div>
               </div>
@@ -183,7 +183,7 @@ export default function ProfilePage() {
                       <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
                     </div>
                     <div className="text-gray-900">
-                      ${item.price.toFixed(2)}
+                      {item.price.toLocaleString('sv-SE')} kr
                     </div>
                   </div>
                 ))}

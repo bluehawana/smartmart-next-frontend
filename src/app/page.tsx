@@ -57,13 +57,35 @@ async function getProducts() {
 
     const response = await res.json()
     console.log('API Response:', response)
-    
+
     // The Go API returns data in response.data.data format
     if (response.success && response.data && response.data.data) {
-      // Return the products directly from API
-      return response.data.data || []
+      let products = response.data.data || []
+
+      // Sort products to prioritize Mtag and tracking products
+      products = products.sort((a: Product, b: Product) => {
+        // Mtag (ID 19) comes first
+        if (a.numeric_id === 19) return -1
+        if (b.numeric_id === 19) return 1
+
+        // Then other tracking products (ID 20, 21, etc.)
+        const isTrackingA = a.name.toLowerCase().includes('track') || a.name.toLowerCase().includes('tag')
+        const isTrackingB = b.name.toLowerCase().includes('track') || b.name.toLowerCase().includes('tag')
+
+        if (isTrackingA && !isTrackingB) return -1
+        if (!isTrackingA && isTrackingB) return 1
+
+        // Then featured products
+        if (a.featured && !b.featured) return -1
+        if (!a.featured && b.featured) return 1
+
+        // Finally by numeric_id
+        return a.numeric_id - b.numeric_id
+      })
+
+      return products
     }
-    
+
     // Only return mock products if API completely fails
     console.log('API failed completely, using mock products')
     return getMockProducts()

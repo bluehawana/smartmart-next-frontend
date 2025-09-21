@@ -51,8 +51,8 @@ const nextConfig = {
         source: '/(.*)',
         headers: [
           {
-            key: 'X-Frame-Options',
-            value: 'DENY',
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
           },
           {
             key: 'X-Content-Type-Options',
@@ -63,8 +63,30 @@ const nextConfig = {
             value: 'strict-origin-when-cross-origin',
           },
           {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
+          {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' https:; connect-src 'self' https: wss:; media-src 'self' https:; object-src 'none'; child-src 'none'; worker-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; manifest-src 'self'",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob: *.supabase.co *.r2.cloudflarestorage.com *.r2.dev; font-src 'self' https: data:; connect-src 'self' https: wss: api.smrtmart.com *.herokuapp.com; media-src 'self' https:; object-src 'none'; child-src https://js.stripe.com https://checkout.stripe.com; worker-src 'self' blob:; frame-ancestors 'none'; form-action 'self' https://checkout.stripe.com; base-uri 'self'; manifest-src 'self'",
+          },
+        ],
+      },
+      {
+        source: '/api/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, no-store, must-revalidate',
+          },
+        ],
+      },
+      {
+        source: '/_next/static/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
           },
         ],
       },
@@ -76,13 +98,15 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  serverExternalPackages: ['@stripe/stripe-js'],
   // Performance optimizations
   experimental: {
     optimizePackageImports: ['lucide-react'],
+    webVitalsAttribution: ['CLS', 'LCP'],
   },
-  // Faster builds
-  swcMinify: true,
+  // Chrome optimizations
+  compress: true,
+  poweredByHeader: false,
+  reactStrictMode: true,
 }
 
 module.exports = nextConfig

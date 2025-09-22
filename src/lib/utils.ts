@@ -54,6 +54,30 @@ export function getProductImageUrl(filename: string) {
   return `${SUPABASE_IMAGE_BASE}/${cleanFilename}`
 }
 
+// Validate and get Stripe-compatible image URL
+export function getStripeImageUrl(filename: string): string {
+  if (!filename) return ''
+
+  const imageUrl = getProductImageUrl(filename)
+
+  // Ensure it's a valid HTTP(S) URL for Stripe
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    try {
+      new URL(imageUrl) // Validate URL format
+      return imageUrl
+    } catch {
+      return '' // Return empty if invalid URL
+    }
+  }
+
+  // If it's a relative path, make it absolute
+  if (imageUrl.startsWith('/')) {
+    return `https://smrtmart.com${imageUrl}`
+  }
+
+  return ''
+}
+
 // 走马灯图片URL
 export function getGalleryImageUrl(path: string) {
   if (!path) return ''

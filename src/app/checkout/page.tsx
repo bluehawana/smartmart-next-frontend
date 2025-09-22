@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useCartStore } from '@/lib/store/cart'
 import { API_BASE } from '@/lib/config'
-import { getProductImageUrl } from '@/lib/utils'
+import { getStripeImageUrl } from '@/lib/utils'
 
 // Form data interfaces
 interface CustomerInfo {
@@ -132,14 +132,22 @@ export default function CheckoutPage() {
     try {
       // Prepare checkout data for backend
       const checkoutData = {
-        items: items.map(item => ({
-          product_id: item.productId.toString(),
-          name: item.name,
-          description: item.description || '',
-          price: item.price,
-          quantity: item.quantity,
-          images: item.image ? [getProductImageUrl(item.image)] : []
-        })),
+        items: items.map(item => {
+          const stripeImageUrl = getStripeImageUrl(item.image)
+          console.log('Backend checkout item:', {
+            name: item.name,
+            originalImage: item.image,
+            stripeImageUrl: stripeImageUrl
+          })
+          return {
+            product_id: item.productId.toString(),
+            name: item.name,
+            description: item.description || '',
+            price: item.price,
+            quantity: item.quantity,
+            images: stripeImageUrl ? [stripeImageUrl] : []
+          }
+        }),
         customer_email: formData.customerInfo.email,
         customer_info: {
           first_name: formData.customerInfo.firstName,
@@ -243,14 +251,22 @@ export default function CheckoutPage() {
     try {
       // Use the existing backend checkout but with minimal data for direct mode
       const checkoutData = {
-        items: items.map(item => ({
-          product_id: item.productId.toString(),
-          name: item.name,
-          description: item.description || '',
-          price: item.price,
-          quantity: item.quantity,
-          images: item.image ? [getProductImageUrl(item.image)] : []
-        })),
+        items: items.map(item => {
+          const stripeImageUrl = getStripeImageUrl(item.image)
+          console.log('Direct checkout item:', {
+            name: item.name,
+            originalImage: item.image,
+            stripeImageUrl: stripeImageUrl
+          })
+          return {
+            product_id: item.productId.toString(),
+            name: item.name,
+            description: item.description || '',
+            price: item.price,
+            quantity: item.quantity,
+            images: stripeImageUrl ? [stripeImageUrl] : []
+          }
+        }),
         customer_email: formData.customerInfo.email,
         success_url: `${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${window.location.origin}/checkout/cancel`

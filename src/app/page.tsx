@@ -86,7 +86,7 @@ async function getProducts() {
 function getMockProducts(): Product[] {
   return [
     {
-      id: "88d35c54-ce2d-40d5-92e9-4af5c7e5e330",
+      id: "1",
       name: "MacBook Pro 16-inch",
       price: 2499,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/macbook.jpg"],
@@ -97,7 +97,7 @@ function getMockProducts(): Product[] {
       category: "computers"
     },
     {
-      id: "c0d069ee-031f-4340-8588-4706103e6b04", 
+      id: "2",
       name: "AirPods Pro 2nd Generation",
       price: 249,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/airpods2.jpg"],
@@ -108,7 +108,7 @@ function getMockProducts(): Product[] {
       category: "audio"
     },
     {
-      id: "7a82d048-b478-4b4b-8b78-64eeb3a7ab86",
+      id: "3",
       name: "Sony WH-1000XM5 Headphones", 
       price: 399,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/sony.jpg"],
@@ -119,7 +119,7 @@ function getMockProducts(): Product[] {
       category: "audio"
     },
     {
-      id: "611bac4c-ef16-484e-899d-1e7992819a88",
+      id: "4",
       name: "Dell XPS 13 Laptop",
       price: 1299,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/xps.jpg"],
@@ -130,7 +130,7 @@ function getMockProducts(): Product[] {
       category: "computers"
     },
     {
-      id: "a4e33218-57c3-4133-ac51-ca9aa711eddb",
+      id: "5",
       name: "Dell Alienware 34 Curved Monitor", 
       price: 899,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell.jpg"],
@@ -141,7 +141,7 @@ function getMockProducts(): Product[] {
       category: "monitors"
     },
     {
-      id: "ff5c7fc1-c3c7-4b35-9e21-15ba9d1c71d1",
+      id: "6",
       name: "Apple Watch Ultra", 
       price: 799,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ultra.jpg"],
@@ -152,7 +152,7 @@ function getMockProducts(): Product[] {
       category: "wearables"
     },
     {
-      id: "a87117d8-e9dd-49ab-a131-245cff3cbf2d",
+      id: "7",
       name: "AI Translate Earphones Pro", 
       price: 199,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/ai-translate-pro.jpg"],
@@ -163,7 +163,7 @@ function getMockProducts(): Product[] {
       category: "audio"
     },
     {
-      id: "eed7ffb1-5dc5-45fe-8e77-63430419dce3",
+      id: "8",
       name: "Smart Language Translator Buds",
       price: 149,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/smart-translator.jpg"],
@@ -174,7 +174,7 @@ function getMockProducts(): Product[] {
       category: "audio"
     },
     {
-      id: "13e2b89d-4f65-4ad0-8c4a-5150657e5bde",
+      id: "9",
       name: "ASUS ROG Rapture GT-BE98 Gaming Router",
       price: 8990,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/asus.jpg"],
@@ -185,7 +185,7 @@ function getMockProducts(): Product[] {
       category: "networking"
     },
     {
-      id: "4dc6d3bf-ec23-4c1b-b47d-f156c82e92fa",
+      id: "10",
       name: "iPhone 15 Pro Max",
       price: 1199,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/iphone.jpg"],
@@ -196,7 +196,7 @@ function getMockProducts(): Product[] {
       category: "smartphones"
     },
     {
-      id: "a3f5302f-f496-4211-9737-e55de3b526c2",
+      id: "11",
       name: "Dell XPS 15 Developer Edition",
       price: 1899,
       images: ["https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/dell-xps-15-2023.jpg"],

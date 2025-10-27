@@ -17,7 +17,7 @@ export function Header() {
         </button>
         
         <Link href="/" className="text-xl font-bold">
-          MEDUSA STORE
+          SmrtMart
         </Link>
 
         <div className="flex items-center gap-4">

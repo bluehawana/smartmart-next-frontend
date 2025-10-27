@@ -5,6 +5,8 @@ import Link from "next/link"
 import { Plus, ArrowLeft } from "lucide-react"
 import ProductsTable from "./ProductsTable"
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminProductsPage() {
   // Check authentication
   const session = await auth.api.getSession({

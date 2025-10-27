@@ -5,6 +5,8 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import OrdersTable from "./OrdersTable"
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminOrdersPage() {
   // Check authentication
   const session = await auth.api.getSession({

@@ -5,6 +5,8 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import ProductForm from "../../ProductForm"
 
+export const dynamic = 'force-dynamic'
+
 interface PageProps {
   params: {
     id: string

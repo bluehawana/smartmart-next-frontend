@@ -5,6 +5,8 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import ProductForm from "../ProductForm"
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewProductPage() {
   // Check authentication
   const session = await auth.api.getSession({

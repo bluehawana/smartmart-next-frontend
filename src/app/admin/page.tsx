@@ -5,6 +5,9 @@ import Link from "next/link"
 import { Plus, Package, ShoppingBag } from "lucide-react"
 import AnalyticsDashboard from "@/components/admin/AnalyticsDashboard"
 
+// Force dynamic rendering to avoid database connection during build
+export const dynamic = 'force-dynamic'
+
 export default async function AdminDashboard() {
   // Check authentication
   const session = await auth.api.getSession({

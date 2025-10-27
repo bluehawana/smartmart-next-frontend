@@ -1,5 +1,5 @@
 function resolveApiBase() {
-  const fallback = 'https://smrtmart-backend-1757499174-0dfbd8d4731e.herokuapp.com/api/v1'
+  const fallback = 'https://api.smrtmart.com/api/v1'
   const raw = process.env.NEXT_PUBLIC_API_URL
   if (!raw) return fallback
   try {

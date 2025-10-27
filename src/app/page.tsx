@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import Link from 'next/link';
 import { getProductImageUrl } from '@/lib/utils';
 import { EmblaOptionsType } from "embla-carousel";
-import { API_BASE } from '@/lib/config'
+import { API_BASE } from '@/lib/config';
+import { useSession } from '@/lib/auth-client';
 
 // API base URL
 const BASE_URL = API_BASE
@@ -248,6 +249,7 @@ export default function Home() {
   const [photos, setPhotos] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const { data: session, isPending } = useSession();
 
   useEffect(() => {
     async function fetchData() {
@@ -278,10 +280,34 @@ export default function Home() {
     return <ErrorCard error={error} />;
   }
 
+  const isAuthenticated = !isPending && session;
+
   return (
-    <div>
-      {/* Hero Section */}
-      <section className="relative bg-gray-50 py-20">
+    <div className="relative">
+      {/* Authentication Overlay */}
+      {!isAuthenticated && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+          <div className="bg-white p-8 rounded-lg shadow-2xl max-w-md w-full mx-4 border border-gray-200">
+            <h2 className="text-2xl font-semibold text-black mb-4 text-center">
+              Sign in to access SmrtMart
+            </h2>
+            <p className="text-gray-600 text-center mb-6">
+              Please sign in to view our premium collection of electronics and products.
+            </p>
+            <Link
+              href="/login"
+              className="block w-full bg-black text-white text-center py-3 px-6 hover:bg-gray-800 transition-colors font-medium"
+            >
+              Sign In
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Content with blur effect when not authenticated */}
+      <div className={!isAuthenticated ? "filter blur-md pointer-events-none select-none" : ""}>
+        {/* Hero Section */}
+        <section className="relative bg-gray-50 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-light text-black mb-6">
@@ -390,6 +416,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </div>
     </div>
   );
 }

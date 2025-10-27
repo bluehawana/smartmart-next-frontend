@@ -5,6 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
 import toast from "react-hot-toast"
 
+// Prevent static generation
+export const dynamic = 'force-dynamic'
+
 function LoginForm() {
   const [email, setEmail] = useState("")
   const [isLoading, setIsLoading] = useState(false)

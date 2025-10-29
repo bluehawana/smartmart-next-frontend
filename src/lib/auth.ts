@@ -3,15 +3,21 @@ import { magicLink } from "better-auth/plugins"
 import { sendMagicLinkEmail } from "./email"
 import { OWNER_EMAILS } from "./auth-utils"
 
+// Construct database URL with SSL parameters for Supabase
+const getDatabaseUrl = () => {
+  const url = process.env.DATABASE_URL!
+  // Add SSL parameter if not already present
+  if (url && !url.includes('sslmode') && !url.includes('ssl=')) {
+    return url.includes('?') ? `${url}&sslmode=no-verify` : `${url}?sslmode=no-verify`
+  }
+  return url
+}
+
 export const auth = betterAuth({
+  baseURL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
   database: {
     provider: "postgres",
-    url: process.env.DATABASE_URL!,
-    config: {
-      ssl: {
-        rejectUnauthorized: false, // Required for Supabase
-      },
-    },
+    url: getDatabaseUrl(),
   },
   emailAndPassword: {
     enabled: false,

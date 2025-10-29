@@ -7,6 +7,11 @@ export const auth = betterAuth({
   database: {
     provider: "postgres",
     url: process.env.DATABASE_URL!,
+    config: {
+      ssl: {
+        rejectUnauthorized: false, // Required for Supabase
+      },
+    },
   },
   emailAndPassword: {
     enabled: false,
@@ -58,6 +63,10 @@ export const auth = betterAuth({
     "http://localhost:3000",
     "https://www.smrtmart.com",
     "https://smrtmart.com",
+    // Allow all Vercel preview deployments
+    (origin) => {
+      return origin?.includes('.vercel.app') ?? false
+    },
   ],
   // Better Auth will automatically create tables on first request
   advanced: {

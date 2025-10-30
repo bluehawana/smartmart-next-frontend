@@ -74,23 +74,6 @@ export const auth = betterAuth({
   advanced: {
     generateSchema: true,
   },
-  // Hooks to set owner role for specific emails
-  hooks: {
-    after: [
-      {
-        matcher: () => true,
-        handler: async (ctx) => {
-          if (ctx.path === "/sign-in/social" || ctx.path === "/sign-in/magic-link") {
-            const user = ctx.context?.user
-            if (user?.email && OWNER_EMAILS.includes(user.email.toLowerCase())) {
-              // Update user role to owner
-              await ctx.context.internalAdapter.updateUser(user.id, {
-                role: "owner",
-              })
-            }
-          }
-        },
-      },
-    ],
-  },
+  // TODO: Re-implement hooks for owner role assignment after verifying basic auth works
+  // The hooks API may have changed in the current version of better-auth
 })

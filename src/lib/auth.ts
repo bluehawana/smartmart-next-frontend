@@ -2,13 +2,19 @@ import { betterAuth } from "better-auth"
 import { magicLink } from "better-auth/plugins"
 import { sendMagicLinkEmail } from "./email"
 import { OWNER_EMAILS } from "./auth-utils"
+import { Pool } from "pg"
+
+// Initialize PostgreSQL Pool as per Better Auth documentation
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL!,
+  ssl: {
+    rejectUnauthorized: false, // Required for Supabase
+  },
+})
 
 export const auth = betterAuth({
   baseURL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
-  database: {
-    provider: "postgres",
-    url: process.env.DATABASE_URL!,
-  },
+  database: pool,
   emailAndPassword: {
     enabled: false,
   },

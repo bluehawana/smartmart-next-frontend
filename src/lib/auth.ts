@@ -20,14 +20,14 @@ export const auth = betterAuth({
   },
   socialProviders: {
     google: {
-      clientId: process.env.AUTH_GOOGLE_ID || "",
-      clientSecret: process.env.AUTH_GOOGLE_SECRET || "",
-      enabled: !!process.env.AUTH_GOOGLE_ID,
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      enabled: !!process.env.GOOGLE_CLIENT_ID,
     },
     github: {
-      clientId: process.env.AUTH_GITHUB_ID || "",
-      clientSecret: process.env.AUTH_GITHUB_SECRET || "",
-      enabled: !!process.env.AUTH_GITHUB_ID,
+      clientId: process.env.GITHUB_CLIENT_ID || "",
+      clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
+      enabled: !!process.env.GITHUB_CLIENT_ID,
     },
   },
   plugins: [

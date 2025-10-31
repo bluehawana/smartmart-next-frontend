@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import "./globals.css";
 import { Toaster } from 'react-hot-toast';
 import { CartProvider } from '@/components/providers/CartProvider';
-import { ClientHeader } from '@/components/layout/ClientHeader';
+import { Header } from '@/components/layout/Header/Header';
 
 export const metadata: Metadata = {
   title: 'SmrtMart - Premium Electronics & Tech',
@@ -19,7 +19,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body className="h-full bg-white text-gray-900 antialiased">
         <CartProvider>
           <div className="flex flex-col min-h-screen">
-            <ClientHeader />
+            <Header />
             <main className="flex-1">
               {children}
             </main>

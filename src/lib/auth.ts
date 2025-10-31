@@ -33,7 +33,7 @@ export const auth = betterAuth({
   plugins: [
     magicLink({
       sendMagicLink: async ({ email, token, url }) => {
-        // Send magic link email via Resend
+        // Send magic link email via Mailjet
         await sendMagicLinkEmail({ email, url })
       },
       expiresIn: 60 * 10, // 10 minutes

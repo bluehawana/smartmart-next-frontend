@@ -8,9 +8,9 @@ import ProductForm from "../../ProductForm"
 export const dynamic = 'force-dynamic'
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 async function getProduct(id: string) {
@@ -33,13 +33,16 @@ async function getProduct(id: string) {
 }
 
 export default async function EditProductPage({ params }: PageProps) {
+  // Next.js 15: await params
+  const { id } = await params
+
   // Check authentication
   const session = await auth.api.getSession({
     headers: await import("next/headers").then((m) => m.headers()),
   })
 
   if (!session) {
-    redirect(`/login?callbackUrl=/admin/products/${params.id}/edit`)
+    redirect(`/login?callbackUrl=/admin/products/${id}/edit`)
   }
 
   // Check if user is owner
@@ -47,7 +50,7 @@ export default async function EditProductPage({ params }: PageProps) {
     redirect("/")
   }
 
-  const product = await getProduct(params.id)
+  const product = await getProduct(id)
 
   if (!product) {
     return (

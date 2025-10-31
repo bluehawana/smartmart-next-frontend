@@ -54,68 +54,121 @@ export function Header() {
                 <>
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md"
+                    className="flex items-center space-x-2 p-1 hover:bg-gray-100 rounded-full transition-colors"
                   >
                     {session.user.image ? (
                       <img
                         src={session.user.image}
                         alt={session.user.name || ''}
-                        className="w-8 h-8 rounded-full"
+                        className="w-8 h-8 rounded-full object-cover ring-2 ring-transparent hover:ring-gray-200 transition-all"
                       />
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-sm font-medium">
-                        {session.user.name?.charAt(0).toUpperCase() || 'U'}
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-700 to-black text-white flex items-center justify-center text-sm font-semibold ring-2 ring-transparent hover:ring-gray-200 transition-all">
+                        {session.user.name?.charAt(0).toUpperCase() || session.user.email?.charAt(0).toUpperCase() || 'U'}
                       </div>
                     )}
                   </button>
 
                   {showUserMenu && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2">
-                      <div className="px-4 py-2 border-b border-gray-200">
-                        <p className="text-sm font-medium text-gray-900">{session.user.name}</p>
-                        <p className="text-xs text-gray-500">{session.user.email}</p>
-                        {isOwner && (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-black text-white mt-1">
-                            <Shield className="w-3 h-3 mr-1" />
-                            Owner
-                          </span>
-                        )}
-                      </div>
-
-                      {isOwner && (
-                        <Link
-                          href="/admin"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => setShowUserMenu(false)}
-                        >
-                          <Shield className="w-4 h-4 inline mr-2" />
-                          Admin Dashboard
-                        </Link>
-                      )}
-
-                      <Link
-                        href="/profile"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    <>
+                      {/* Backdrop */}
+                      <div
+                        className="fixed inset-0 z-40"
                         onClick={() => setShowUserMenu(false)}
-                      >
-                        <User className="w-4 h-4 inline mr-2" />
-                        My Profile
-                      </Link>
+                      />
 
-                      <button
-                        onClick={handleSignOut}
-                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                      >
-                        <LogOut className="w-4 h-4 inline mr-2" />
-                        Sign Out
-                      </button>
-                    </div>
+                      {/* Dropdown */}
+                      <div className="absolute right-0 mt-3 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                        {/* User Info */}
+                        <div className="px-5 py-4 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
+                          <div className="flex items-center space-x-3 mb-2">
+                            {session.user.image ? (
+                              <img
+                                src={session.user.image}
+                                alt={session.user.name || ''}
+                                className="w-12 h-12 rounded-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gray-700 to-black text-white flex items-center justify-center text-lg font-semibold">
+                                {session.user.name?.charAt(0).toUpperCase() || session.user.email?.charAt(0).toUpperCase() || 'U'}
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-gray-900 truncate">
+                                {session.user.name || 'User'}
+                              </p>
+                              <p className="text-xs text-gray-500 truncate">
+                                {session.user.email}
+                              </p>
+                            </div>
+                          </div>
+                          {isOwner && (
+                            <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-black text-white">
+                              <Shield className="w-3 h-3 mr-1" />
+                              Store Owner
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Menu Items */}
+                        <div className="py-2">
+                          {isOwner && (
+                            <>
+                              <Link
+                                href="/admin"
+                                className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                onClick={() => setShowUserMenu(false)}
+                              >
+                                <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center mr-3">
+                                  <Shield className="w-4 h-4" />
+                                </div>
+                                <div>
+                                  <p className="font-medium text-gray-900">Admin Dashboard</p>
+                                  <p className="text-xs text-gray-500">Manage your store</p>
+                                </div>
+                              </Link>
+                              <div className="border-t border-gray-100 my-2" />
+                            </>
+                          )}
+
+                          <Link
+                            href="/profile"
+                            className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                            onClick={() => setShowUserMenu(false)}
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center mr-3">
+                              <User className="w-4 h-4 text-gray-700" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900">My Account</p>
+                              <p className="text-xs text-gray-500">Profile & orders</p>
+                            </div>
+                          </Link>
+                        </div>
+
+                        {/* Sign Out */}
+                        <div className="border-t border-gray-100 py-2">
+                          <button
+                            onClick={handleSignOut}
+                            className="w-full flex items-center px-5 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center mr-3">
+                              <LogOut className="w-4 h-4 text-red-600" />
+                            </div>
+                            <div className="text-left">
+                              <p className="font-medium">Sign Out</p>
+                              <p className="text-xs text-red-500">See you soon!</p>
+                            </div>
+                          </button>
+                        </div>
+                      </div>
+                    </>
                   )}
                 </>
               ) : (
                 <Link
-                  href="/auth/signin"
-                  className="flex items-center space-x-1 px-4 py-2 text-sm font-medium text-white bg-black hover:bg-gray-800 rounded-md transition-colors"
+                  href="/login"
+                  className="flex items-center space-x-1 px-4 py-2 text-sm font-medium text-white bg-black hover:bg-gray-800 rounded-full transition-colors"
                 >
                   <User className="w-4 h-4" />
                   <span>Sign In</span>

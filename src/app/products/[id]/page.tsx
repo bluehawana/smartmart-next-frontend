@@ -30,11 +30,14 @@ async function fetchProduct(productId: string) {
 export default async function ProductPage({
   params
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
+  // Next.js 15: await params
+  const { id } = await params
+
   // Backend handles both numeric IDs (1, 2, 3) and UUIDs automatically
-  const product = await fetchProduct(params.id)
-  
+  const product = await fetchProduct(id)
+
   if (!product) {
     notFound()
   }

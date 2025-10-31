@@ -1,101 +1,89 @@
 import { redirect } from "next/navigation"
 import { auth } from "@/lib/auth"
 import { hasOwnerAccess } from "@/lib/auth-utils"
+import { headers } from "next/headers"
 import Link from "next/link"
-import { Plus, Package, ShoppingBag } from "lucide-react"
+import AdminLayout from "@/components/admin/AdminLayout"
 import AnalyticsDashboard from "@/components/admin/AnalyticsDashboard"
 
-// Force dynamic rendering to avoid database connection during build
 export const dynamic = 'force-dynamic'
 
 export default async function AdminDashboard() {
-  // Check authentication
   const session = await auth.api.getSession({
-    headers: await import("next/headers").then((m) => m.headers()),
+    headers: await headers(),
   })
 
-  if (!session) {
+  if (!session?.user || !hasOwnerAccess(session.user)) {
     redirect("/login?callbackUrl=/admin")
   }
 
-  // Check if user is owner
-  if (!hasOwnerAccess(session.user)) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
-          <p className="text-gray-600 mb-4">You don't have permission to access this page.</p>
-          <Link href="/" className="text-black hover:underline">
-            Go back home
-          </Link>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
-          <p className="text-gray-600">
+    <AdminLayout>
+      <div className="space-y-6">
+        {/* Welcome */}
+        <div>
+          <h2 className="text-2xl font-semibold text-black">
             Welcome back, {session.user.name || session.user.email}
+          </h2>
+          <p className="mt-1 text-sm text-gray-600">
+            Here's what's happening with your store today
           </p>
         </div>
 
-        {/* Analytics Dashboard */}
-        <div className="mb-8">
-          <AnalyticsDashboard />
-        </div>
+        {/* Analytics */}
+        <AnalyticsDashboard />
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-lg shadow mb-8">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900">Quick Actions</h2>
-          </div>
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-black mb-4">Quick Actions</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link
               href="/admin/products/new"
-              className="flex items-center gap-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-black hover:bg-gray-50 transition-colors"
+              className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-black hover:bg-gray-50 transition-colors"
             >
               <div className="p-2 bg-black text-white rounded-lg">
-                <Plus className="w-5 h-5" />
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
               </div>
               <div>
-                <p className="font-semibold text-gray-900">Add New Product</p>
-                <p className="text-sm text-gray-600">Create a new product listing</p>
+                <p className="font-semibold text-black">Add Product</p>
+                <p className="text-xs text-gray-600">Create new listing</p>
               </div>
             </Link>
 
             <Link
               href="/admin/products"
-              className="flex items-center gap-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-black hover:bg-gray-50 transition-colors"
+              className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-black hover:bg-gray-50 transition-colors"
             >
               <div className="p-2 bg-gray-900 text-white rounded-lg">
-                <Package className="w-5 h-5" />
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
               </div>
               <div>
-                <p className="font-semibold text-gray-900">Manage Products</p>
-                <p className="text-sm text-gray-600">View and edit all products</p>
+                <p className="font-semibold text-black">Products</p>
+                <p className="text-xs text-gray-600">Manage inventory</p>
               </div>
             </Link>
 
             <Link
               href="/admin/orders"
-              className="flex items-center gap-3 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-black hover:bg-gray-50 transition-colors"
+              className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-black hover:bg-gray-50 transition-colors"
             >
               <div className="p-2 bg-gray-900 text-white rounded-lg">
-                <ShoppingBag className="w-5 h-5" />
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
               </div>
               <div>
-                <p className="font-semibold text-gray-900">View Orders</p>
-                <p className="text-sm text-gray-600">Check customer orders</p>
+                <p className="font-semibold text-black">Orders</p>
+                <p className="text-xs text-gray-600">View customer orders</p>
               </div>
             </Link>
           </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   )
 }

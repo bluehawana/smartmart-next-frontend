@@ -8,14 +8,25 @@ import { Minus, Plus, Trash2 } from 'lucide-react';
 import { getProductImageUrl } from '@/lib/utils';
 
 export default function CartPage() {
-  const { 
-    items, 
-    isLoading, 
-    updateQuantity, 
-    removeFromCart, 
+  const {
+    items,
+    isLoading,
+    updateQuantity,
+    removeFromCart,
     getTotalPrice,
     refreshItemDetails
   } = useCartStore();
+
+  // Consolidate duplicate items by productId
+  const consolidatedItems = items.reduce((acc, item) => {
+    const existing = acc.find(i => i.productId === item.productId);
+    if (existing) {
+      existing.quantity += item.quantity;
+    } else {
+      acc.push({ ...item });
+    }
+    return acc;
+  }, [] as typeof items);
 
   // Don't auto-fetch cart - rely on persisted storage
   // useEffect(() => {
@@ -66,7 +77,7 @@ export default function CartPage() {
     );
   }
 
-  if (items.length === 0) {
+  if (consolidatedItems.length === 0) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center py-16">
@@ -94,7 +105,7 @@ export default function CartPage() {
         {/* Cart Items */}
         <div className="lg:col-span-2">
           <div className="space-y-4">
-            {items.map((item) => (
+            {consolidatedItems.map((item) => (
               <div key={item.id} className="flex items-center space-x-4 bg-white p-4 border border-gray-200 rounded-lg shadow-sm">
                 <div className="w-20 h-20 bg-gray-100 flex-shrink-0 rounded-md overflow-hidden">
                   <img

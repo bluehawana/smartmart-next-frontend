@@ -188,6 +188,20 @@ async function resolveCartItemDetails(
   return sanitized
 }
 
+// Helper to consolidate duplicate items by productId
+const consolidateCartItems = (items: CartItem[]): CartItem[] => {
+  const consolidated = items.reduce((acc, item) => {
+    const existing = acc.find(i => i.productId === item.productId);
+    if (existing) {
+      existing.quantity += item.quantity;
+    } else {
+      acc.push({ ...item });
+    }
+    return acc;
+  }, [] as CartItem[]);
+  return consolidated;
+};
+
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
@@ -270,7 +284,9 @@ export const useCartStore = create<CartStore>()(
               })
             )
 
-            set({ items: cartItems, error: null })
+            // Consolidate any duplicate items
+            const consolidatedItems = consolidateCartItems(cartItems);
+            set({ items: consolidatedItems, error: null })
           } else {
             console.log('Backend cart empty, keeping local cart items')
           }
@@ -521,6 +537,12 @@ export const useCartStore = create<CartStore>()(
     {
       name: 'cart-storage',
       skipHydration: false,
+      // Consolidate items when loading from storage
+      onRehydrateStorage: () => (state) => {
+        if (state?.items && state.items.length > 0) {
+          state.items = consolidateCartItems(state.items);
+        }
+      },
     }
   )
 )

@@ -19,9 +19,11 @@ const IMAGE_OVERRIDES: Record<string, string> = {
   'usb-c-iphone-cable.jpg': `${R2_PUBLIC_BASE}/uploads/${encodeURIComponent('usb c iphone cable.jpg')}`,
   'macbookair-m3-weaving-case.jpg': `${R2_PUBLIC_BASE}/uploads/${encodeURIComponent('macbookair m3 weaving case.jpg')}`,
   'macbook-m4-charging-cable.png': `${R2_PUBLIC_BASE}/uploads/${encodeURIComponent('macbook m4 charging cable.png')}`,
-  // Smart Tracking Card -> new canonical PNG in Supabase
-  'mtrackingtag.jpg': 'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/monecard.png',
-  'mtrackingtag.png': 'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/monecard.png',
+  // Product 19: Mtag tracker -> mtrackingtag.png
+  'mtrackingtag.jpg': 'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/mtrackingtag.png',
+  'mtrackingtag.png': 'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/mtrackingtag.png',
+  // Product 20: Smart Tracking Card -> monecard.png
+  'monecard.png': 'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/monecard.png',
   'smart tracking card.jpg': 'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/monecard.png',
   'smart-tracking-card.jpg': 'https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/monecard.png',
 }

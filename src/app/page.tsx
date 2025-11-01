@@ -281,11 +281,12 @@ export default function Home() {
   }
 
   const isAuthenticated = !isPending && session;
+  const shouldShowLoginOverlay = !isPending && !session;
 
   return (
     <div className="relative">
-      {/* Authentication Overlay */}
-      {!isAuthenticated && (
+      {/* Authentication Overlay - Only show when session is loaded and user is not authenticated */}
+      {shouldShowLoginOverlay && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
           <div className="bg-white p-8 rounded-lg shadow-2xl max-w-md w-full mx-4 border border-gray-200">
             <h2 className="text-2xl font-semibold text-black mb-4 text-center">
@@ -305,7 +306,7 @@ export default function Home() {
       )}
 
       {/* Content with blur effect when not authenticated */}
-      <div className={!isAuthenticated ? "filter blur-md pointer-events-none select-none" : ""}>
+      <div className={shouldShowLoginOverlay ? "filter blur-md pointer-events-none select-none" : ""}>
         {/* Hero Section */}
         <section className="relative bg-gray-50 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

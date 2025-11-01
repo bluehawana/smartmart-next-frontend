@@ -52,48 +52,76 @@ export function MenuLeft({ isOpen, onClose }: MenuLeftProps) {
 
         <div className="overflow-auto h-[calc(100vh-64px)]">
           <nav className="p-4">
-            {categories.map((category) => (
-              <div key={category.name} className="mb-6">
-                <h3 className="font-semibold mb-2">{category.name}</h3>
-                <ul className="space-y-2">
-                  {category.subcategories.map((sub) => (
-                    <li key={sub}>
-                      <Link 
-                        href={`/category/${category.name.toLowerCase()}/${sub.toLowerCase()}`}
-                        className="text-gray-600 hover:text-gray-900"
-                        onClick={onClose}
-                      >
-                        {sub}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            <div className="space-y-1 mb-6">
+              <Link
+                href="/"
+                className="block py-3 px-4 text-gray-900 hover:bg-gray-100 rounded-md font-medium"
+                onClick={onClose}
+              >
+                Home
+              </Link>
+              <Link
+                href="/products"
+                className="block py-3 px-4 text-gray-900 hover:bg-gray-100 rounded-md font-medium"
+                onClick={onClose}
+              >
+                All Products
+              </Link>
+            </div>
+
+            <div className="border-t pt-4">
+              <h3 className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                Shop by Category
+              </h3>
+              {categories.map((category) => (
+                <div key={category.name} className="mb-4">
+                  <Link
+                    href={`/products?category=${category.name.toLowerCase()}`}
+                    className="block py-2 px-4 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+                    onClick={onClose}
+                  >
+                    {category.name}
+                  </Link>
+                  <ul className="ml-4 mt-1 space-y-1">
+                    {category.subcategories.map((sub) => (
+                      <li key={sub}>
+                        <Link
+                          href={`/products?category=${category.name.toLowerCase()}`}
+                          className="block py-1.5 px-4 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md"
+                          onClick={onClose}
+                        >
+                          {sub}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
           </nav>
 
-          <footer className="p-4 border-t">
-            <div className="space-y-4">
-              <Link 
+          <footer className="p-4 border-t mt-4">
+            <div className="space-y-1">
+              <Link
                 href="/about"
-                className="block text-gray-600 hover:text-gray-900"
+                className="block py-2 px-4 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md"
                 onClick={onClose}
               >
                 About Us
               </Link>
-              <Link 
+              <Link
                 href="/contact"
-                className="block text-gray-600 hover:text-gray-900"
+                className="block py-2 px-4 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md"
                 onClick={onClose}
               >
                 Contact
               </Link>
-              <Link 
-                href="/support"
-                className="block text-gray-600 hover:text-gray-900"
+              <Link
+                href="/cart"
+                className="block py-2 px-4 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md"
                 onClick={onClose}
               >
-                Support
+                Shopping Cart
               </Link>
             </div>
           </footer>

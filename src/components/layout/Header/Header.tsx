@@ -8,12 +8,14 @@ import { useCartStore } from '@/lib/store/cart'
 import { hasOwnerAccess } from '@/lib/auth-utils'
 import toast from 'react-hot-toast'
 import { useState } from 'react'
+import { MenuLeft } from '@/components/layout/MenuLeft'
 
 export function Header() {
   const router = useRouter()
   const { data: session } = useSession()
   const cart = useCartStore()
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
 
   const handleSignOut = async () => {
     await authClient.signOut()
@@ -25,15 +27,22 @@ export function Header() {
   const isOwner = hasOwnerAccess(session?.user)
 
   return (
-    <header className="border-b bg-white sticky top-0 z-50">
-      <div className="container mx-auto px-6 max-w-[1440px]">
-        <div className="flex items-center justify-between h-16">
-          {/* Left */}
-          <div className="flex items-center">
-            <button className="p-2 hover:bg-gray-100 rounded-md">
-              <Menu className="w-6 h-6" />
-            </button>
-          </div>
+    <>
+      <MenuLeft isOpen={showMobileMenu} onClose={() => setShowMobileMenu(false)} />
+
+      <header className="border-b bg-white sticky top-0 z-50">
+        <div className="container mx-auto px-6 max-w-[1440px]">
+          <div className="flex items-center justify-between h-16">
+            {/* Left */}
+            <div className="flex items-center">
+              <button
+                onClick={() => setShowMobileMenu(true)}
+                className="p-2 hover:bg-gray-100 rounded-md"
+                aria-label="Open menu"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+            </div>
 
           {/* Center */}
           <div className="flex-1 text-center">
@@ -188,5 +197,6 @@ export function Header() {
         </div>
       </div>
     </header>
+    </>
   )
 } 

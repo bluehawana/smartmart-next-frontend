@@ -12,6 +12,12 @@ export async function sendMagicLinkEmail({
   email: string
   url: string
 }) {
+  console.log('[Mailjet] Starting to send magic link email...')
+  console.log('[Mailjet] Recipient:', email)
+  console.log('[Mailjet] URL:', url)
+  console.log('[Mailjet] API Key:', process.env.MAILJET_API_KEY ? 'SET' : 'NOT SET')
+  console.log('[Mailjet] Secret Key:', process.env.MAILJET_SECRET_KEY ? 'SET' : 'NOT SET')
+
   try {
     const request = mailjet.post("send", { version: "v3.1" }).request({
       Messages: [
@@ -61,14 +67,24 @@ export async function sendMagicLinkEmail({
 
     const result = await request
 
+    console.log('[Mailjet] Response status:', result.response.status)
+    console.log('[Mailjet] Response body:', JSON.stringify(result.body))
+
     if (result.response.status !== 200) {
-      console.error("Failed to send magic link email:", result.body)
+      console.error("[Mailjet] Failed to send magic link email - non-200 status:", result.body)
       throw new Error("Failed to send email")
     }
 
+    console.log('[Mailjet] Magic link email sent successfully!')
     return result.body
   } catch (error) {
-    console.error("Error sending magic link email:", error)
+    console.error("[Mailjet] Error sending magic link email:", error)
+    // Log more details about the error
+    if (error instanceof Error) {
+      console.error("[Mailjet] Error name:", error.name)
+      console.error("[Mailjet] Error message:", error.message)
+      console.error("[Mailjet] Error stack:", error.stack)
+    }
     throw error
   }
 }

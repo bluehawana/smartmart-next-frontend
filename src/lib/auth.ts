@@ -34,7 +34,16 @@ export const auth = betterAuth({
     magicLink({
       sendMagicLink: async ({ email, token, url }) => {
         // Send magic link email via Mailjet
-        await sendMagicLinkEmail({ email, url })
+        try {
+          console.log('[Better Auth] Sending magic link email to:', email)
+          console.log('[Better Auth] Magic link URL:', url)
+          await sendMagicLinkEmail({ email, url })
+          console.log('[Better Auth] Magic link email sent successfully')
+        } catch (error) {
+          console.error('[Better Auth] Failed to send magic link email:', error)
+          // Re-throw to ensure Better Auth knows it failed
+          throw error
+        }
       },
       expiresIn: 60 * 10, // 10 minutes
     }),

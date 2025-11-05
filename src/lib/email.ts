@@ -12,11 +12,13 @@ export async function sendMagicLinkEmail({
   email: string
   url: string
 }) {
-  console.log('[Mailjet] Starting to send magic link email...')
+  console.log('============================================')
+  console.log('[Mailjet] 🚀 FUNCTION CALLED - Starting to send magic link email...')
   console.log('[Mailjet] Recipient:', email)
   console.log('[Mailjet] URL:', url)
-  console.log('[Mailjet] API Key:', process.env.MAILJET_API_KEY ? 'SET' : 'NOT SET')
-  console.log('[Mailjet] Secret Key:', process.env.MAILJET_SECRET_KEY ? 'SET' : 'NOT SET')
+  console.log('[Mailjet] API Key:', process.env.MAILJET_API_KEY ? `SET (${process.env.MAILJET_API_KEY.substring(0,8)}...)` : '❌ NOT SET')
+  console.log('[Mailjet] Secret Key:', process.env.MAILJET_SECRET_KEY ? `SET (${process.env.MAILJET_SECRET_KEY.substring(0,8)}...)` : '❌ NOT SET')
+  console.log('============================================')
 
   try {
     const request = mailjet.post("send", { version: "v3.1" }).request({

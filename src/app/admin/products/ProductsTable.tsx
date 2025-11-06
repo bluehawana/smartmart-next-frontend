@@ -117,7 +117,7 @@ export default function ProductsTable() {
                 <div className="flex items-center">
                   {Array.isArray(product.images) && product.images[0] && (
                     <img
-                      src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.images[0]}`}
+                      src={`https://mqkoydypybxgcwxioqzc.supabase.co/storage/v1/object/public/products/${product.images[0]}`}
                       alt={product.name}
                       className="h-10 w-10 rounded object-cover mr-3"
                     />

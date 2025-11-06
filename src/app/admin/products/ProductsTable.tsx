@@ -29,10 +29,16 @@ export default function ProductsTable() {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`)
       if (!response.ok) throw new Error("Failed to fetch products")
       const data = await response.json()
-      setProducts(data.data || [])
+
+      // Handle nested API response structure: data.data.data
+      const productsData = data?.data?.data || data?.data || []
+
+      // Ensure productsData is an array before setting
+      setProducts(Array.isArray(productsData) ? productsData : [])
     } catch (error) {
       console.error("Error fetching products:", error)
       toast.error("Failed to load products")
+      setProducts([]) // Set empty array on error
     } finally {
       setLoading(false)
     }
@@ -109,7 +115,7 @@ export default function ProductsTable() {
             <tr key={product.id} className="hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
-                  {product.images && product.images[0] && (
+                  {Array.isArray(product.images) && product.images[0] && (
                     <img
                       src={product.images[0]}
                       alt={product.name}

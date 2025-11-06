@@ -117,7 +117,7 @@ export default function ProductsTable() {
                 <div className="flex items-center">
                   {Array.isArray(product.images) && product.images[0] && (
                     <img
-                      src={product.images[0]}
+                      src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${product.images[0]}`}
                       alt={product.name}
                       className="h-10 w-10 rounded object-cover mr-3"
                     />

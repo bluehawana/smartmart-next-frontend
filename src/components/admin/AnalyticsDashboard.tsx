@@ -36,7 +36,7 @@ export default function AnalyticsDashboard() {
   async function fetchAnalytics() {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/analytics?range=${timeRange}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/analytics?range=${timeRange}`,
         {
           credentials: "include",
         }

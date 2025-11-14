@@ -13,6 +13,7 @@ const pool = new Pool({
 })
 
 export const auth = betterAuth({
+  secret: process.env.BETTER_AUTH_SECRET!,
   baseURL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
   database: pool,
   emailAndPassword: {
@@ -77,15 +78,16 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // 1 day
+    cookieCache: {
+      enabled: true,
+      maxAge: 60 * 5, // 5 minutes
+    },
   },
   trustedOrigins: [
     "http://localhost:3000",
+    "http://107.175.235.220:3000",
     "https://www.smrtmart.com",
     "https://smrtmart.com",
-    // Allow all Vercel preview deployments
-    (origin) => {
-      return origin?.includes('.vercel.app') ?? false
-    },
   ],
   // Better Auth will automatically create tables on first request
   advanced: {

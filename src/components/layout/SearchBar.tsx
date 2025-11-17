@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useDebounce } from '@/lib/hooks/useDebounce'
+import { API_BASE } from '@/lib/config'
+import { getProductImageUrl } from '@/lib/utils'
 
 interface SearchResult {
   id: number
@@ -33,7 +35,7 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
 
     setIsLoading(true)
     try {
-      const res = await fetch(`http://localhost:8080/api/products/search?q=${encodeURIComponent(searchQuery)}`)
+      const res = await fetch(`${API_BASE}/products/search?q=${encodeURIComponent(searchQuery)}`)
       if (!res.ok) throw new Error('Search failed')
       const data = await res.json()
       setResults(data)
@@ -85,13 +87,13 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
                   {results.map((product) => (
                     <Link
                       key={product.id}
-                      href={`/product/${product.id}`}
+                      href={`/products/${product.id}`}
                       onClick={onClose}
                       className="flex gap-4 p-4 rounded-lg hover:bg-gray-50"
                     >
                       <div className="relative w-20 h-20 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0">
                         <Image
-                          src={`http://localhost:8080/api/uploads/${product.image}`}
+                          src={getProductImageUrl(product.image)}
                           alt={product.name}
                           fill
                           className="object-contain p-2"

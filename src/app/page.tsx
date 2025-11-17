@@ -59,7 +59,9 @@ async function getProducts() {
       headers: {
         'Content-Type': 'application/json',
       },
-      mode: 'cors'
+      mode: 'cors',
+      // Cache for 5 minutes to prevent rate limiting
+      next: { revalidate: 300 }
     })
 
     if (!res.ok) {
@@ -69,13 +71,13 @@ async function getProducts() {
 
     const response = await res.json()
     console.log('API Response:', response)
-    
+
     // The Go API returns data in response.data.data format
     if (response.success && response.data && response.data.data) {
       // Return products as-is with UUID IDs and API images
       return response.data.data
     }
-    
+
     return getMockProducts()
   } catch (error) {
     console.error('Error fetching products:', error)
@@ -210,10 +212,9 @@ function getMockProducts(): Product[] {
   ]
 }
 
-// Get featured products for gallery
-async function getFeaturedProducts() {
+// Get featured products for gallery (from already fetched products)
+function getFeaturedProductImages(products: Product[]): string[] {
   try {
-    const products = await getProducts();
     const featuredProducts = products.filter(p => p.featured).slice(0, 6);
     return featuredProducts.map(p => p.images[0]).filter(Boolean);
   } catch (error) {
@@ -255,10 +256,10 @@ export default function Home() {
     async function fetchData() {
       try {
         console.log('Fetching data...');
-        const [productsData, photosData] = await Promise.all([
-          getProducts(),
-          getFeaturedProducts()
-        ]);
+        // Fetch products once, then derive featured images
+        const productsData = await getProducts();
+        const photosData = getFeaturedProductImages(productsData);
+
         setProducts(productsData);
         setPhotos(photosData);
         console.log('Products loaded:', productsData.length);

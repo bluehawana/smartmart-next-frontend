@@ -6,6 +6,7 @@ import { useCartStore } from '@/lib/store/cart';
 import { toast } from 'react-hot-toast';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { getProductImageUrl } from '@/lib/utils';
+import { getCartVATBreakdown } from '@/lib/vat';
 
 export default function CartPage() {
   const {
@@ -163,21 +164,37 @@ export default function CartPage() {
         {/* Order Summary */}
         <div className="bg-gray-50 p-6">
           <h2 className="text-xl font-medium text-black mb-4">Order Summary</h2>
-          
+
           <div className="space-y-2 mb-4">
             <div className="flex justify-between">
-              <span className="text-gray-600">Subtotal</span>
+              <span className="text-gray-600">Subtotal (inkl. moms)</span>
               <span className="text-black">{getTotalPrice().toLocaleString('sv-SE')} kr</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-500 pl-4">- varav moms (25%)</span>
+              <span className="text-gray-500">
+                {(() => {
+                  const vatBreakdown = getCartVATBreakdown(
+                    consolidatedItems.map(item => ({
+                      name: item.name,
+                      price: item.price,
+                      quantity: item.quantity
+                    }))
+                  );
+                  return vatBreakdown.vatAmount.toLocaleString('sv-SE');
+                })()} kr
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Shipping</span>
               <span className="text-black">Free</span>
             </div>
-            <div className="border-t pt-2">
+            <div className="border-t pt-2 mt-2">
               <div className="flex justify-between font-medium">
                 <span className="text-black">Total</span>
                 <span className="text-black">{getTotalPrice().toLocaleString('sv-SE')} kr</span>
               </div>
+              <p className="text-xs text-gray-500 mt-1">Inkl. 25% moms</p>
             </div>
           </div>
           

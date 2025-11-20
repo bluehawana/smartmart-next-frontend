@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useCartStore } from '@/lib/store/cart'
 import { API_BASE } from '@/lib/config'
 import { loadStripe } from '@stripe/stripe-js'
+import { getCartVATBreakdown } from '@/lib/vat'
 
 const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
   ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
@@ -343,7 +344,7 @@ export default function CheckoutPage() {
       {/* Order Summary */}
       <div className="bg-gray-50 rounded-lg p-6 mb-8">
         <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
-        
+
         {items.map((item) => (
           <div key={item.id} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0">
             <div>
@@ -353,10 +354,36 @@ export default function CheckoutPage() {
             <p className="font-semibold">{(item.price * item.quantity).toLocaleString('sv-SE')} kr</p>
           </div>
         ))}
-        
-        <div className="flex justify-between items-center pt-4 mt-4 border-t border-gray-300">
-          <span className="text-xl font-bold">Total:</span>
-          <span className="text-xl font-bold">{getTotalPrice().toLocaleString('sv-SE')} kr</span>
+
+        <div className="pt-4 mt-4 border-t border-gray-300 space-y-2">
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600">Subtotal (inkl. moms):</span>
+            <span className="font-medium">{getTotalPrice().toLocaleString('sv-SE')} kr</span>
+          </div>
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-gray-500 pl-4">- varav moms (25%)</span>
+            <span className="text-gray-500">
+              {(() => {
+                const vatBreakdown = getCartVATBreakdown(
+                  items.map(item => ({
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity
+                  }))
+                );
+                return vatBreakdown.vatAmount.toLocaleString('sv-SE');
+              })()} kr
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600">Shipping:</span>
+            <span className="font-medium">Free</span>
+          </div>
+          <div className="flex justify-between items-center pt-2 border-t border-gray-300">
+            <span className="text-xl font-bold">Total:</span>
+            <span className="text-xl font-bold">{getTotalPrice().toLocaleString('sv-SE')} kr</span>
+          </div>
+          <p className="text-xs text-gray-500 text-right">Inkl. 25% moms</p>
         </div>
       </div>
 

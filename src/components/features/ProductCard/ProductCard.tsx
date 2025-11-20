@@ -58,7 +58,10 @@ export function ProductCard({ id, name, price, imageUrl }: ProductCardProps) {
       <div className="p-4">
         <Link href={`/products/${id}`}>
           <h3 className="text-sm font-medium text-gray-900 hover:text-gray-700">{name}</h3>
-          <p className="mt-1 text-lg font-medium text-gray-900">€{price.toFixed(2)}</p>
+          <div className="mt-1">
+            <p className="text-lg font-medium text-gray-900">{price.toLocaleString('sv-SE')} kr</p>
+            <p className="text-xs text-gray-500">inkl. 25% moms</p>
+          </div>
         </Link>
         <button
           onClick={handleAddToCart}

@@ -1,4 +1,5 @@
 import Mailjet from "node-mailjet"
+import { getCartVATBreakdown } from "./vat"
 
 const mailjet = Mailjet.apiConnect(
   process.env.MAILJET_API_KEY || "",
@@ -114,6 +115,15 @@ export async function sendOrderConfirmationEmail({
   customerName?: string
 }) {
   try {
+    // Calculate VAT breakdown
+    const vatBreakdown = getCartVATBreakdown(
+      items.map(item => ({
+        name: item.productName,
+        price: item.price,
+        quantity: item.quantity
+      }))
+    )
+
     const itemsHtml = items
       .map(
         (item) => `
@@ -185,11 +195,40 @@ export async function sendOrderConfirmationEmail({
               <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
                 ${itemsHtml}
                 <tr>
-                  <td style="padding: 16px 12px 0 12px; text-align: right; font-size: 18px; font-weight: 700; color: #111827;">
+                  <td style="padding: 12px 12px 4px 12px; text-align: right; color: #6b7280;">
+                    Subtotal (inkl. moms):
+                  </td>
+                  <td style="padding: 12px 12px 4px 12px; text-align: right; color: #111827; font-weight: 600;">
+                    ${totalAmount.toLocaleString("sv-SE")} kr
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 4px 12px 4px 24px; text-align: right; color: #9ca3af; font-size: 14px;">
+                    - varav moms (25%):
+                  </td>
+                  <td style="padding: 4px 12px 4px 12px; text-align: right; color: #9ca3af; font-size: 14px;">
+                    ${vatBreakdown.vatAmount.toLocaleString("sv-SE")} kr
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 4px 12px 12px 12px; text-align: right; color: #6b7280;">
+                    Shipping:
+                  </td>
+                  <td style="padding: 4px 12px 12px 12px; text-align: right; color: #111827; font-weight: 600;">
+                    Free
+                  </td>
+                </tr>
+                <tr style="border-top: 2px solid #e5e7eb;">
+                  <td style="padding: 16px 12px 8px 12px; text-align: right; font-size: 18px; font-weight: 700; color: #111827;">
                     Total:
                   </td>
-                  <td style="padding: 16px 12px 0 12px; text-align: right; font-size: 18px; font-weight: 700; color: #111827;">
+                  <td style="padding: 16px 12px 8px 12px; text-align: right; font-size: 18px; font-weight: 700; color: #111827;">
                     ${totalAmount.toLocaleString("sv-SE")} kr
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2" style="padding: 0 12px 12px 12px; text-align: right; font-size: 12px; color: #9ca3af;">
+                    Inkl. 25% moms
                   </td>
                 </tr>
               </table>

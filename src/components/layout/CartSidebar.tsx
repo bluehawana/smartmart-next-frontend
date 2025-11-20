@@ -116,9 +116,16 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
           {/* Footer */}
           <div className="border-t p-4">
-            <div className="flex justify-between mb-4">
-              <span>Total</span>
-              <span className="font-bold">{getCartTotal().toLocaleString('sv-SE')} kr</span>
+            <div className="space-y-2 mb-4">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Total (inkl. moms)</span>
+                <span className="font-medium">{getCartTotal().toLocaleString('sv-SE')} kr</span>
+              </div>
+              <div className="flex justify-between mb-2">
+                <span className="font-bold">Total</span>
+                <span className="font-bold">{getCartTotal().toLocaleString('sv-SE')} kr</span>
+              </div>
+              <p className="text-xs text-gray-500 text-right">Inkl. 25% moms</p>
             </div>
             <CheckoutButton />
           </div>

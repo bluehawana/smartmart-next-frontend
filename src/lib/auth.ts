@@ -4,12 +4,55 @@ import { sendMagicLinkEmail } from "./email"
 import { OWNER_EMAILS } from "./auth-utils"
 import { Pool } from "pg"
 
-// Initialize PostgreSQL Pool as per Better Auth documentation
+// Determine SSL configuration based on DATABASE_URL
+function getSSLConfig() {
+  const dbUrl = process.env.DATABASE_URL || ''
+
+  // If connecting to Supabase, AWS RDS, or using sslmode=require
+  if (dbUrl.includes('supabase.co') || dbUrl.includes('amazonaws.com') || dbUrl.includes('sslmode=require')) {
+    return {
+      rejectUnauthorized: false, // Accept self-signed certificates
+    }
+  }
+
+  // For local development or VPS without SSL
+  if (dbUrl.includes('localhost') || dbUrl.includes('127.0.0.1') || dbUrl.includes('sslmode=disable')) {
+    return false // Disable SSL
+  }
+
+  // Default: try with SSL but don't reject unauthorized
+  return {
+    rejectUnauthorized: false,
+  }
+}
+
+// Initialize PostgreSQL Pool optimized for serverless
+// Connection pooling best practices for Vercel/serverless environments
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL!,
-  ssl: {
-    rejectUnauthorized: false, // Required for Supabase
-  },
+  ssl: getSSLConfig(),
+  // Serverless-optimized settings
+  max: 10, // Maximum pool size (lower for serverless)
+  min: 0, // Don't maintain minimum connections in serverless
+  idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
+  connectionTimeoutMillis: 10000, // Fail fast if can't connect in 10 seconds
+  // Prevent connection exhaustion
+  allowExitOnIdle: true, // Allow process to exit when idle
+})
+
+// Graceful error handling for pool errors
+pool.on('error', (err) => {
+  console.error('[Database Pool] Unexpected error on idle client:', err)
+  // Don't exit - let the connection be recreated
+})
+
+// Log pool events for debugging (remove in production if needed)
+pool.on('connect', () => {
+  console.log('[Database Pool] New client connected')
+})
+
+pool.on('remove', () => {
+  console.log('[Database Pool] Client removed from pool')
 })
 
 export const auth = betterAuth({

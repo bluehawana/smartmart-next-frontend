@@ -21,15 +21,31 @@ function LoginForm() {
     setIsLoading(true)
 
     try {
-      await authClient.signIn.magicLink({
+      const result = await authClient.signIn.magicLink({
         email,
         callbackURL: callbackUrl,
       })
+
+      console.log('[Login] Magic link result:', result)
       setEmailSent(true)
       toast.success("Check your email for the magic link!")
-    } catch (error) {
-      console.error("Magic link error:", error)
-      toast.error("Failed to send magic link. Please try again.")
+    } catch (error: any) {
+      console.error("[Login] Magic link error:", error)
+
+      // Provide more specific error messages
+      let errorMessage = "Failed to send magic link. Please try again."
+
+      if (error?.message?.includes('network') || error?.message?.includes('fetch')) {
+        errorMessage = "Network error. Please check your connection and try again."
+      } else if (error?.message?.includes('timeout')) {
+        errorMessage = "Request timed out. Please try again."
+      } else if (error?.message?.includes('email')) {
+        errorMessage = "Invalid email address. Please check and try again."
+      } else if (error?.status === 503) {
+        errorMessage = "Service temporarily unavailable. Please try again in a moment."
+      }
+
+      toast.error(errorMessage)
     } finally {
       setIsLoading(false)
     }
@@ -38,13 +54,29 @@ function LoginForm() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true)
     try {
+      console.log('[Login] Starting Google sign in...')
       await authClient.signIn.social({
         provider: "google",
         callbackURL: callbackUrl,
       })
-    } catch (error) {
-      console.error("Google sign in error:", error)
-      toast.error("Failed to sign in with Google")
+      // If we reach here, redirect is happening
+      console.log('[Login] Google sign in redirect initiated')
+    } catch (error: any) {
+      console.error("[Login] Google sign in error:", error)
+
+      let errorMessage = "Failed to sign in with Google. Please try again."
+
+      if (error?.message?.includes('network') || error?.message?.includes('fetch')) {
+        errorMessage = "Network error. Please check your connection."
+      } else if (error?.message?.includes('popup')) {
+        errorMessage = "Popup blocked. Please allow popups and try again."
+      } else if (error?.status === 503) {
+        errorMessage = "Service temporarily unavailable. Please try again in a moment."
+      } else if (error?.message) {
+        errorMessage = `Google sign in failed: ${error.message}`
+      }
+
+      toast.error(errorMessage)
       setIsLoading(false)
     }
   }
@@ -52,13 +84,29 @@ function LoginForm() {
   const handleGitHubSignIn = async () => {
     setIsLoading(true)
     try {
+      console.log('[Login] Starting GitHub sign in...')
       await authClient.signIn.social({
         provider: "github",
         callbackURL: callbackUrl,
       })
-    } catch (error) {
-      console.error("GitHub sign in error:", error)
-      toast.error("Failed to sign in with GitHub")
+      // If we reach here, redirect is happening
+      console.log('[Login] GitHub sign in redirect initiated')
+    } catch (error: any) {
+      console.error("[Login] GitHub sign in error:", error)
+
+      let errorMessage = "Failed to sign in with GitHub. Please try again."
+
+      if (error?.message?.includes('network') || error?.message?.includes('fetch')) {
+        errorMessage = "Network error. Please check your connection."
+      } else if (error?.message?.includes('popup')) {
+        errorMessage = "Popup blocked. Please allow popups and try again."
+      } else if (error?.status === 503) {
+        errorMessage = "Service temporarily unavailable. Please try again in a moment."
+      } else if (error?.message) {
+        errorMessage = `GitHub sign in failed: ${error.message}`
+      }
+
+      toast.error(errorMessage)
       setIsLoading(false)
     }
   }

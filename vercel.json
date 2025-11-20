@@ -3,6 +3,10 @@
   "buildCommand": "npm run build",
   "installCommand": "npm install --prefer-offline --no-audit --progress=false",
   "functions": {
+    "app/api/auth/**/*": {
+      "maxDuration": 30,
+      "memory": 1024
+    },
     "app/**/*.tsx": {
       "maxDuration": 30
     }
@@ -11,5 +15,16 @@
     "env": {
       "NEXT_TELEMETRY_DISABLED": "1"
     }
-  }
+  },
+  "headers": [
+    {
+      "source": "/api/auth/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate"
+        }
+      ]
+    }
+  ]
 }

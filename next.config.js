@@ -41,8 +41,6 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
-  // Faster builds
-  swcMinify: true,
 }
 
 module.exports = nextConfig

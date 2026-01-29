@@ -6,6 +6,7 @@ export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    orderNumber: '',
     subject: '',
     message: ''
   });
@@ -15,13 +16,13 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // Simulate form submission
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     setSubmitted(true);
     setIsSubmitting(false);
-    setFormData({ name: '', email: '', subject: '', message: '' });
+    setFormData({ name: '', email: '', orderNumber: '', subject: '', message: '' });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -36,9 +37,9 @@ export default function ContactPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-light text-black mb-6">Let's Transform Your Business</h1>
+          <h1 className="text-4xl font-light text-black mb-6">Customer Support</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Ready to digitalize your business? We've helped restaurants, SMEs, and entrepreneurs achieve remarkable growth through technology. Let's discuss your vision.
+            Need help with your order? Have questions about our products? We're here to assist you.
           </p>
         </div>
 
@@ -46,95 +47,59 @@ export default function ContactPage() {
           {/* Contact Information */}
           <div className="space-y-8">
             <div>
-              <h2 className="text-2xl font-light text-black mb-8">Our Success Story</h2>
-              <div className="bg-gray-50 p-6 mb-8 rounded-lg">
-                <h3 className="text-lg font-medium text-black mb-3">Ichiban Sushi: From Local Restaurant to Top 5 in Gothenburg</h3>
-                <p className="text-gray-600 text-sm mb-4">
-                  We transformed our own restaurant through digital innovation - achieving 15% growth and reaching top 5 status in just 4 years. 
-                  Our website revolutionized our sales, marketing, CRM, and customer engagement.
-                </p>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium text-black">✓ Online Ordering</span>
-                    <p className="text-gray-600">Integrated with Uber Eats, Foodora, Wolt</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-black">✓ Customer Management</span>
-                    <p className="text-gray-600">CRM system for loyalty & retention</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-black">✓ Digital Marketing</span>
-                    <p className="text-gray-600">SEO, social media integration</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-black">✓ Analytics & Growth</span>
-                    <p className="text-gray-600">Data-driven business decisions</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="space-y-6">
-                {/* Location */}
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0 w-6 h-6 mt-1">
-                    <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-black mb-1">Location</h3>
-                    <p className="text-gray-600">
-                      Södra vägen 91<br />
-                      412 63, Göteborg, Sweden
-                    </p>
-                    <p className="text-sm text-gray-500 mt-1">🇸🇪 🇪🇺 🇺🇸 Remote work available</p>
-                  </div>
+              <h2 className="text-2xl font-light text-black mb-8">How Can We Help?</h2>
+
+              <div className="space-y-4 mb-8">
+                <div className="bg-gray-50 p-4">
+                  <h3 className="font-medium text-black mb-2">📦 Order Inquiries</h3>
+                  <p className="text-gray-600 text-sm">Questions about your order status, shipping, or delivery</p>
                 </div>
 
-                {/* Email */}
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0 w-6 h-6 mt-1">
-                    <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-black mb-1">Email</h3>
-                    <p className="text-gray-600">info@smrtmart.com</p>
-                  </div>
+                <div className="bg-gray-50 p-4">
+                  <h3 className="font-medium text-black mb-2">↩️ Returns & Refunds</h3>
+                  <p className="text-gray-600 text-sm">30-day return policy for unused items in original condition</p>
+                </div>
+
+                <div className="bg-gray-50 p-4">
+                  <h3 className="font-medium text-black mb-2">📧 Product Support</h3>
+                  <p className="text-gray-600 text-sm">Setup help, troubleshooting, and usage guidance</p>
+                </div>
+
+                <div className="bg-gray-50 p-4">
+                  <h3 className="font-medium text-black mb-2">❓ General Questions</h3>
+                  <p className="text-gray-600 text-sm">Any other questions about Mtag, Mcard, or SmrtMart</p>
                 </div>
               </div>
             </div>
 
-            {/* Services Overview */}
+            {/* Location */}
             <div>
-              <h3 className="text-lg font-medium text-black mb-4">How We Can Help</h3>
-              <div className="space-y-4 text-sm">
-                <div className="border-l-4 border-black pl-4">
-                  <h4 className="font-medium text-black">Restaurant & SME Digitalization</h4>
-                  <p className="text-gray-600">Complete digital transformation based on our proven restaurant success</p>
-                </div>
-                <div className="border-l-4 border-gray-300 pl-4">
-                  <h4 className="font-medium text-black">Full Stack Development</h4>
-                  <p className="text-gray-600">Java Spring Boot, React/Next.js, TypeScript, AWS cloud solutions</p>
-                </div>
-                <div className="border-l-4 border-gray-300 pl-4">
-                  <h4 className="font-medium text-black">Business Bridging</h4>
-                  <p className="text-gray-600">China-Global market entry, cultural adaptation, partnership facilitation</p>
-                </div>
-                <div className="border-l-4 border-gray-300 pl-4">
-                  <h4 className="font-medium text-black">Immigration Support</h4>
-                  <p className="text-gray-600">Helping immigrants achieve their business dreams and set examples for their children</p>
-                </div>
+              <h3 className="text-lg font-medium text-black mb-4">Location</h3>
+              <div className="space-y-2 text-gray-600">
+                <p>Södra vägen 91</p>
+                <p>412 63, Göteborg</p>
+                <p>Sweden</p>
+                <p className="text-sm text-gray-500 mt-2">🇸🇪 🇪🇺 EU-wide shipping available</p>
               </div>
+            </div>
+
+            {/* Email */}
+            <div>
+              <h3 className="text-lg font-medium text-black mb-4">Email Us</h3>
+              <div className="flex items-center space-x-3">
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <span className="text-gray-600">info@smrtmart.com</span>
+              </div>
+              <p className="text-gray-500 text-sm mt-2">We typically respond within 24-48 hours</p>
             </div>
           </div>
 
           {/* Contact Form */}
           <div>
-            <h2 className="text-2xl font-light text-black mb-8">Start Your Digital Journey</h2>
-            
+            <h2 className="text-2xl font-light text-black mb-8">Send Us a Message</h2>
+
             {submitted ? (
               <div className="bg-gray-50 p-8 text-center">
                 <div className="w-16 h-16 mx-auto mb-4 bg-black rounded-full flex items-center justify-center">
@@ -142,13 +107,16 @@ export default function ContactPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-medium text-black mb-2">Let's Build Something Amazing!</h3>
-                <p className="text-gray-600">Thank you for reaching out. We'll contact you within 24 hours to discuss your digitalization goals.</p>
-                <button 
+                <h3 className="text-lg font-medium text-black mb-2">Message Received!</h3>
+                <p className="text-gray-600">
+                  Thank you for contacting us. Our support team will review your message
+                  and get back to you within 24-48 hours.
+                </p>
+                <button
                   onClick={() => setSubmitted(false)}
                   className="mt-4 text-sm text-gray-600 hover:text-black border-b border-gray-300 hover:border-black transition-colors"
                 >
-                  Discuss another project
+                  Send another message
                 </button>
               </div>
             ) : (
@@ -156,7 +124,7 @@ export default function ContactPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-black mb-2">
-                      Name
+                      Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -170,7 +138,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-black mb-2">
-                      Email
+                      Email <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="email"
@@ -183,10 +151,25 @@ export default function ContactPage() {
                     />
                   </div>
                 </div>
-                
+
+                <div>
+                  <label htmlFor="orderNumber" className="block text-sm font-medium text-black mb-2">
+                    Order Number (if applicable)
+                  </label>
+                  <input
+                    type="text"
+                    id="orderNumber"
+                    name="orderNumber"
+                    value={formData.orderNumber}
+                    onChange={handleChange}
+                    placeholder="e.g., SMRT-12345"
+                    className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none text-sm"
+                  />
+                </div>
+
                 <div>
                   <label htmlFor="subject" className="block text-sm font-medium text-black mb-2">
-                    Project Type
+                    Subject <span className="text-red-500">*</span>
                   </label>
                   <select
                     id="subject"
@@ -196,19 +179,18 @@ export default function ContactPage() {
                     required
                     className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none text-sm"
                   >
-                    <option value="">Select your project type</option>
-                    <option value="restaurant-digitalization">Restaurant Digitalization</option>
-                    <option value="sme-transformation">SME Digital Transformation</option>
-                    <option value="full-stack-development">Full Stack Development</option>
-                    <option value="china-global-bridging">China-Global Business Bridging</option>
-                    <option value="consultation">Technology Consultation</option>
-                    <option value="other">Other</option>
+                    <option value="">Select your inquiry type</option>
+                    <option value="order-status">Order Status</option>
+                    <option value="shipping">Shipping & Delivery</option>
+                    <option value="returns">Returns & Refunds</option>
+                    <option value="product-support">Product Support</option>
+                    <option value="general">General Question</option>
                   </select>
                 </div>
-                
+
                 <div>
                   <label htmlFor="message" className="block text-sm font-medium text-black mb-2">
-                    Tell us about your business goals
+                    Message <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     id="message"
@@ -217,20 +199,39 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     rows={6}
-                    placeholder="Describe your current business, digitalization goals, challenges you're facing, or how we can help transform your vision into reality..."
+                    placeholder="Please describe your question or issue in detail..."
                     className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none text-sm resize-none"
                   />
                 </div>
-                
+
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   className="w-full bg-black text-white py-4 text-sm font-medium hover:bg-gray-800 transition-colors disabled:bg-gray-400"
                 >
-                  {isSubmitting ? 'Connecting...' : 'Start Your Digital Transformation'}
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
                 </button>
               </form>
             )}
+          </div>
+        </div>
+
+        {/* Quick Links */}
+        <div className="mt-16 pt-8 border-t border-gray-200">
+          <h2 className="text-xl font-light text-black mb-6 text-center">Quick Help</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+            <a href="/products" className="bg-gray-50 p-4 hover:bg-gray-100 transition-colors">
+              <div className="text-2xl mb-2">📦</div>
+              <h3 className="text-sm font-medium text-black">Browse Products</h3>
+            </a>
+            <a href="/cart" className="bg-gray-50 p-4 hover:bg-gray-100 transition-colors">
+              <div className="text-2xl mb-2">🛒</div>
+              <h3 className="text-sm font-medium text-black">View Cart</h3>
+            </a>
+            <a href="/support" className="bg-gray-50 p-4 hover:bg-gray-100 transition-colors">
+              <div className="text-2xl mb-2">❓</div>
+              <h3 className="text-sm font-medium text-black">FAQ & Support</h3>
+            </a>
           </div>
         </div>
       </div>

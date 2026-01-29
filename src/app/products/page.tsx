@@ -1,117 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useCartStore } from '@/lib/store/cart';
-import { API_BASE } from '@/lib/config'
+import { API_BASE } from '@/lib/config';
 import { getProductImageUrl } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
-
-// ProductCard component
-function ProductCard({ id, name, price, imageUrl, description, comparePrice, stock, featured }: {
-  id: string;
-  name: string;
-  price: number;
-  imageUrl: string;
-  description: string;
-  comparePrice: number;
-  stock: number;
-  featured: boolean;
-}) {
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const addToCart = useCartStore((state) => state.addToCart);
-
-  const handleAddToCart = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    setIsAddingToCart(true);
-    try {
-      await addToCart(id, 1, {
-        name,
-        price,
-        description,
-        image: imageUrl,
-        comparePrice,
-      });
-      toast.success('Added to cart!');
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      toast.error('Failed to add to cart');
-    } finally {
-      setIsAddingToCart(false);
-    }
-  };
-
-  return (
-    <div className="group">
-      <Link href={`/products/${id}`}>
-        <div className="aspect-square bg-gray-50 mb-4 overflow-hidden relative">
-          <img
-            src={getProductImageUrl(imageUrl) || '/placeholder-product.svg'}
-            alt={name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = '/placeholder-product.svg';
-            }}
-          />
-          {featured && (
-            <div className="absolute top-3 left-3 bg-black text-white px-2 py-1 text-xs font-medium">
-              Featured
-            </div>
-          )}
-        </div>
-      </Link>
-      <div>
-        <Link href={`/products/${id}`}>
-          <h3 className="text-sm font-medium text-black mb-1 hover:text-gray-700">
-            {name}
-          </h3>
-        </Link>
-        <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-          {description}
-        </p>
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center space-x-2">
-            <span className="text-sm font-medium text-black">
-              {price.toLocaleString('sv-SE')} kr
-            </span>
-            {comparePrice > price && (
-              <span className="text-sm text-gray-400 line-through">
-                {comparePrice.toLocaleString('sv-SE')} kr
-              </span>
-            )}
-          </div>
-          <span className="text-xs text-gray-500">
-            {stock > 0 ? 'In Stock' : 'Out of Stock'}
-          </span>
-        </div>
-        <button
-          onClick={handleAddToCart}
-          disabled={isAddingToCart || stock <= 0}
-          className="w-full bg-black text-white py-2 px-4 text-sm font-medium hover:bg-gray-800 transition-colors disabled:bg-gray-400 flex items-center justify-center gap-2"
-        >
-          {isAddingToCart ? (
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 11-4 0v-6m4 0V9a2 2 0 10-4 0v4.01" />
-            </svg>
-          )}
-          {isAddingToCart ? 'Adding...' : 'Add to Cart'}
-        </button>
-      </div>
-    </div>
-  );
-}
+import { Search, SlidersHorizontal, X, ChevronDown, Grid3X3, LayoutGrid, ShoppingBag } from 'lucide-react';
 
 const BASE_URL = API_BASE;
-
-// Helper function to get clean product URL
-const getProductUrl = (productId: string): string => {
-  return `/products/${productId}`
-}
 
 interface Product {
   id: string;
@@ -127,342 +25,491 @@ interface Product {
   tags: string[];
 }
 
-export default function ProductsPage() {
+// Premium Product Card
+function ProductCard({ product, index }: { product: Product; index: number }) {
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const addToCart = useCartStore((state) => state.addToCart);
+  const discount = product.compare_price && product.compare_price > product.price
+    ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100)
+    : 0;
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsAddingToCart(true);
+    try {
+      await addToCart(product.id, 1, {
+        name: product.name,
+        price: product.price,
+        description: product.description,
+        image: product.images?.[0] || '',
+        comparePrice: product.compare_price,
+      });
+      toast.success('Added to cart!');
+    } catch (error) {
+      toast.error('Failed to add to cart');
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
+
+  return (
+    <div
+      className={`group animate-fade-in-up`}
+      style={{ animationDelay: `${(index % 12) * 50}ms` }}
+    >
+      <Link href={`/products/${product.id}`}>
+        <div className="relative aspect-square bg-primary-50 rounded-xl overflow-hidden mb-4">
+          {/* Badges */}
+          <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
+            {product.featured && (
+              <span className="badge badge-accent">Featured</span>
+            )}
+            {discount > 0 && (
+              <span className="badge badge-primary">-{discount}%</span>
+            )}
+          </div>
+
+          {/* Stock Badge */}
+          {product.stock <= 5 && product.stock > 0 && (
+            <div className="absolute top-3 right-3 z-10">
+              <span className="badge bg-warning/10 text-warning-dark border border-warning/20">
+                Low Stock
+              </span>
+            </div>
+          )}
+
+          {/* Image */}
+          <img
+            src={getProductImageUrl(product.images?.[0]) || '/placeholder-product.svg'}
+            alt={product.name}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = '/placeholder-product.svg';
+            }}
+          />
+
+          {/* Quick Add Overlay */}
+          <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-t from-primary-950/80 to-transparent pt-12">
+            <button
+              onClick={handleAddToCart}
+              disabled={isAddingToCart || product.stock <= 0}
+              className="w-full py-3 bg-white text-primary-950 text-sm font-medium rounded-lg hover:bg-primary-50 transition-colors disabled:bg-primary-200 disabled:text-primary-400 flex items-center justify-center gap-2"
+            >
+              {isAddingToCart ? (
+                <div className="w-4 h-4 border-2 border-primary-950 border-t-transparent rounded-full animate-spin" />
+              ) : product.stock <= 0 ? (
+                'Out of Stock'
+              ) : (
+                <>
+                  <ShoppingBag className="w-4 h-4" />
+                  Quick Add
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </Link>
+
+      {/* Product Info */}
+      <Link href={`/products/${product.id}`}>
+        <p className="text-xs text-primary-400 uppercase tracking-wide mb-1">{product.category}</p>
+        <h3 className="text-sm font-medium text-primary-950 group-hover:text-accent-dark transition-colors line-clamp-2 mb-1">
+          {product.name}
+        </h3>
+        <p className="text-xs text-primary-500 line-clamp-2 mb-2">{product.description}</p>
+        <div className="flex items-center gap-2">
+          <span className="text-base font-semibold text-primary-950">
+            {product.price.toLocaleString('sv-SE')} kr
+          </span>
+          {product.compare_price > product.price && (
+            <span className="text-sm text-primary-400 line-through">
+              {product.compare_price.toLocaleString('sv-SE')} kr
+            </span>
+          )}
+        </div>
+        <p className="text-xs text-primary-400 mt-1">inkl. 25% moms</p>
+      </Link>
+    </div>
+  );
+}
+
+// Product Skeleton
+function ProductSkeleton() {
+  return (
+    <div className="animate-pulse">
+      <div className="aspect-square bg-primary-100 rounded-xl mb-4" />
+      <div className="h-3 bg-primary-100 rounded w-1/4 mb-2" />
+      <div className="h-4 bg-primary-100 rounded w-3/4 mb-2" />
+      <div className="h-3 bg-primary-100 rounded w-full mb-2" />
+      <div className="h-4 bg-primary-100 rounded w-1/3" />
+    </div>
+  );
+}
+
+// Category Filter Pills
+const categories = [
+  { value: '', label: 'All' },
+  { value: 'computers', label: 'Computers' },
+  { value: 'smartphones', label: 'Smartphones' },
+  { value: 'audio', label: 'Audio' },
+  { value: 'wearables', label: 'Wearables' },
+  { value: 'monitors', label: 'Monitors' },
+  { value: 'networking', label: 'Networking' },
+  { value: 'accessories', label: 'Accessories' },
+];
+
+const sortOptions = [
+  { value: 'newest', label: 'Newest' },
+  { value: 'price-asc', label: 'Price: Low to High' },
+  { value: 'price-desc', label: 'Price: High to Low' },
+  { value: 'name-asc', label: 'Name: A-Z' },
+];
+
+function ProductsContent() {
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [category, setCategory] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchInput, setSearchInput] = useState('');
+  const [category, setCategory] = useState(searchParams.get('category') || '');
+  const [searchInput, setSearchInput] = useState(searchParams.get('search') || '');
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
+  const [sortBy, setSortBy] = useState('newest');
+  const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'compact'>('grid');
 
-  const categories = [
-    { value: '', label: 'All Categories' },
-    { value: 'computers', label: 'Computers' },
-    { value: 'smartphones', label: 'Smartphones' },
-    { value: 'audio', label: 'Audio' },
-    { value: 'wearables', label: 'Wearables' },
-    { value: 'monitors', label: 'Monitors' },
-    { value: 'networking', label: 'Networking' },
-    { value: 'accessories', label: 'Accessories' },
-  ];
-
-  // Debounce search input
+  // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
       setSearchTerm(searchInput);
     }, 300);
-
     return () => clearTimeout(timer);
   }, [searchInput]);
 
+  // Update category from URL
+  useEffect(() => {
+    const urlCategory = searchParams.get('category');
+    if (urlCategory) setCategory(urlCategory);
+  }, [searchParams]);
+
   useEffect(() => {
     fetchProducts();
-  }, [page, category, searchTerm]);
+  }, [category, searchTerm, sortBy]);
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      let url = `${BASE_URL}/products?page=${page}&limit=12`;
+      let url = `${BASE_URL}/products?limit=24`;
 
       if (category) url += `&category=${category}`;
       if (searchTerm) url += `&search=${encodeURIComponent(searchTerm)}`;
 
       const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         mode: 'cors'
       });
 
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
-          setProducts(data.data.data);
+          let sortedProducts = [...data.data.data];
+          sortedProducts = sortProducts(sortedProducts);
+          setProducts(sortedProducts);
         }
       } else {
-        console.error('API Error:', response.status);
-        // Use mock data when API fails
-        setProducts(getFilteredMockProducts());
+        let filtered = getFilteredMockProducts();
+        filtered = sortProducts(filtered);
+        setProducts(filtered);
       }
     } catch (error) {
-      console.error('Error fetching products:', error);
-      // Use mock data when API fails
-      setProducts(getFilteredMockProducts());
+      let filtered = getFilteredMockProducts();
+      filtered = sortProducts(filtered);
+      setProducts(filtered);
     } finally {
       setLoading(false);
     }
   };
 
+  const sortProducts = (prods: Product[]) => {
+    switch (sortBy) {
+      case 'price-asc':
+        return [...prods].sort((a, b) => a.price - b.price);
+      case 'price-desc':
+        return [...prods].sort((a, b) => b.price - a.price);
+      case 'name-asc':
+        return [...prods].sort((a, b) => a.name.localeCompare(b.name));
+      default:
+        return prods;
+    }
+  };
+
   const getFilteredMockProducts = () => {
     let filtered = getMockProducts();
-
-    // Filter by category
     if (category) {
-      filtered = filtered.filter(product =>
-        product.category.toLowerCase() === category.toLowerCase()
-      );
+      filtered = filtered.filter(p => p.category.toLowerCase() === category.toLowerCase());
     }
-
-    // Filter by search term
     if (searchTerm) {
-      const searchLower = searchTerm.toLowerCase();
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(searchLower) ||
-        product.description.toLowerCase().includes(searchLower) ||
-        product.category.toLowerCase().includes(searchLower) ||
-        product.tags.some(tag => tag.toLowerCase().includes(searchLower))
+      const search = searchTerm.toLowerCase();
+      filtered = filtered.filter(p =>
+        p.name.toLowerCase().includes(search) ||
+        p.description.toLowerCase().includes(search) ||
+        p.category.toLowerCase().includes(search)
       );
     }
-
     return filtered;
   };
 
-  const getMockProducts = (): Product[] => {
-    return [
-      {
-        id: "1",
-        name: "Apple MacBook Pro 16-inch",
-        price: 2499,
-        compare_price: 2799,
-        images: ["https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&h=500&fit=crop&crop=center"],
-        description: "Apple MacBook Pro 16-inch with M3 Pro chip, 18GB RAM, 512GB SSD. Perfect for professionals and creatives.",
-        stock: 15,
-        status: "active",
-        featured: true,
-        category: "computers",
-        tags: ["apple", "macbook", "laptop", "professional"]
-      },
-      {
-        id: "2",
-        name: "AirPods Pro 2nd Generation",
-        price: 249,
-        compare_price: 279,
-        images: ["https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=500&h=500&fit=crop&crop=center"],
-        description: "Apple AirPods Pro with Active Noise Cancellation, Transparency mode, and spatial audio.",
-        stock: 50,
-        status: "active",
-        featured: true,
-        category: "audio",
-        tags: ["apple", "airpods", "wireless", "noise-cancellation"]
-      },
-      {
-        id: "3",
-        name: "Sony WH-1000XM5 Headphones",
-        price: 399,
-        compare_price: 449,
-        images: ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop&crop=center"],
-        description: "Industry-leading noise canceling headphones with exceptional sound quality and 30-hour battery life.",
-        stock: 25,
-        status: "active",
-        featured: true,
-        category: "audio",
-        tags: ["sony", "headphones", "noise-cancellation", "wireless"]
-      },
-      {
-        id: "4",
-        name: "Dell Alienware 34 Curved Monitor",
-        price: 899,
-        compare_price: 1099,
-        images: ["https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500&h=500&fit=crop&crop=center"],
-        description: "34-inch curved gaming monitor with 144Hz refresh rate, NVIDIA G-SYNC, and stunning WQHD resolution.",
-        stock: 10,
-        status: "active",
-        featured: true,
-        category: "monitors",
-        tags: ["dell", "alienware", "monitor", "gaming", "curved", "144hz"]
-      },
-      {
-        id: "5",
-        name: "Apple Watch Ultra",
-        price: 799,
-        compare_price: 849,
-        images: ["https://images.unsplash.com/photo-1551816230-ef5deaed4a26?w=500&h=500&fit=crop&crop=center"],
-        description: "The most rugged and capable Apple Watch, designed for endurance athletes and outdoor adventurers.",
-        stock: 30,
-        status: "active",
-        featured: true,
-        category: "wearables",
-        tags: ["apple", "watch", "ultra", "fitness", "rugged"]
-      },
-      {
-        id: "6",
-        name: "AI Translate Earphones Pro",
-        price: 199,
-        compare_price: 249,
-        images: ["https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500&h=500&fit=crop&crop=center"],
-        description: "Revolutionary intelligent translate earphones with real-time translation in 40+ languages.",
-        stock: 25,
-        status: "active",
-        featured: true,
-        category: "audio",
-        tags: ["translate", "earphones", "ai", "language", "travel", "wireless"]
-      },
-      {
-        id: "7",
-        name: "Dell XPS 13 Laptop",
-        price: 1299,
-        compare_price: 1499,
-        images: ["https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&h=500&fit=crop&crop=center"],
-        description: "Ultra-portable Dell XPS 13 with Intel Core i7, 16GB RAM, 512GB SSD, and stunning InfinityEdge display.",
-        stock: 20,
-        status: "active",
-        featured: false,
-        category: "computers",
-        tags: ["dell", "xps", "laptop", "ultrabook", "portable"]
-      },
-      {
-        id: "8",
-        name: "ASUS ROG Rapture GT-BE98 Gaming Router",
-        price: 8990,
-        compare_price: 9990,
-        images: ["https://images.unsplash.com/photo-1606904825846-647eb07f5be2?w=500&h=500&fit=crop&crop=center"],
-        description: "ASUS ROG Rapture GT-BE98 Quad-band Gaming Router with WiFi 7, advanced QoS, and ultra-low latency for competitive gaming.",
-        stock: 8,
-        status: "active",
-        featured: false,
-        category: "networking",
-        tags: ["asus", "rog", "router", "gaming", "wifi7", "networking"]
-      },
-      {
-        id: "9",
-        name: "iPhone 15 Pro Max",
-        price: 1199,
-        compare_price: 1299,
-        images: ["https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=500&h=500&fit=crop&crop=center"],
-        description: "The ultimate iPhone with titanium design, A17 Pro chip, and professional camera system.",
-        stock: 18,
-        status: "active",
-        featured: false,
-        category: "smartphones",
-        tags: ["apple", "iphone", "smartphone", "titanium", "a17", "pro"]
-      },
-      {
-        id: "10",
-        name: "Smart Language Translator Buds",
-        price: 149,
-        compare_price: 199,
-        images: ["https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=500&h=500&fit=crop&crop=center"],
-        description: "Next-generation wireless earbuds with built-in AI translator. Supports conversation mode, offline translation for 12 languages, and crystal-clear audio quality.",
-        stock: 40,
-        status: "active",
-        featured: true,
-        category: "audio",
-        tags: ["translator", "earbuds", "ai", "language", "wireless", "travel"]
-      },
-      {
-        id: "11",
-        name: "Dell XPS 15 Developer Edition",
-        price: 1899,
-        compare_price: 2199,
-        images: ["https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500&h=500&fit=crop&crop=center"],
-        description: "Dell XPS 15 Developer Edition with Ubuntu, Intel Core i7, 32GB RAM, 1TB SSD, NVIDIA GeForce RTX 4050. Perfect for developers and content creators.",
-        stock: 12,
-        status: "active",
-        featured: true,
-        category: "computers",
-        tags: ["dell", "xps", "laptop", "developer", "ubuntu", "nvidia"]
-      }
-    ];
+  const getMockProducts = (): Product[] => [
+    {
+      id: "1", name: "MacBook Pro 16-inch", price: 24990, compare_price: 27990,
+      images: ["https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500"],
+      description: "Apple MacBook Pro 16-inch with M3 Pro chip, 18GB RAM, 512GB SSD.",
+      stock: 15, status: "active", featured: true, category: "Computers", tags: ["apple", "macbook"]
+    },
+    {
+      id: "2", name: "AirPods Pro 2nd Generation", price: 2490, compare_price: 2790,
+      images: ["https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=500"],
+      description: "Apple AirPods Pro with Active Noise Cancellation and spatial audio.",
+      stock: 50, status: "active", featured: true, category: "Audio", tags: ["apple", "airpods"]
+    },
+    {
+      id: "3", name: "Sony WH-1000XM5 Headphones", price: 3990, compare_price: 4490,
+      images: ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500"],
+      description: "Industry-leading noise canceling headphones with 30-hour battery.",
+      stock: 25, status: "active", featured: true, category: "Audio", tags: ["sony", "headphones"]
+    },
+    {
+      id: "4", name: "Dell XPS 13 Laptop", price: 12990, compare_price: 14990,
+      images: ["https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500"],
+      description: "Ultra-portable Dell XPS 13 with Intel Core i7, 16GB RAM.",
+      stock: 20, status: "active", featured: false, category: "Computers", tags: ["dell", "laptop"]
+    },
+    {
+      id: "5", name: "Dell Alienware 34 Monitor", price: 8990, compare_price: 10990,
+      images: ["https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500"],
+      description: "34-inch curved gaming monitor with 144Hz and G-SYNC.",
+      stock: 10, status: "active", featured: true, category: "Monitors", tags: ["dell", "monitor"]
+    },
+    {
+      id: "6", name: "Apple Watch Ultra", price: 7990, compare_price: 8490,
+      images: ["https://images.unsplash.com/photo-1551816230-ef5deaed4a26?w=500"],
+      description: "The most rugged Apple Watch for outdoor adventurers.",
+      stock: 30, status: "active", featured: true, category: "Wearables", tags: ["apple", "watch"]
+    },
+    {
+      id: "7", name: "AI Translate Earphones Pro", price: 1990, compare_price: 2490,
+      images: ["https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500"],
+      description: "Real-time translation in 40+ languages.",
+      stock: 25, status: "active", featured: true, category: "Audio", tags: ["translate", "earphones"]
+    },
+    {
+      id: "8", name: "iPhone 15 Pro Max", price: 11990, compare_price: 12990,
+      images: ["https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=500"],
+      description: "Titanium design with A17 Pro chip and pro camera.",
+      stock: 18, status: "active", featured: false, category: "Smartphones", tags: ["apple", "iphone"]
+    },
+    {
+      id: "9", name: "ASUS ROG Gaming Router", price: 8990, compare_price: 9990,
+      images: ["https://images.unsplash.com/photo-1606904825846-647eb07f5be2?w=500"],
+      description: "Quad-band WiFi 7 gaming router with ultra-low latency.",
+      stock: 8, status: "active", featured: false, category: "Networking", tags: ["asus", "router"]
+    },
+    {
+      id: "10", name: "Smart Language Translator Buds", price: 1490, compare_price: 1990,
+      images: ["https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=500"],
+      description: "Wireless earbuds with AI translator for 12 languages.",
+      stock: 40, status: "active", featured: true, category: "Audio", tags: ["translator", "earbuds"]
+    },
+    {
+      id: "11", name: "Dell XPS 15 Developer Edition", price: 18990, compare_price: 21990,
+      images: ["https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500"],
+      description: "Dell XPS 15 with Ubuntu, 32GB RAM, RTX 4050.",
+      stock: 12, status: "active", featured: true, category: "Computers", tags: ["dell", "developer"]
+    },
+    {
+      id: "12", name: "Samsung Galaxy Watch 6", price: 3490, compare_price: 3990,
+      images: ["https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=500"],
+      description: "Advanced health tracking and seamless Galaxy integration.",
+      stock: 35, status: "active", featured: false, category: "Wearables", tags: ["samsung", "watch"]
+    },
+  ];
+
+  const clearFilters = () => {
+    setCategory('');
+    setSearchInput('');
+    setSearchTerm('');
+    setSortBy('newest');
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSearchTerm(searchInput);
-    setPage(1);
-  };
-
-  if (loading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(12)].map((_, i) => (
-            <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
-              <div className="h-64 bg-gray-200" />
-              <div className="p-4">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-                <div className="h-4 bg-gray-200 rounded w-1/4" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  const hasActiveFilters = category || searchTerm;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* Header */}
-      <div className="mb-12">
-        <h1 className="text-3xl font-light text-black mb-8">All Products</h1>
+    <div className="min-h-screen bg-white">
+      {/* Page Header */}
+      <div className="bg-primary-50 border-b border-primary-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+          <h1 className="font-display text-display-sm sm:text-display-md text-primary-950 mb-2">
+            {category ? categories.find(c => c.value === category)?.label || 'Products' : 'All Products'}
+          </h1>
+          <p className="text-primary-500">
+            {loading ? 'Loading...' : `${products.length} products available`}
+          </p>
+        </div>
+      </div>
 
-        {/* Search and Filters */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
-          <form onSubmit={handleSearch} className="flex-1">
-            <div className="flex">
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className="flex-1 px-4 py-2 border border-gray-300 focus:border-black focus:outline-none text-sm"
-              />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Search & Filter Bar */}
+        <div className="flex flex-col lg:flex-row gap-4 mb-8">
+          {/* Search */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-400" />
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-primary-50 border border-primary-100 rounded-xl text-sm focus:outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100 transition-all"
+            />
+            {searchInput && (
               <button
-                type="submit"
-                className="px-6 py-2 bg-black text-white text-sm font-medium hover:bg-gray-800 transition-colors"
+                onClick={() => { setSearchInput(''); setSearchTerm(''); }}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-primary-400 hover:text-primary-600"
               >
-                Search
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-3">
+            {/* Sort */}
+            <div className="relative">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="appearance-none pl-4 pr-10 py-3 bg-white border border-primary-200 rounded-xl text-sm focus:outline-none focus:border-primary-300 cursor-pointer"
+              >
+                {sortOptions.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-400 pointer-events-none" />
+            </div>
+
+            {/* Filter Toggle (Mobile) */}
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="lg:hidden flex items-center gap-2 px-4 py-3 bg-white border border-primary-200 rounded-xl text-sm font-medium"
+            >
+              <SlidersHorizontal className="w-4 h-4" />
+              Filters
+            </button>
+
+            {/* View Mode */}
+            <div className="hidden sm:flex items-center border border-primary-200 rounded-xl overflow-hidden">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-3 ${viewMode === 'grid' ? 'bg-primary-100 text-primary-950' : 'text-primary-400 hover:text-primary-600'}`}
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('compact')}
+                className={`p-3 ${viewMode === 'compact' ? 'bg-primary-100 text-primary-950' : 'text-primary-400 hover:text-primary-600'}`}
+              >
+                <Grid3X3 className="w-4 h-4" />
               </button>
             </div>
-          </form>
-
-          <select
-            value={category}
-            onChange={(e) => {
-              setCategory(e.target.value);
-              setPage(1);
-            }}
-            className="px-4 py-2 border border-gray-300 focus:border-black focus:outline-none text-sm"
-          >
-            {categories.map((cat) => (
-              <option key={cat.value} value={cat.value}>
-                {cat.label}
-              </option>
-            ))}
-          </select>
+          </div>
         </div>
-      </div>
 
-      {/* Products Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {loading ? (
-          [...Array(12)].map((_, i) => (
-            <div key={`loading-${i}`} className="group">
-              <div className="aspect-square bg-gray-100 animate-pulse mb-4"></div>
-              <div className="h-4 bg-gray-100 animate-pulse mb-2"></div>
-              <div className="h-4 bg-gray-100 animate-pulse w-1/3"></div>
+        {/* Category Pills */}
+        <div className={`flex flex-wrap gap-2 mb-8 ${showFilters ? 'block' : 'hidden lg:flex'}`}>
+          {categories.map((cat) => (
+            <button
+              key={cat.value}
+              onClick={() => setCategory(cat.value)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                category === cat.value
+                  ? 'bg-primary-950 text-white'
+                  : 'bg-primary-50 text-primary-600 hover:bg-primary-100'
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
+
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="px-4 py-2 rounded-full text-sm font-medium text-error hover:bg-error/5 transition-colors flex items-center gap-1"
+            >
+              <X className="w-3 h-3" />
+              Clear All
+            </button>
+          )}
+        </div>
+
+        {/* Products Grid */}
+        <div className={`grid gap-6 lg:gap-8 ${
+          viewMode === 'grid'
+            ? 'grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+            : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'
+        }`}>
+          {loading ? (
+            [...Array(12)].map((_, i) => <ProductSkeleton key={i} />)
+          ) : products.length > 0 ? (
+            products.map((product, index) => (
+              <ProductCard key={product.id} product={product} index={index} />
+            ))
+          ) : null}
+        </div>
+
+        {/* Empty State */}
+        {!loading && products.length === 0 && (
+          <div className="text-center py-20">
+            <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Search className="w-8 h-8 text-primary-400" />
             </div>
-          ))
-        ) : products.map((product) => (
-          <ProductCard
-            key={product.id}
-            id={product.id}
-            name={product.name}
-            price={product.price}
-            imageUrl={product.images && product.images.length > 0 ? product.images[0] : ''}
-            description={product.description}
-            comparePrice={product.compare_price}
-            stock={product.stock}
-            featured={product.featured}
-          />
-        ))}
+            <h3 className="font-display text-xl text-primary-950 mb-2">No products found</h3>
+            <p className="text-primary-500 mb-6">Try adjusting your search or filters.</p>
+            <button
+              onClick={clearFilters}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-primary-950 text-white text-sm font-medium rounded-lg hover:bg-primary-800 transition-colors"
+            >
+              Clear Filters
+            </button>
+          </div>
+        )}
       </div>
-
-      {products.length === 0 && !loading && (
-        <div className="text-center py-16">
-          <h3 className="text-lg font-medium text-black mb-2">No products found</h3>
-          <p className="text-gray-600">Try adjusting your search or filters.</p>
-        </div>
-      )}
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white">
+        <div className="bg-primary-50 border-b border-primary-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+            <div className="h-10 bg-primary-200 rounded w-48 animate-pulse" />
+            <div className="h-5 bg-primary-100 rounded w-32 mt-2 animate-pulse" />
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="aspect-square bg-primary-100 rounded-xl mb-4" />
+                <div className="h-4 bg-primary-100 rounded w-3/4 mb-2" />
+                <div className="h-4 bg-primary-100 rounded w-1/3" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    }>
+      <ProductsContent />
+    </Suspense>
   );
 }

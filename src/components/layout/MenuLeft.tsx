@@ -1,20 +1,44 @@
 'use client'
 
-import { X } from 'lucide-react'
+import { X, ChevronRight, Home, Package, Headphones, Watch, Smartphone, Monitor, Wifi, Settings, HelpCircle, Mail } from 'lucide-react'
 import Link from 'next/link'
 
 const categories = [
   {
-    name: 'Electronics',
-    subcategories: ['Laptops', 'Smartphones', 'Accessories']
+    name: 'Computers',
+    icon: Monitor,
+    href: '/products?category=computers',
+    description: 'Laptops & Desktops'
   },
   {
     name: 'Audio',
-    subcategories: ['Headphones', 'Speakers', 'Microphones']
+    icon: Headphones,
+    href: '/products?category=audio',
+    description: 'Headphones & Speakers'
   },
   {
     name: 'Wearables',
-    subcategories: ['Smartwatches', 'Fitness Trackers']
+    icon: Watch,
+    href: '/products?category=wearables',
+    description: 'Smartwatches & Trackers'
+  },
+  {
+    name: 'Smartphones',
+    icon: Smartphone,
+    href: '/products?category=smartphones',
+    description: 'Phones & Tablets'
+  },
+  {
+    name: 'Networking',
+    icon: Wifi,
+    href: '/products?category=networking',
+    description: 'Routers & Accessories'
+  },
+  {
+    name: 'Accessories',
+    icon: Settings,
+    href: '/products?category=accessories',
+    description: 'Cables, Cases & More'
   }
 ]
 
@@ -27,106 +51,121 @@ export function MenuLeft({ isOpen, onClose }: MenuLeftProps) {
   return (
     <>
       {/* Backdrop */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-50"
-          onClick={onClose}
-        />
-      )}
+      <div
+        className={`fixed inset-0 bg-primary-950/50 backdrop-blur-sm z-50 transition-opacity duration-300 ${
+          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={onClose}
+      />
 
       {/* Menu Panel */}
-      <div className={`
-        fixed top-0 left-0 h-full bg-white w-[75vw] max-w-[350px] z-50
-        transform transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-        <div className="p-4 border-b flex justify-between items-center">
-          <h2 className="text-xl font-bold">Menu</h2>
-          <button 
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full"
-          >
-            <X size={24} />
-          </button>
-        </div>
+      <div
+        className={`fixed top-0 left-0 h-full w-[85vw] max-w-[380px] bg-white z-50 transform transition-transform duration-300 ease-out shadow-soft-2xl ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 h-16 border-b border-primary-100">
+            <Link
+              href="/"
+              onClick={onClose}
+              className="font-display text-xl font-semibold text-primary-950 tracking-tight"
+            >
+              SMRTMART
+            </Link>
+            <button
+              onClick={onClose}
+              className="p-2 -mr-2 text-primary-500 hover:text-primary-950 hover:bg-primary-50 rounded-lg transition-colors"
+              aria-label="Close menu"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-        <div className="overflow-auto h-[calc(100vh-64px)]">
-          <nav className="p-4">
-            <div className="space-y-1 mb-6">
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto">
+            {/* Quick Links */}
+            <div className="p-4">
               <Link
                 href="/"
-                className="block py-3 px-4 text-gray-900 hover:bg-gray-100 rounded-md font-medium"
                 onClick={onClose}
+                className="flex items-center gap-3 px-4 py-3 text-primary-700 hover:text-primary-950 hover:bg-primary-50 rounded-xl transition-colors"
               >
-                Home
+                <Home className="w-5 h-5" />
+                <span className="font-medium">Home</span>
               </Link>
               <Link
                 href="/products"
-                className="block py-3 px-4 text-gray-900 hover:bg-gray-100 rounded-md font-medium"
                 onClick={onClose}
+                className="flex items-center gap-3 px-4 py-3 text-primary-700 hover:text-primary-950 hover:bg-primary-50 rounded-xl transition-colors"
               >
-                All Products
+                <Package className="w-5 h-5" />
+                <span className="font-medium">All Products</span>
               </Link>
             </div>
 
-            <div className="border-t pt-4">
-              <h3 className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+            {/* Categories */}
+            <div className="px-4 pb-4">
+              <h3 className="px-4 py-2 text-xs font-semibold text-primary-400 uppercase tracking-wider">
                 Shop by Category
               </h3>
-              {categories.map((category) => (
-                <div key={category.name} className="mb-4">
-                  <Link
-                    href={`/products?category=${category.name.toLowerCase()}`}
-                    className="block py-2 px-4 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md"
-                    onClick={onClose}
-                  >
-                    {category.name}
-                  </Link>
-                  <ul className="ml-4 mt-1 space-y-1">
-                    {category.subcategories.map((sub) => (
-                      <li key={sub}>
-                        <Link
-                          href={`/products?category=${category.name.toLowerCase()}`}
-                          className="block py-1.5 px-4 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-                          onClick={onClose}
-                        >
-                          {sub}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+              <div className="space-y-1">
+                {categories.map((category) => {
+                  const Icon = category.icon
+                  return (
+                    <Link
+                      key={category.name}
+                      href={category.href}
+                      onClick={onClose}
+                      className="flex items-center justify-between px-4 py-3 hover:bg-primary-50 rounded-xl transition-colors group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center group-hover:bg-primary-200 transition-colors">
+                          <Icon className="w-5 h-5 text-primary-700" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-primary-900">{category.name}</p>
+                          <p className="text-xs text-primary-500">{category.description}</p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-primary-400 group-hover:text-primary-600 transition-colors" />
+                    </Link>
+                  )
+                })}
+              </div>
             </div>
-          </nav>
 
-          <footer className="p-4 border-t mt-4">
+            {/* Promo Banner */}
+            <div className="mx-4 mb-4 p-4 bg-gradient-to-br from-accent/10 to-accent/5 rounded-xl border border-accent/20">
+              <p className="text-xs font-semibold text-accent-dark uppercase tracking-wide mb-1">Limited Offer</p>
+              <p className="text-sm text-primary-800 font-medium">Free shipping on orders over 500 kr</p>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="border-t border-primary-100 p-4">
             <div className="space-y-1">
               <Link
                 href="/about"
-                className="block py-2 px-4 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md"
                 onClick={onClose}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-primary-600 hover:text-primary-950 hover:bg-primary-50 rounded-lg transition-colors"
               >
+                <HelpCircle className="w-4 h-4" />
                 About Us
               </Link>
               <Link
                 href="/contact"
-                className="block py-2 px-4 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md"
                 onClick={onClose}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-primary-600 hover:text-primary-950 hover:bg-primary-50 rounded-lg transition-colors"
               >
+                <Mail className="w-4 h-4" />
                 Contact
               </Link>
-              <Link
-                href="/cart"
-                className="block py-2 px-4 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-                onClick={onClose}
-              >
-                Shopping Cart
-              </Link>
             </div>
-          </footer>
+          </div>
         </div>
       </div>
     </>
   )
-} 
+}

@@ -301,7 +301,7 @@ export default function Home() {
     fetchData();
   }, []);
 
-  const shouldShowLoginOverlay = !isPending && !session;
+  const shouldShowLoginOverlay = false; // Disabled - let users browse without login
   const featuredProducts = products.filter(p => p.featured).slice(0, 4);
   const allProducts = products.slice(0, 8);
 

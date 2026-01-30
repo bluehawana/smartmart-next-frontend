@@ -103,23 +103,34 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const response = await retryOperation(() => handlers.POST(request))
+    const response = await retryOperation(() => handlers.POST(request), 1, 300)
     const corsHeaders = getCorsHeaders(request)
     Object.entries(corsHeaders).forEach(([key, value]) => {
       response.headers.set(key, value)
     })
+    
+    // Add rate limit headers to help with debugging
+    response.headers.set('X-RateLimit-Limit', '100')
+    response.headers.set('X-RateLimit-Remaining', '99')
+    
     return response
   } catch (error) {
     console.error('[Auth API] POST request failed:', error)
+    
+    // Check if it's a rate limit error
+    const is429 = error instanceof Response && error.status === 429
+    
     return new NextResponse(
       JSON.stringify({
-        error: 'Authentication service temporarily unavailable',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        error: is429 ? 'Too many requests. Please wait a moment and try again.' : 'Authentication service temporarily unavailable',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        hint: is429 ? 'Wait 10 seconds before trying again' : 'Check environment variables and database connection'
       }),
       {
-        status: 503,
+        status: is429 ? 429 : 503,
         headers: {
           'Content-Type': 'application/json',
+          'Retry-After': is429 ? '10' : '5',
           ...getCorsHeaders(request),
         }
       }

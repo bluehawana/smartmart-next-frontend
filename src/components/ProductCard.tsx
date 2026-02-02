@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCartStore } from '@/lib/store/cart'
+import { getProductImageUrl } from '@/lib/utils'
 import { useState } from 'react';
 
 interface ProductCardProps {
@@ -49,8 +50,8 @@ export function ProductCard({ id, name, price, images, description, stock }: Pro
     <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-[600px]">
       <div className="relative h-80 bg-gray-50 flex-shrink-0">
         <Image
-          src={images && images.length > 0 
-            ? (images[0].startsWith('http') ? images[0] : `${process.env.NEXT_PUBLIC_IMAGE_BASE_URL}/${images[0]}`)
+          src={images && images.length > 0
+            ? getProductImageUrl(images[0])
             : '/placeholder-product.jpg'
           }
           alt={name}

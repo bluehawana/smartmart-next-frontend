@@ -6,7 +6,26 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "pages:build": "npx @cloudflare/next-on-pages",
+    "pages:dev": "npx wrangler pages dev --compatibility-date=2024-11-01 --compatibility-flag=nodejs_compat .vercel/output/static",
+    "pages:deploy": "npx wrangler pages deploy .vercel/output/static --project-name=smrtmart",
+    "d1:migrate": "npx wrangler d1 migrations apply smrtmart-auth --remote",
+    "d1:migrate:local": "npx wrangler d1 migrations apply smrtmart-auth --local",
+    "cf:deploy": "npm run pages:build && npm run pages:deploy",
+    "auth:deploy": "cd ../smrtmart-auth-worker && npm run deploy",
+    "auth:dev": "cd ../smrtmart-auth-worker && npm run dev",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:prod": "TEST_ENV=production playwright test",
+    "test:e2e:prod:headed": "TEST_ENV=production playwright test --headed",
+    "test:e2e:chromium": "playwright test --project=chromium",
+    "test:e2e:prod:chromium": "TEST_ENV=production playwright test --project=chromium"
   },
   "dependencies": {
     "@stripe/stripe-js": "^5.10.0",
@@ -20,8 +39,6 @@
     "lucide-react": "^0.294.0",
     "next": "15.1.9",
     "node-mailjet": "^6.0.11",
-    "pg": "^8.16.3",
-    "postgres": "^3.4.7",
     "react": "^18",
     "react-dom": "^18",
     "react-hot-toast": "^2.4.1",
@@ -31,12 +48,25 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^1.13.0",
+    "@cloudflare/workers-types": "^4.20240725.0",
+    "@playwright/test": "^1.58.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^24.1.0",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@vitejs/plugin-react": "^5.1.2",
+    "@vitest/coverage-v8": "^4.0.18",
     "autoprefixer": "^10.0.1",
+    "jsdom": "^27.4.0",
+    "pg": "^8.17.2",
     "postcss": "^8",
     "tailwindcss": "^3.3.0",
-    "typescript": "^5"
+    "tsx": "^4.7.0",
+    "typescript": "^5",
+    "vitest": "^4.0.18",
+    "wrangler": "^3.100.0"
   }
 }

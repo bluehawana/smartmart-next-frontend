@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCartStore } from '@/lib/store/cart'
 import { getProductImageUrl } from '@/lib/utils'
 import { useState } from 'react';
+import { toast } from 'react-hot-toast';
 
 interface ProductCardProps {
   id: string
@@ -16,11 +17,12 @@ interface ProductCardProps {
 
 export function ProductCard({ id, name, price, images, description, stock }: ProductCardProps) {
   const [isAdding, setIsAdding] = useState(false);
+  const [addedSuccess, setAddedSuccess] = useState(false);
   const addToCart = useCartStore(state => state.addToCart);
 
   const handleAddToCart = async () => {
-    if (isAdding) return;
-    
+    if (isAdding || addedSuccess) return;
+
     setIsAdding(true);
     try {
       await addToCart(id, 1, {
@@ -29,19 +31,19 @@ export function ProductCard({ id, name, price, images, description, stock }: Pro
         description,
         image: images && images.length > 0 ? images[0] : '',
       });
-      
-      // 显示成功反馈
-      const button = document.activeElement as HTMLButtonElement;
-      if (button) {
-        button.textContent = "Added!";
-        setTimeout(() => {
-          button.textContent = "Add to Cart";
-          setIsAdding(false);
-        }, 1000);
-      }
+
+      // Show success state
+      setIsAdding(false);
+      setAddedSuccess(true);
+      toast.success('Added to cart!');
+
+      // Reset button after 1.5 seconds
+      setTimeout(() => {
+        setAddedSuccess(false);
+      }, 1500);
     } catch (error) {
       console.error('Failed to add item to cart:', error);
-      alert(error instanceof Error ? error.message : 'Failed to add item to cart. Please try again.');
+      toast.error(error instanceof Error ? error.message : 'Failed to add item to cart. Please try again.');
       setIsAdding(false);
     }
   };
@@ -67,18 +69,20 @@ export function ProductCard({ id, name, price, images, description, stock }: Pro
           <p className="text-xl font-semibold text-gray-900">{price.toLocaleString('sv-SE')} kr</p>
         </div>
         {stock > 0 ? (
-          <button 
+          <button
             onClick={handleAddToCart}
-            disabled={isAdding}
+            disabled={isAdding || addedSuccess}
             className={`
               mt-6 w-full py-3 px-4 rounded-md transition-colors
-              ${isAdding 
+              ${addedSuccess
                 ? 'bg-green-500 text-white cursor-not-allowed'
-                : 'bg-black text-white hover:bg-gray-800'
+                : isAdding
+                  ? 'bg-gray-500 text-white cursor-not-allowed'
+                  : 'bg-black text-white hover:bg-gray-800'
               }
             `}
           >
-            {isAdding ? 'Adding...' : 'Add to Cart'}
+            {addedSuccess ? 'Added!' : isAdding ? 'Adding...' : 'Add to Cart'}
           </button>
         ) : (
           <button disabled className="mt-6 w-full bg-gray-300 text-gray-500 py-3 px-4 rounded-md cursor-not-allowed">

@@ -398,13 +398,15 @@ export const useCartStore = create<CartStore>()(
           }
         } catch (error) {
           console.error('Error adding to cart:', error)
+          const errorMessage = error instanceof Error
+            ? error.message
+            : 'Failed to add item to cart'
           set({
-            error:
-              error instanceof Error
-                ? error.message
-                : 'Failed to add item to cart',
+            error: errorMessage,
             isLoading: false,
           })
+          // Re-throw so the component can catch and handle the error
+          throw new Error(errorMessage)
         }
       },
 
